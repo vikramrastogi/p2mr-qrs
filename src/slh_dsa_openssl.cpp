@@ -64,6 +64,7 @@ std::string provider_name(EVP_PKEY* key) {
 }
 
 void set_empty_context(EVP_MD_CTX* ctx) {
+#if defined(OSSL_SIGNATURE_PARAM_CONTEXT_STRING)
   EVP_PKEY_CTX* pctx = EVP_MD_CTX_get_pkey_ctx(ctx);
   if (pctx == nullptr) {
     throw std::runtime_error("EVP_MD_CTX_get_pkey_ctx failed");
@@ -76,6 +77,17 @@ void set_empty_context(EVP_MD_CTX* ctx) {
   if (EVP_PKEY_CTX_set_params(pctx, params) <= 0) {
     throw std::runtime_error("setting empty SLH-DSA context string failed: " + openssl_error());
   }
+#else
+  (void)ctx;
+#endif
+}
+
+std::string slh_dsa_mode() {
+#if defined(OSSL_SIGNATURE_PARAM_CONTEXT_STRING)
+  return "EVP direct message signing/verification, no prehash digest, context-string explicitly set to empty";
+#else
+  return "EVP direct message signing/verification, no prehash digest, OpenSSL headers do not expose explicit context-string parameter";
+#endif
 }
 
 std::vector<unsigned char> raw_public_key(EVP_PKEY* key) {
@@ -173,8 +185,7 @@ SlhDsaResult run_slh_dsa_benchmarks(bool quick) {
                                std::to_string(sig.size()) + ", expected 7856");
     }
     r.signature_bytes = sig.size();
-    r.mode =
-        "EVP direct message signing/verification, no prehash digest, context-string explicitly set to empty";
+    r.mode = slh_dsa_mode();
     if (!verify_message(public_key.get(), msg, sig)) {
       throw std::runtime_error("valid SLH-DSA signature failed before timing");
     }
