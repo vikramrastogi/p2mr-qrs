@@ -1,0 +1,1 @@
+{"name":"invalid_control_block_length","mutation":"2-byte control block","expected_failure_stage":"control_block_length","reaches_slh_dsa_verifier":false}

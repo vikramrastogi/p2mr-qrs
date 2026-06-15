@@ -1,0 +1,166 @@
+#!/usr/bin/env python3
+"""Assert the reviewer-facing quick-report contract."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+
+def fail(message: str) -> None:
+    raise AssertionError(message)
+
+
+def require(value: bool, message: str) -> None:
+    if not value:
+        fail(message)
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--json", type=Path, required=True)
+    parser.add_argument("--markdown", type=Path, default=None)
+    parser.add_argument("--batch-evidence-json", type=Path, default=None)
+    args = parser.parse_args()
+
+    report = json.loads(args.json.read_text(encoding="utf-8"))
+    require(report.get("schema") == "qrs-native-bench/v0", "unexpected report schema")
+
+    schnorr = report["benchmarks"]["schnorr_bip340"]
+    require(schnorr["status"] == "available", "individual Schnorr backend must be available")
+    require(
+        schnorr["individual_valid_verify"]["status"] == "available",
+        "individual valid Schnorr timing must be available",
+    )
+    require(
+        schnorr["individual_invalid_verify"]["status"] == "available",
+        "individual invalid Schnorr timing must be available",
+    )
+
+    batch = schnorr["batch"]
+    require(batch["status"] == "unavailable", "batch status must remain explicitly unavailable")
+    require(
+        schnorr["batch_reviewed_public_api_status"] == "unavailable",
+        "reviewed public batch API status must remain unavailable",
+    )
+    require(
+        schnorr["batch_reviewed_public_api"]["status"] == "unavailable",
+        "reviewed public batch API object status must remain unavailable",
+    )
+    require(
+        batch["per_signature_verify"]["status"] == "unavailable",
+        "batch per-signature timing must not be synthesized",
+    )
+    require("verify_batch" in batch["reason"], "batch reason must mention verify_batch limitation")
+    require("No fake batch baseline" in batch["reason"], "batch reason must forbid fake baseline")
+    require(
+        schnorr["batch_experimental_valid"]["status"] == "available",
+        "experimental valid batch baseline must be available",
+    )
+    require(
+        schnorr["batch_experimental"]["status"] == "available",
+        "experimental batch status object must be available",
+    )
+    require(
+        schnorr["batch_experimental_invalid"]["status"] == "available",
+        "experimental invalid batch baseline must be available",
+    )
+    require(
+        "not a reviewed public libsecp256k1 API" in schnorr["batch_experimental_valid"]["label"],
+        "experimental batch label must say it is not a reviewed public API",
+    )
+    require(
+        "coefficient derivation" in schnorr["batch_experimental_valid"]["timing_scope"],
+        "experimental batch timing scope must document coefficient derivation",
+    )
+    require(
+        len(schnorr["batch_experimental_valid"]["batch_sizes"]) >= 5,
+        "experimental batch baseline must report all requested batch sizes",
+    )
+
+    block = report["block_model"]
+    require(
+        block["schnorr_individual_saturated_block"]["status"] == "available",
+        "individual Schnorr block model must be available",
+    )
+    require(
+        block["schnorr_batch_saturated_block"]["status"] == "unavailable",
+        "batch Schnorr block model must remain unavailable",
+    )
+    require(
+        block["schnorr_experimental_batch_saturated_block"]["status"] == "available",
+        "experimental batch Schnorr block model must be available",
+    )
+
+    slh = report["benchmarks"]["slh_dsa_sha2_128s"]
+    if slh["status"] == "available":
+        require(slh["public_key_bytes"] == 32, "SLH-DSA public key must be 32 bytes")
+        require(slh["signature_bytes"] == 7856, "SLH-DSA signature must be 7856 bytes")
+        require(slh["valid_verify"]["status"] == "available", "valid SLH timing missing")
+        require(
+            slh["invalid_fixed_length_verify"]["status"] == "available",
+            "invalid fixed-length SLH timing missing",
+        )
+
+    qrs_path = report["benchmarks"]["qrs_validation_path"]
+    require(qrs_path["total_valid"]["status"] == "available", "QRS path total valid timing missing")
+    require(
+        qrs_path["invalid_structural"]["status"] == "available",
+        "QRS path invalid structural timing missing",
+    )
+    require(
+        qrs_path["invalid_fixed_length"]["status"] == "available",
+        "QRS path invalid fixed-length timing missing",
+    )
+    require(
+        "not Bitcoin Core consensus integration" in qrs_path["scope"],
+        "QRS path scope must avoid claiming Bitcoin Core integration",
+    )
+
+    if args.markdown:
+        md = args.markdown.read_text(encoding="utf-8")
+        require("batch Schnorr" in md, "Markdown must mention batch Schnorr")
+        require("reviewed public batch" in md, "Markdown must mention reviewed public batch")
+        require("No fake batch baseline" in md, "Markdown must include the no-fake baseline reason")
+        require(
+            "experimental native BIP-340 batch baseline" in md,
+            "Markdown must identify the experimental native BIP-340 batch baseline",
+        )
+        require(
+            "not a reviewed public libsecp256k1 API" in md,
+            "Markdown must distinguish experimental batch from reviewed public API",
+        )
+        require(
+            "QRS vs experimental batch Schnorr" in md,
+            "Markdown must include QRS vs experimental batch Schnorr section",
+        )
+        require(
+            "median of per-batch means" in md,
+            "Markdown must define timing-statistic samples",
+        )
+        require("QRS Validation Path Model" in md, "Markdown must include QRS path model")
+
+    if args.batch_evidence_json:
+        evidence = json.loads(args.batch_evidence_json.read_text(encoding="utf-8"))
+        require(evidence["status"] == "unavailable", "batch evidence status must be unavailable")
+        require(
+            evidence["bundled_commit_expected"] == schnorr["libsecp256k1_commit"],
+            "batch evidence commit must match report commit",
+        )
+        require(
+            evidence["public_batch_api_detected"] is False,
+            "batch evidence must not detect a public batch API",
+        )
+
+    print("quick report assertions passed")
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except AssertionError as exc:
+        print(f"assert_quick_report.py: {exc}", file=sys.stderr)
+        sys.exit(1)

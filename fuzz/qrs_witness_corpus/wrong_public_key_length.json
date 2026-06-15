@@ -1,0 +1,1 @@
+{"name":"wrong_public_key_length","mutation":"31-byte public key","expected_failure_stage":"public_key_length","reaches_slh_dsa_verifier":false}

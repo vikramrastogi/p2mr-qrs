@@ -1,0 +1,18 @@
+{
+  "schema": "qrs-negative-cases/v0",
+  "cases": [
+    {"name": "empty_witness", "mutation": "empty witness stack", "expected_failure_stage": "malformed_witness", "reaches_slh_dsa_verifier": false},
+    {"name": "too_many_witness_elements", "mutation": "extra element after annex removal", "expected_failure_stage": "malformed_witness", "reaches_slh_dsa_verifier": false},
+    {"name": "too_few_witness_elements", "mutation": "missing control block", "expected_failure_stage": "malformed_witness", "reaches_slh_dsa_verifier": false},
+    {"name": "wrong_signature_length", "mutation": "7857-byte signature", "expected_failure_stage": "signature_length", "reaches_slh_dsa_verifier": false},
+    {"name": "wrong_public_key_length", "mutation": "31-byte public key", "expected_failure_stage": "public_key_length", "reaches_slh_dsa_verifier": false},
+    {"name": "malformed_compact_size", "mutation": "non-minimal CompactSize in modeled leaf payload", "expected_failure_stage": "malformed_compact_size", "reaches_slh_dsa_verifier": false},
+    {"name": "invalid_control_block_length", "mutation": "2-byte control block", "expected_failure_stage": "control_block_length", "reaches_slh_dsa_verifier": false},
+    {"name": "low_bit_unset", "mutation": "control byte low bit unset", "expected_failure_stage": "control_low_bit", "reaches_slh_dsa_verifier": false},
+    {"name": "wrong_leaf_version", "mutation": "control byte leaf version mismatch", "expected_failure_stage": "leaf_version", "reaches_slh_dsa_verifier": false},
+    {"name": "merkle_path_mismatch", "mutation": "sibling path recomputes wrong root", "expected_failure_stage": "merkle_root_mismatch", "reaches_slh_dsa_verifier": false},
+    {"name": "annex_ambiguity", "mutation": "annex marker in wrong stack position", "expected_failure_stage": "malformed_witness", "reaches_slh_dsa_verifier": false},
+    {"name": "max_depth_path", "mutation": "128 sibling hashes", "expected_failure_stage": "none", "reaches_slh_dsa_verifier": true},
+    {"name": "invalid_fixed_length_signature_reaches_verifier", "mutation": "one byte flipped in 7856-byte signature", "expected_failure_stage": "slh_dsa_verify", "reaches_slh_dsa_verifier": true}
+  ]
+}

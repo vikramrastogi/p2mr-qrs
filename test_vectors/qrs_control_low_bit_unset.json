@@ -1,0 +1,17 @@
+{
+  "name": "qrs_control_low_bit_unset",
+  "version": "0.9.0-provisional",
+  "provisional_leaf_version": "c2",
+  "finalization_blocker": "BIP-360 final hashing and sighash definitions are not final.",
+  "transaction": {"version": 2, "lock_time": 0, "inputs": [{"prevout": "00:6", "sequence": 4294967295}], "outputs": [{"value_sat": 1000, "script_pubkey": "51201212121212121212121212121212121212121212121212121212121212121212"}]},
+  "spent_output_scriptPubKey": "51201212121212121212121212121212121212121212121212121212121212121212",
+  "witness_stack": ["qrs_signature", "qrs_public_key", "control_block"],
+  "qrs_public_key": {"encoding": "repeat_byte", "byte": "08", "bytes": 32},
+  "qrs_signature": {"encoding": "repeat_byte", "byte": "11", "bytes": 7856},
+  "control_block": {"hex": "c2", "depth": 0},
+  "expected_leaf_hash": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+  "expected_qrs_msg": "dcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdc",
+  "expected_result": false,
+  "failure_stage": "control_low_bit",
+  "reaches_slh_dsa_verifier": false
+}

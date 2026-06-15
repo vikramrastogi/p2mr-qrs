@@ -1,0 +1,1 @@
+{"name":"too_many_witness_elements","mutation":"extra element after annex removal","expected_failure_stage":"malformed_witness","reaches_slh_dsa_verifier":false}

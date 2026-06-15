@@ -1,0 +1,10 @@
+.DS_Store
+__MACOSX/
+._*
+
+build/
+build-direct/
+__pycache__/
+*.pyc
+*.o
+qrs_native_bench

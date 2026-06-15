@@ -1,0 +1,1 @@
+{"name":"low_bit_unset","mutation":"control byte low bit unset","expected_failure_stage":"control_low_bit","reaches_slh_dsa_verifier":false}

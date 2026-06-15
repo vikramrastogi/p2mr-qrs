@@ -1,0 +1,47 @@
+{
+  "bundled_commit_actual": "aea86bc3509f3ceb5c047fe6567bf8910f72a728",
+  "bundled_commit_expected": "aea86bc3509f3ceb5c047fe6567bf8910f72a728",
+  "policy": "No batch Schnorr timing is synthesized from assumed speedups.",
+  "public_batch_api_detected": false,
+  "public_batch_mentions": [],
+  "public_schnorr_api_names": [
+    "secp256k1_schnorrsig_extraparams",
+    "secp256k1_schnorrsig_sign",
+    "secp256k1_schnorrsig_sign32",
+    "secp256k1_schnorrsig_sign_custom",
+    "secp256k1_schnorrsig_verify"
+  ],
+  "public_schnorr_header": "third_party/secp256k1/include/secp256k1_schnorrsig.h",
+  "reason": "Bundled upstream bitcoin-core/secp256k1 commit aea86bc3509f3ceb5c047fe6567bf8910f72a728 exposes no public BIP-340 batch verification API; local schnorrsig tests still mark verify_batch as TODO; and the upstream head search found no batch/Schnorr/BIP-340 branch to wire as a reviewed experimental baseline.",
+  "schema": "qrs-native-bench/batch-baseline-evidence/v0",
+  "status": "unavailable",
+  "upstream_head_search": {
+    "matching_heads": [],
+    "patterns": [
+      "*batch*",
+      "*schnorr*",
+      "*bip340*"
+    ],
+    "status": "ok",
+    "stderr": "",
+    "timeout_seconds": 15.0,
+    "url": "https://github.com/bitcoin-core/secp256k1.git"
+  },
+  "verify_batch_todo_mentions": [
+    {
+      "line": 200,
+      "path": "third_party/secp256k1/src/modules/schnorrsig/tests_impl.h",
+      "text": "* Checks that both verify and verify_batch (TODO) return the same value as expected. */"
+    },
+    {
+      "line": 880,
+      "path": "third_party/secp256k1/src/modules/schnorrsig/tests_impl.h",
+      "text": "* verify_batch (TODO). Then flips some bits and checks that verification now"
+    },
+    {
+      "line": 903,
+      "path": "third_party/secp256k1/src/modules/schnorrsig/tests_impl.h",
+      "text": "* verify and verify_batch (TODO) fail */"
+    }
+  ]
+}

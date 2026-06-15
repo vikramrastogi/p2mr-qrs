@@ -1,0 +1,77 @@
+name: QRS native benchmark smoke
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  quick-smoke:
+    name: quick smoke (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build jq libssl-dev
+
+      - name: Install macOS dependencies
+        if: runner.os == 'macOS'
+        run: |
+          brew install cmake ninja jq openssl@3
+
+      - name: Configure
+        shell: bash
+        run: |
+          if [[ "$RUNNER_OS" == "macOS" ]]; then
+            cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR="$(brew --prefix openssl@3)"
+          else
+            cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          fi
+
+      - name: Build
+        run: cmake --build build -j
+
+      - name: Check batch Schnorr evidence
+        run: |
+          python3 scripts/check_batch_schnorr_baseline.py \
+            --json out/batch-evidence.json \
+            --markdown out/batch-evidence.md \
+            --upstream-timeout-seconds 15
+
+      - name: Run quick benchmark
+        run: ./build/qrs_native_bench --quick --json out/quick.json --markdown out/quick.md
+
+      - name: Assert report contract
+        run: |
+          python3 scripts/assert_quick_report.py \
+            --json out/quick.json \
+            --markdown out/quick.md \
+            --batch-evidence-json out/batch-evidence.json
+          jq '.benchmarks.schnorr_bip340.batch.status' out/quick.json
+          jq '.benchmarks.schnorr_bip340.batch_experimental_valid.status' out/quick.json
+          jq '.benchmarks.schnorr_bip340.batch_reviewed_public_api_status' out/quick.json
+          grep -n "experimental native BIP-340 batch baseline" out/quick.md
+          grep -n "not a reviewed public libsecp256k1 API" out/quick.md
+          grep -n "QRS vs experimental batch Schnorr" out/quick.md
+          grep -n "reviewed public batch" out/quick.md
+
+      - name: Upload benchmark reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: qrs-native-bench-${{ matrix.os }}
+          path: |
+            out/quick.json
+            out/quick.md
+            out/batch-evidence.json
+            out/batch-evidence.md

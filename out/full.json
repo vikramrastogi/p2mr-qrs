@@ -1,0 +1,534 @@
+{
+  "schema": "qrs-native-bench/v0",
+  "mode": "full",
+  "environment": {
+    "benchmark_commit": "record with git rev-parse HEAD in published runs",
+    "build_type": "Release/NDEBUG",
+    "compiler": "clang 17.0.0 (clang-1700.6.4.2)",
+    "compiler_flags": "CMake target: -O3 -Wall -Wextra -Wpedantic",
+    "cpu_features": "hw.optional.arm.FEAT_AES=1, hw.optional.arm.FEAT_PMULL=1, hw.optional.arm.FEAT_SHA1=1, hw.optional.arm.FEAT_SHA256=1, hw.optional.arm.FEAT_SHA3=1, hw.optional.arm.FEAT_SHA512=1, hw.optional.arm.FEAT_LSE=1, hw.optional.arm.FEAT_FP16=1",
+    "cpu_frequency": "unavailable",
+    "cpu_model": "Apple M2 Pro",
+    "frequency_scaling": "not controlled by harness; reviewer must record governor/power mode",
+    "os": "Darwin 25.3.0 arm64"
+  },
+  "benchmarks": {
+    "slh_dsa_sha2_128s": {
+      "status": "available",
+      "reason": "",
+      "openssl_version": "OpenSSL 3.6.1 27 Jan 2026",
+      "provider": "default",
+      "algorithm": "SLH-DSA-SHA2-128s",
+      "mode": "EVP direct message signing/verification, no prehash digest, context-string explicitly set to empty",
+      "public_key_bytes": 32,
+      "signature_bytes": 7856,
+      "valid_verify": {
+        "status": "available",
+        "samples": 31,
+        "iterations_per_sample": 100,
+        "mean_ns": 178496.801,
+        "stddev_ns": 1659.815,
+        "median_ns": 178257.920,
+        "p95_ns": 181601.665,
+        "p99_ns": 182584.037,
+        "max_ns": 182689.160,
+        "ops_per_sec": 5602.341
+      },
+      "invalid_fixed_length_verify": {
+        "status": "available",
+        "samples": 31,
+        "iterations_per_sample": 100,
+        "mean_ns": 185815.821,
+        "stddev_ns": 2222.900,
+        "median_ns": 185582.920,
+        "p95_ns": 189320.000,
+        "p99_ns": 191321.044,
+        "max_ns": 192152.920,
+        "ops_per_sec": 5381.673
+      }
+    },
+    "schnorr_bip340": {
+      "status": "available",
+      "reason": "",
+      "libsecp256k1_commit": "aea86bc3509f3ceb5c047fe6567bf8910f72a728",
+      "compile_flags": "bundled libsecp256k1 CMake target, schnorrsig/extrakeys enabled, tests/benchmarks disabled",
+      "individual_valid_verify": {
+        "status": "available",
+        "samples": 51,
+        "iterations_per_sample": 20000,
+        "mean_ns": 20700.888,
+        "stddev_ns": 564.113,
+        "median_ns": 20508.706,
+        "p95_ns": 22090.888,
+        "p99_ns": 22833.556,
+        "max_ns": 23140.944,
+        "ops_per_sec": 48307.107
+      },
+      "individual_invalid_verify": {
+        "status": "available",
+        "samples": 51,
+        "iterations_per_sample": 20000,
+        "mean_ns": 20657.926,
+        "stddev_ns": 288.121,
+        "median_ns": 20576.767,
+        "p95_ns": 21398.389,
+        "p99_ns": 21734.239,
+        "max_ns": 21744.737,
+        "ops_per_sec": 48407.570
+      },
+      "batch_reviewed_public_api_status": "unavailable",
+      "batch_reviewed_public_api_reason": "Bundled upstream bitcoin-core/secp256k1 commit aea86bc3509f3ceb5c047fe6567bf8910f72a728 exposes only the public secp256k1_schnorrsig_verify API for BIP-340; its schnorrsig tests still mark verify_batch as TODO, and git ls-remote found no upstream heads matching batch/schnorr/bip340 for a reviewed experimental baseline. No fake batch baseline is synthesized.",
+      "batch_reviewed_public_api": {
+        "status": "unavailable",
+        "reason": "Bundled upstream bitcoin-core/secp256k1 commit aea86bc3509f3ceb5c047fe6567bf8910f72a728 exposes only the public secp256k1_schnorrsig_verify API for BIP-340; its schnorrsig tests still mark verify_batch as TODO, and git ls-remote found no upstream heads matching batch/schnorr/bip340 for a reviewed experimental baseline. No fake batch baseline is synthesized."
+      },
+      "batch": {
+        "status": "unavailable",
+        "reason": "Bundled upstream bitcoin-core/secp256k1 commit aea86bc3509f3ceb5c047fe6567bf8910f72a728 exposes only the public secp256k1_schnorrsig_verify API for BIP-340; its schnorrsig tests still mark verify_batch as TODO, and git ls-remote found no upstream heads matching batch/schnorr/bip340 for a reviewed experimental baseline. No fake batch baseline is synthesized.",
+        "per_signature_verify": {
+          "status": "unavailable",
+          "samples": null,
+          "median_ns": null,
+          "p95_ns": null,
+          "p99_ns": null,
+          "max_ns": null
+        }
+      }
+,
+      "batch_experimental": {
+        "status": "available",
+        "reason": "",
+        "label": "Experimental native BIP-340 batch baseline; not a reviewed public libsecp256k1 API."
+      },
+      "batch_experimental_valid": {
+        "status": "available",
+        "reason": "",
+        "label": "Experimental native BIP-340 batch baseline; not a reviewed public libsecp256k1 API.",
+        "coefficient_policy": "Deterministic nonzero coefficients derived from a domain-separated hash of all batch inputs; a_0 = 1.",
+        "timing_scope": "Timed verification includes signature/public-key parsing, BIP-340 challenge computation, coefficient derivation, and the multiscalar batch equation check.",
+        "primary_per_signature_verify": {
+          "status": "available",
+          "samples": 21,
+          "iterations_per_sample": 2,
+          "mean_ns": 13674.160,
+          "stddev_ns": 160.213,
+          "median_ns": 13643.866,
+          "p95_ns": 13838.895,
+          "p99_ns": 14187.578,
+          "max_ns": 14274.748,
+          "ops_per_sec": 73130.634
+        },
+        "batch_sizes": [
+          {
+            "batch_size": 64,
+            "total_verify": {
+              "status": "available",
+              "samples": 21,
+              "iterations_per_sample": 12,
+              "mean_ns": 1378167.329,
+              "stddev_ns": 16866.816,
+              "median_ns": 1377691.000,
+              "p95_ns": 1401052.083,
+              "p99_ns": 1402218.750,
+              "max_ns": 1402510.417,
+              "ops_per_sec": 725.601
+            },
+            "per_signature_verify": {
+              "status": "available",
+              "samples": 21,
+              "iterations_per_sample": 12,
+              "mean_ns": 21533.865,
+              "stddev_ns": 263.544,
+              "median_ns": 21526.422,
+              "p95_ns": 21891.439,
+              "p99_ns": 21909.668,
+              "max_ns": 21914.225,
+              "ops_per_sec": 46438.483
+            }
+          },
+          {
+            "batch_size": 128,
+            "total_verify": {
+              "status": "available",
+              "samples": 21,
+              "iterations_per_sample": 12,
+              "mean_ns": 2558394.512,
+              "stddev_ns": 36295.318,
+              "median_ns": 2546038.250,
+              "p95_ns": 2609812.500,
+              "p99_ns": 2636993.100,
+              "max_ns": 2643788.250,
+              "ops_per_sec": 390.870
+            },
+            "per_signature_verify": {
+              "status": "available",
+              "samples": 21,
+              "iterations_per_sample": 12,
+              "mean_ns": 19987.457,
+              "stddev_ns": 283.557,
+              "median_ns": 19890.924,
+              "p95_ns": 20389.160,
+              "p99_ns": 20601.509,
+              "max_ns": 20654.596,
+              "ops_per_sec": 50031.377
+            }
+          },
+          {
+            "batch_size": 512,
+            "total_verify": {
+              "status": "available",
+              "samples": 21,
+              "iterations_per_sample": 12,
+              "mean_ns": 8837556.373,
+              "stddev_ns": 69952.670,
+              "median_ns": 8845663.250,
+              "p95_ns": 8933399.333,
+              "p99_ns": 8942602.067,
+              "max_ns": 8944902.750,
+              "ops_per_sec": 113.153
+            },
+            "per_signature_verify": {
+              "status": "available",
+              "samples": 21,
+              "iterations_per_sample": 12,
+              "mean_ns": 17260.852,
+              "stddev_ns": 136.626,
+              "median_ns": 17276.686,
+              "p95_ns": 17448.046,
+              "p99_ns": 17466.020,
+              "max_ns": 17470.513,
+              "ops_per_sec": 57934.567
+            }
+          },
+          {
+            "batch_size": 2048,
+            "total_verify": {
+              "status": "available",
+              "samples": 21,
+              "iterations_per_sample": 5,
+              "mean_ns": 31774921.029,
+              "stddev_ns": 1160476.322,
+              "median_ns": 31546658.400,
+              "p95_ns": 31980566.800,
+              "p99_ns": 35930859.920,
+              "max_ns": 36918433.200,
+              "ops_per_sec": 31.471
+            },
+            "per_signature_verify": {
+              "status": "available",
+              "samples": 21,
+              "iterations_per_sample": 5,
+              "mean_ns": 15515.098,
+              "stddev_ns": 566.639,
+              "median_ns": 15403.642,
+              "p95_ns": 15615.511,
+              "p99_ns": 17544.365,
+              "max_ns": 18026.579,
+              "ops_per_sec": 64453.347
+            }
+          },
+          {
+            "batch_size": 17391,
+            "total_verify": {
+              "status": "available",
+              "samples": 21,
+              "iterations_per_sample": 2,
+              "mean_ns": 237807319.429,
+              "stddev_ns": 2786267.418,
+              "median_ns": 237280479.500,
+              "p95_ns": 240672229.000,
+              "p99_ns": 246736162.600,
+              "max_ns": 248252146.000,
+              "ops_per_sec": 4.205
+            },
+            "per_signature_verify": {
+              "status": "available",
+              "samples": 21,
+              "iterations_per_sample": 2,
+              "mean_ns": 13674.160,
+              "stddev_ns": 160.213,
+              "median_ns": 13643.866,
+              "p95_ns": 13838.895,
+              "p99_ns": 14187.578,
+              "max_ns": 14274.748,
+              "ops_per_sec": 73130.634
+            }
+          }
+        ]
+      },
+      "batch_experimental_invalid": {
+        "status": "available",
+        "reason": "",
+        "label": "Experimental native BIP-340 batch baseline; not a reviewed public libsecp256k1 API.",
+        "invalid_batch_policy": "Invalid batch rejects as a batch; no fallback to individual verification is timed.",
+        "timing_scope": "Timed verification includes signature/public-key parsing, BIP-340 challenge computation, coefficient derivation, and the multiscalar batch equation check.",
+        "batch_sizes": [
+          {
+            "batch_size": 64,
+            "total_verify": {
+              "status": "available",
+              "samples": 21,
+              "iterations_per_sample": 12,
+              "mean_ns": 1353556.718,
+              "stddev_ns": 18606.322,
+              "median_ns": 1350413.250,
+              "p95_ns": 1387461.833,
+              "p99_ns": 1401334.033,
+              "max_ns": 1404802.083,
+              "ops_per_sec": 738.794
+            },
+            "per_signature_verify": {
+              "status": "available",
+              "samples": 21,
+              "iterations_per_sample": 12,
+              "mean_ns": 21149.324,
+              "stddev_ns": 290.724,
+              "median_ns": 21100.207,
+              "p95_ns": 21679.091,
+              "p99_ns": 21895.844,
+              "max_ns": 21950.033,
+              "ops_per_sec": 47282.836
+            }
+          },
+          {
+            "batch_size": 128,
+            "total_verify": {
+              "status": "available",
+              "samples": 21,
+              "iterations_per_sample": 12,
+              "mean_ns": 2534120.877,
+              "stddev_ns": 29114.540,
+              "median_ns": 2527555.583,
+              "p95_ns": 2572583.333,
+              "p99_ns": 2588505.533,
+              "max_ns": 2592486.083,
+              "ops_per_sec": 394.614
+            },
+            "per_signature_verify": {
+              "status": "available",
+              "samples": 21,
+              "iterations_per_sample": 12,
+              "mean_ns": 19797.819,
+              "stddev_ns": 227.457,
+              "median_ns": 19746.528,
+              "p95_ns": 20098.307,
+              "p99_ns": 20222.699,
+              "max_ns": 20253.798,
+              "ops_per_sec": 50510.613
+            }
+          },
+          {
+            "batch_size": 512,
+            "total_verify": {
+              "status": "available",
+              "samples": 21,
+              "iterations_per_sample": 12,
+              "mean_ns": 9013462.968,
+              "stddev_ns": 662025.466,
+              "median_ns": 8838812.500,
+              "p95_ns": 10271371.500,
+              "p99_ns": 11340077.100,
+              "max_ns": 11607253.500,
+              "ops_per_sec": 110.945
+            },
+            "per_signature_verify": {
+              "status": "available",
+              "samples": 21,
+              "iterations_per_sample": 12,
+              "mean_ns": 17604.420,
+              "stddev_ns": 1293.018,
+              "median_ns": 17263.306,
+              "p95_ns": 20061.272,
+              "p99_ns": 22148.588,
+              "max_ns": 22670.417,
+              "ops_per_sec": 56803.917
+            }
+          },
+          {
+            "batch_size": 2048,
+            "total_verify": {
+              "status": "available",
+              "samples": 21,
+              "iterations_per_sample": 5,
+              "mean_ns": 31405978.952,
+              "stddev_ns": 463377.709,
+              "median_ns": 31314725.000,
+              "p95_ns": 31660066.600,
+              "p99_ns": 33009766.600,
+              "max_ns": 33347191.600,
+              "ops_per_sec": 31.841
+            },
+            "per_signature_verify": {
+              "status": "available",
+              "samples": 21,
+              "iterations_per_sample": 5,
+              "mean_ns": 15334.951,
+              "stddev_ns": 226.259,
+              "median_ns": 15290.393,
+              "p95_ns": 15459.017,
+              "p99_ns": 16118.050,
+              "max_ns": 16282.808,
+              "ops_per_sec": 65210.513
+            }
+          },
+          {
+            "batch_size": 17391,
+            "total_verify": {
+              "status": "available",
+              "samples": 21,
+              "iterations_per_sample": 2,
+              "mean_ns": 237764991.976,
+              "stddev_ns": 2119443.372,
+              "median_ns": 236972583.000,
+              "p95_ns": 240604021.000,
+              "p99_ns": 244468370.600,
+              "max_ns": 245434458.000,
+              "ops_per_sec": 4.206
+            },
+            "per_signature_verify": {
+              "status": "available",
+              "samples": 21,
+              "iterations_per_sample": 2,
+              "mean_ns": 13671.726,
+              "stddev_ns": 121.870,
+              "median_ns": 13626.162,
+              "p95_ns": 13834.973,
+              "p99_ns": 14057.177,
+              "max_ns": 14112.728,
+              "ops_per_sec": 73143.653
+            }
+          }
+        ]
+      }
+    },
+    "qrs_validation_path": {
+      "status": "available",
+      "reason": "",
+      "scope": "Modeled validation path only; not Bitcoin Core consensus integration.",
+      "qrs_msg_scope": "Modeled qrs_msg construction over deterministic fixture fields; final BIP-360 sighash integration remains a blocker.",
+      "structural_checks": {
+        "status": "available",
+        "samples": 31,
+        "iterations_per_sample": 20000,
+        "mean_ns": 371.743,
+        "stddev_ns": 11.372,
+        "median_ns": 370.452,
+        "p95_ns": 383.850,
+        "p99_ns": 412.810,
+        "max_ns": 423.508,
+        "ops_per_sec": 2690031.318
+      },
+      "qrs_msg_construction": {
+        "status": "available",
+        "samples": 31,
+        "iterations_per_sample": 20000,
+        "mean_ns": 761.925,
+        "stddev_ns": 58.234,
+        "median_ns": 746.217,
+        "p95_ns": 872.605,
+        "p99_ns": 982.309,
+        "max_ns": 1003.952,
+        "ops_per_sec": 1312465.818
+      },
+      "verifier_valid": {
+        "status": "available",
+        "samples": 31,
+        "iterations_per_sample": 100,
+        "mean_ns": 183072.905,
+        "stddev_ns": 1454.214,
+        "median_ns": 183040.420,
+        "p95_ns": 185108.745,
+        "p99_ns": 185734.329,
+        "max_ns": 185969.580,
+        "ops_per_sec": 5462.305
+      },
+      "total_valid": {
+        "status": "available",
+        "samples": 31,
+        "iterations_per_sample": 100,
+        "mean_ns": 184967.567,
+        "stddev_ns": 1805.738,
+        "median_ns": 184461.670,
+        "p95_ns": 187558.545,
+        "p99_ns": 188443.706,
+        "max_ns": 188779.580,
+        "ops_per_sec": 5406.353
+      },
+      "invalid_structural": {
+        "status": "available",
+        "samples": 31,
+        "iterations_per_sample": 20000,
+        "mean_ns": 2.728,
+        "stddev_ns": 0.035,
+        "median_ns": 2.721,
+        "p95_ns": 2.730,
+        "p99_ns": 2.863,
+        "max_ns": 2.919,
+        "ops_per_sec": 366610315.113
+      },
+      "invalid_fixed_length": {
+        "status": "available",
+        "samples": 31,
+        "iterations_per_sample": 100,
+        "mean_ns": 180544.073,
+        "stddev_ns": 2278.325,
+        "median_ns": 180726.250,
+        "p95_ns": 184076.670,
+        "p99_ns": 185692.044,
+        "max_ns": 186202.920,
+        "ops_per_sec": 5538.814
+      }
+    }
+  },
+  "block_model": {
+    "assumption": "simplified per-input saturation approximation; real blocks include transaction overhead and outputs",
+    "block_weight_wu": 4000000,
+    "p2tr_keypath_input_wu": 230,
+    "p2mr_qrs_depth0_input_wu": 8059,
+    "qrs_saturated_block_valid": {
+      "status": "available",
+      "input_weight_wu": 8059,
+      "max_inputs": 496,
+      "median_ms": 88.416,
+      "p95_ms": 90.074,
+      "p99_ms": 90.562,
+      "max_ms": 90.614
+    },
+    "qrs_saturated_block_invalid_fixed_length": {
+      "status": "available",
+      "input_weight_wu": 8059,
+      "max_inputs": 496,
+      "median_ms": 92.049,
+      "p95_ms": 93.903,
+      "p99_ms": 94.895,
+      "max_ms": 95.308
+    },
+    "schnorr_individual_saturated_block": {
+      "status": "available",
+      "input_weight_wu": 230,
+      "max_inputs": 17391,
+      "median_ms": 356.667,
+      "p95_ms": 384.183,
+      "p99_ms": 397.098,
+      "max_ms": 402.444
+    },
+    "schnorr_experimental_batch_saturated_block": {
+      "status": "available",
+      "input_weight_wu": 230,
+      "max_inputs": 17391,
+      "median_ms": 237.280,
+      "p95_ms": 240.672,
+      "p99_ms": 246.736,
+      "max_ms": 248.252
+    },
+    "schnorr_batch_saturated_block": {
+      "status": "unavailable",
+      "input_weight_wu": 230,
+      "max_inputs": 17391,
+      "median_ms": null,
+      "p95_ms": null,
+      "p99_ms": null,
+      "max_ms": null
+    }
+  }
+}
