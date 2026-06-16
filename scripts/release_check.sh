@@ -87,7 +87,8 @@ python3 "$ROOT/scripts/evaluate_resource_accounting.py" \
   --report-json "$QUICK_JSON" \
   --batch-evidence-json "$BATCH_EVIDENCE" \
   --json "$RESOURCE_DECISION_JSON" \
-  --markdown "$RESOURCE_DECISION_MD"
+  --markdown "$RESOURCE_DECISION_MD" \
+  --advisory
 
 jq '.benchmarks.slh_dsa_sha2_128s.valid_verify.status' "$QUICK_JSON"
 jq '.benchmarks.schnorr_bip340.individual_valid_verify.status' "$QUICK_JSON"

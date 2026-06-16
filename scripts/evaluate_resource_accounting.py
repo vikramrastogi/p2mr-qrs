@@ -239,6 +239,11 @@ def main() -> int:
     parser.add_argument("--json", type=Path, default=None)
     parser.add_argument("--markdown", type=Path, default=None)
     parser.add_argument("--allow-unavailable-qrs", action="store_true")
+    parser.add_argument(
+        "--advisory",
+        action="store_true",
+        help="Emit the decision but do not fail on timing-derived budget decisions. Use only for quick smoke reports.",
+    )
     args = parser.parse_args()
 
     report = json.loads(args.report_json.read_text(encoding="utf-8"))
@@ -249,7 +254,7 @@ def main() -> int:
     write_text(args.markdown, render_markdown(decision))
     print(decision["conclusion"])
 
-    if decision["explicit_qrs_budget_required"]:
+    if decision["explicit_qrs_budget_required"] and not args.advisory:
         return 2
     if decision["draft_rule_status"] == "evidence_incomplete" and not args.allow_unavailable_qrs:
         return 2

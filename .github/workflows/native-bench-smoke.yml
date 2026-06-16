@@ -76,6 +76,7 @@ jobs:
             --batch-evidence-json out/batch-evidence.json \
             --json out/resource-accounting-decision.json \
             --markdown out/resource-accounting-decision.md \
+            --advisory \
             "${extra_args[@]}"
           jq '.benchmarks.schnorr_bip340.batch.status' out/quick.json
           jq '.benchmarks.schnorr_bip340.batch_experimental_valid.status' out/quick.json
