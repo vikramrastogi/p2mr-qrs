@@ -61,6 +61,10 @@ are explicitly hypothetical and must not be cited as measured batch evidence;
 their purpose is to show where reviewer concern about a faster batch baseline
 would make the no-additional-budget rule unresolved.
 
+The generated decision record also reports QRS depth sensitivity for depth 0
+and depth 128. This counts Merkle path witness weight and TapBranch hash counts,
+but does not benchmark Bitcoin Core branch-hash implementation overhead.
+
 A measured experimental batch implementation that is slower than individual
 Schnorr is not favorable evidence for QRS. It is reported as non-tightening and
 cannot support the no-additional-budget rule for activation review.

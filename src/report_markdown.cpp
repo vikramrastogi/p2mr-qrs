@@ -218,7 +218,7 @@ std::string render_markdown(const Environment& env,
   block_row(o, "Schnorr reviewed-public batch saturated block",
             block_model.schnorr_batch_saturated_block);
 
-  o << "\n## QRS Depth-Sensitive Block Model\n\n";
+  o << "\n## QRS depth-sensitive saturated block estimates\n\n";
   o << "| Model | QRS Merkle depth | Status | Input WU | Max inputs | "
        "TapBranch hashes/block | Median ms | p99 ms | Max ms |\n";
   o << "|---|---:|---:|---:|---:|---:|---:|---:|---:|\n";

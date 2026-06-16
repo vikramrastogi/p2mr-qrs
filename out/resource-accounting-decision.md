@@ -12,10 +12,10 @@
 
 | Estimate | p99 ms |
 | --- | ---: |
-| qrs_valid_saturated_block | 96.537 |
-| qrs_worst_invalid_fixed_length_saturated_block | 102.982 |
-| individual_schnorr_saturated_block | 355.245 |
-| experimental_batch_schnorr_saturated_block | 245.970 |
+| qrs_valid_saturated_block | 92.973 |
+| qrs_worst_invalid_fixed_length_saturated_block | 101.836 |
+| individual_schnorr_saturated_block | 359.255 |
+| experimental_batch_schnorr_saturated_block | 247.543 |
 | reviewed_public_batch_schnorr_saturated_block | unavailable |
 
 ## Checks
@@ -29,9 +29,20 @@
 | Reviewed public batch status explicit | pass | unavailable |
 | Batch evidence forbids fake speedups | pass | No batch Schnorr timing is synthesized from assumed speedups. |
 | Report metadata complete | pass | complete |
-| QRS worst p99 below individual Schnorr p99 | pass | qrs_worst=102.982 ms, individual_schnorr=355.245 ms |
-| QRS worst p99 below experimental batch Schnorr p99 | pass | qrs_worst=102.982 ms, experimental_batch=245.970 ms |
-| Experimental batch tightens individual Schnorr baseline | pass | experimental_batch=245.970 ms, individual_schnorr=355.245 ms |
+| QRS worst p99 below individual Schnorr p99 | pass | qrs_worst=101.836 ms, individual_schnorr=359.255 ms |
+| QRS worst p99 below experimental batch Schnorr p99 | pass | qrs_worst=101.836 ms, experimental_batch=247.543 ms |
+| Experimental batch tightens individual Schnorr baseline | pass | experimental_batch=247.543 ms, individual_schnorr=359.255 ms |
+
+## QRS Depth Sensitivity
+
+| Field | Value |
+| --- | ---: |
+| qrs_depth0_p99_ms | 92.973 |
+| qrs_depth128_p99_ms | 61.669 |
+| qrs_depth_binding_case | depth128_lower_block_time_due_to_fewer_weight_limited_inputs |
+
+Depth-sensitive rows count Merkle path witness weight and TapBranch hash counts. They do not benchmark Bitcoin Core branch-hash implementation overhead.
+
 
 ## Batch-Speedup Sensitivity
 
@@ -40,18 +51,18 @@ Hypothetical batch speedups are sensitivity analysis only; they are not a measur
 If the experimental batch baseline is slower than individual Schnorr, it is reported as non-tightening and cannot support the no-additional-budget rule for activation review.
 
 - Experimental batch tightens individual Schnorr: true
-- Experimental batch speedup vs individual: 1.444x
-- QRS valid exceeds a hypothetical batch baseline if speedup is greater than 3.680x.
-- QRS worst-invalid exceeds a hypothetical batch baseline if speedup is greater than 3.450x.
+- Experimental batch speedup vs individual: 1.451x
+- QRS valid exceeds a hypothetical batch baseline if speedup is greater than 3.864x.
+- QRS worst-invalid exceeds a hypothetical batch baseline if speedup is greater than 3.528x.
 
 | Hypothetical speedup vs individual | Hypothetical Schnorr p99 ms | QRS valid exceeds | QRS worst-invalid exceeds |
 | ---: | ---: | --- | --- |
-| 1.5x | 236.830 | false | false |
-| 2.0x | 177.623 | false | false |
-| 2.5x | 142.098 | false | false |
-| 3.0x | 118.415 | false | false |
-| 4.0x | 88.811 | true | true |
-| 5.0x | 71.049 | true | true |
+| 1.5x | 239.503 | false | false |
+| 2.0x | 179.627 | false | false |
+| 2.5x | 143.702 | false | false |
+| 3.0x | 119.752 | false | false |
+| 4.0x | 89.814 | true | true |
+| 5.0x | 71.851 | true | true |
 
 ## Fallback Trigger Checks
 
@@ -59,11 +70,11 @@ Fallback trigger checks identify when the inactive explicit QRS budget must be r
 
 | Fallback trigger | Triggered | Threshold p99 ms | QRS worst p99 ms | Detail |
 | --- | --- | ---: | ---: | --- |
-| qrs_worst_exceeds_individual_schnorr | false | 355.245 | 102.982 | fallback trigger if QRS worst-invalid p99 exceeds individual Schnorr p99 |
-| qrs_worst_exceeds_2_5x_hypothetical_reviewed_batch_schnorr | false | 142.098 | 102.982 | fallback trigger if QRS worst-invalid p99 exceeds a 2.5x hypothetical reviewed-batch-Schnorr baseline |
-| qrs_worst_exceeds_3_0x_hypothetical_reviewed_batch_schnorr | false | 118.415 | 102.982 | fallback trigger if QRS worst-invalid p99 exceeds a 3.0x hypothetical reviewed-batch-Schnorr baseline |
-| qrs_worst_exceeds_reviewed_public_batch_schnorr | unavailable | unavailable | 102.982 | fallback trigger if a reviewed public batch-Schnorr implementation becomes available and QRS exceeds it |
-| bitcoin_core_validation_path_overhead | unavailable | unavailable | 102.982 | fallback trigger requires Bitcoin Core validation-path integration evidence; current harness models that path only |
+| qrs_worst_exceeds_individual_schnorr | false | 359.255 | 101.836 | fallback trigger if QRS worst-invalid p99 exceeds individual Schnorr p99 |
+| qrs_worst_exceeds_2_5x_hypothetical_reviewed_batch_schnorr | false | 143.702 | 101.836 | fallback trigger if QRS worst-invalid p99 exceeds a 2.5x hypothetical reviewed-batch-Schnorr baseline |
+| qrs_worst_exceeds_3_0x_hypothetical_reviewed_batch_schnorr | false | 119.752 | 101.836 | fallback trigger if QRS worst-invalid p99 exceeds a 3.0x hypothetical reviewed-batch-Schnorr baseline |
+| qrs_worst_exceeds_reviewed_public_batch_schnorr | unavailable | unavailable | 101.836 | fallback trigger if a reviewed public batch-Schnorr implementation becomes available and QRS exceeds it |
+| bitcoin_core_validation_path_overhead | unavailable | unavailable | 101.836 | fallback trigger requires Bitcoin Core validation-path integration evidence; current harness models that path only |
 
 ## Activation Blockers
 
