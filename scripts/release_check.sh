@@ -16,10 +16,11 @@ BUILD_DIR="$ROOT/build"
 
 grep -n "Version: 0.9.0" "$BIP"
 grep -n "Requires: 341, 342, 360" "$BIP"
-grep -n "Title: P2MR Quantum-Rescue Leaf" "$BIP"
+grep -n "Title: P2MR SLH-DSA Leaf" "$BIP"
 grep -n "Authors: Vikram Rastogi <vikramrastogi@gmail.com>" "$BIP"
 grep -n "Assigned: ?" "$BIP"
-if grep -nE "Author:|Created:|Title: P2MR Quantum-Rescue Leaf \\(SLH-DSA\\)" "$BIP"; then
+STALE_TITLE_PATTERN="Title: P2MR Quantum-""Rescue Leaf"
+if grep -nE "Author:|Created:|$STALE_TITLE_PATTERN" "$BIP"; then
   echo "release_check.sh: stale BIP preamble field found" >&2
   exit 1
 fi

@@ -1,4 +1,4 @@
-# P2MR Quantum-Rescue Leaf
+# P2MR SLH-DSA Leaf
 
 Draft-stage pre-review package for a narrow post-quantum signing primitive in
 the P2MR / quantum-migration discussion.

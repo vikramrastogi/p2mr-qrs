@@ -8,7 +8,7 @@ Repo / branch:
 - Branch: `main`.
 
 Exact goal:
-- Publish a narrow pre-review package for the P2MR Quantum-Rescue Leaf BIP.
+- Publish a narrow pre-review package for the P2MR SLH-DSA Leaf BIP.
 - Keep the proposal scoped to one P2MR-only future leaf, one SLH-DSA-SHA2-128s signature, no legacy-output policy, no witness discount, no algorithm registry, and no tapscript opcode in v1.
 - Produce evidence for whether QRS validation can safely rely on existing SegWit weight accounting or needs an explicit per-QRS consensus validation budget.
 
