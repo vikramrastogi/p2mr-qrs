@@ -138,6 +138,22 @@ void json_slh_backends(std::ostringstream& o,
   o << pad << "}";
 }
 
+void json_slh_backend_probe(std::ostringstream& o,
+                            const SlhDsaBackendProbe& probe,
+                            int indent) {
+  const std::string pad(indent, ' ');
+  o << "{\n";
+  o << pad << "  \"keygen\": \"" << esc(probe.keygen) << "\",\n";
+  o << pad << "  \"sign\": \"" << esc(probe.sign) << "\",\n";
+  o << pad << "  \"verify_valid\": \"" << esc(probe.verify_valid) << "\",\n";
+  o << pad << "  \"verify_mutated_signature\": \""
+    << esc(probe.verify_mutated_signature) << "\",\n";
+  o << pad << "  \"public_key_bytes\": " << probe.public_key_bytes << ",\n";
+  o << pad << "  \"signature_bytes\": " << probe.signature_bytes << ",\n";
+  o << pad << "  \"context_string\": \"" << esc(probe.context_string) << "\"\n";
+  o << pad << "}";
+}
+
 }  // namespace
 
 std::string render_json(const Environment& env,
@@ -168,6 +184,9 @@ std::string render_json(const Environment& env,
   o << "      \"mode\": \"" << esc(slh.mode) << "\",\n";
   o << "      \"public_key_bytes\": " << slh.public_key_bytes << ",\n";
   o << "      \"signature_bytes\": " << slh.signature_bytes << ",\n";
+  o << "      \"slh_dsa_backend_probe\": ";
+  json_slh_backend_probe(o, slh.backend_probe, 6);
+  o << ",\n";
   o << "      \"backends\": ";
   json_slh_backends(o, slh.backends, 6);
   o << ",\n";

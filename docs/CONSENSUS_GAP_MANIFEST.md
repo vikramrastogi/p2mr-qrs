@@ -22,7 +22,7 @@ must not be hidden by benchmark prose.
 | `bitcoin_core_validation_path_integration` | activation, resource accounting | `docs/BITCOIN_CORE_INTEGRATION_REQUIREMENTS.md` |
 | `second_reviewed_slh_dsa_backend` | activation | `docs/SLH_DSA_VERIFY_COST_ANALYSIS.md` |
 | `cross_hardware_reproduction` | activation, resource accounting | `docs/REPRODUCTION_MATRIX.md` |
-| `reviewed_public_batch_schnorr_baseline` | activation, resource accounting | `04_batch_schnorr_baseline.md` |
+| `reviewed_public_batch_schnorr_baseline` | activation, resource accounting | `docs/BATCH_SCHNORR_BASELINE_STATUS.md` |
 | `wallet_descriptor_psbt_hardware_standards` | activation, wallet standards | `docs/PUBLIC_REVIEW_READINESS.md` |
 | `activation_parameters` | activation | `docs/PUBLIC_REVIEW_POST_DRAFT.md` |
 | `final_serialized_consensus_vectors` | activation, complete vectors | `docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md` |

@@ -58,6 +58,8 @@ validation budget before activation.
   targets.
 - `docs/SLH_DSA_VERIFY_COST_ANALYSIS.md` - verifier-cost evidence and
   algorithmic worst-case caveat.
+- `docs/BATCH_SCHNORR_BASELINE_STATUS.md` - reviewed-public and experimental
+  batch Schnorr baseline status.
 - `docs/RELEASE_CHECKLIST.md` - posting and release checks.
 - `docs/PUBLIC_REVIEW_READINESS.md` - public pre-review readiness checklist.
 - `docs/PUBLIC_REVIEW_POST_DRAFT.md` - short draft text for opening public

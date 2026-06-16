@@ -6,6 +6,7 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
+    "schema_status",
     "name",
     "bip360_revision",
     "qrs_bip_revision",
@@ -28,6 +29,13 @@
     "reaches_slh_dsa_verifier"
   ],
   "properties": {
+    "schema_status": {
+      "type": "string",
+      "enum": [
+        "schema_only_pending_final_bip360_qrs",
+        "final_consensus_vector"
+      ]
+    },
     "name": { "type": "string", "minLength": 1 },
     "bip360_revision": { "type": "string", "minLength": 1 },
     "qrs_bip_revision": { "type": "string", "minLength": 1 },

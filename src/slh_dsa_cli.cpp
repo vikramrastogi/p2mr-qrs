@@ -10,7 +10,9 @@
 #include <openssl/core_names.h>
 #include <openssl/err.h>
 #include <openssl/evp.h>
+#include <openssl/opensslv.h>
 #include <openssl/params.h>
+#include <openssl/provider.h>
 #endif
 
 namespace qrs {
@@ -144,6 +146,15 @@ PkeyPtr import_public_key(const std::vector<unsigned char>& raw_pub) {
   return PkeyPtr(raw, EVP_PKEY_free);
 }
 
+std::string provider_name(EVP_PKEY* key) {
+  const OSSL_PROVIDER* provider = EVP_PKEY_get0_provider(key);
+  if (provider == nullptr) {
+    return "unknown";
+  }
+  const char* name = OSSL_PROVIDER_get0_name(provider);
+  return name == nullptr ? "unknown" : std::string(name);
+}
+
 PkeyPtr import_private_key(const std::vector<unsigned char>& raw_priv) {
   EVP_PKEY* raw = EVP_PKEY_new_raw_private_key_ex(
       nullptr, "SLH-DSA-SHA2-128s", nullptr, raw_priv.data(), raw_priv.size());
@@ -206,6 +217,44 @@ int keygen_command() {
   return 0;
 }
 
+int probe_command() {
+  auto key = generate_key();
+  const auto pub = raw_public_key(key.get());
+  if (pub.size() != 32) {
+    throw std::runtime_error("SLH-DSA-SHA2-128s public key length was not 32 bytes");
+  }
+  auto public_key = import_public_key(pub);
+  std::vector<unsigned char> msg(32);
+  for (std::size_t i = 0; i < msg.size(); ++i) {
+    msg[i] = static_cast<unsigned char>(0x5aU ^ i);
+  }
+  auto sig = sign_message(key.get(), msg);
+  if (sig.size() != 7856) {
+    throw std::runtime_error("SLH-DSA-SHA2-128s signature length was not 7856 bytes");
+  }
+  if (!verify_message(public_key.get(), msg, sig)) {
+    throw std::runtime_error("valid SLH-DSA signature failed verification");
+  }
+  sig[0] ^= 0x01;
+  if (verify_message(public_key.get(), msg, sig)) {
+    throw std::runtime_error("mutated fixed-length SLH-DSA signature verified");
+  }
+  std::cout << "{\n"
+            << "  \"status\": \"available\",\n"
+            << "  \"algorithm\": \"SLH-DSA-SHA2-128s\",\n"
+            << "  \"openssl_version\": \"" << OpenSSL_version(OPENSSL_VERSION) << "\",\n"
+            << "  \"provider\": \"" << provider_name(key.get()) << "\",\n"
+            << "  \"keygen\": \"passed\",\n"
+            << "  \"sign\": \"passed\",\n"
+            << "  \"verify_valid\": \"passed\",\n"
+            << "  \"verify_mutated_signature\": \"passed\",\n"
+            << "  \"public_key_bytes\": 32,\n"
+            << "  \"signature_bytes\": 7856,\n"
+            << "  \"context_string\": \"explicit_empty_context_set\"\n"
+            << "}\n";
+  return 0;
+}
+
 int sign_command(int argc, char** argv) {
   const auto priv = parse_hex(arg_value(argc, argv, "--private-key-hex"), "private key");
   const auto msg = parse_hex(arg_value(argc, argv, "--message-hex"), "message");
@@ -231,7 +280,8 @@ int verify_command(int argc, char** argv) {
 }  // namespace
 
 bool is_slh_dsa_cli_command(const std::string& command) {
-  return command == "--slh-keygen" || command == "--slh-sign" || command == "--slh-verify";
+  return command == "--slh-keygen" || command == "--slh-sign" ||
+         command == "--slh-verify" || command == "--slh-probe";
 }
 
 int run_slh_dsa_cli(int argc, char** argv) {
@@ -247,6 +297,9 @@ int run_slh_dsa_cli(int argc, char** argv) {
     const std::string command = argv[1];
     if (command == "--slh-keygen") {
       return keygen_command();
+    }
+    if (command == "--slh-probe") {
+      return probe_command();
     }
     if (command == "--slh-sign") {
       return sign_command(argc, argv);

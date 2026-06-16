@@ -114,6 +114,18 @@ std::string render_markdown(const Environment& env,
        "backend; it remains unavailable until a reviewed/pinned verifier strategy "
        "is wired for cross-backend agreement.\n\n";
 
+  o << "## SLH-DSA Backend Probe\n\n";
+  o << "| Probe | Result |\n";
+  o << "|---|---|\n";
+  o << "| keygen | " << slh.backend_probe.keygen << " |\n";
+  o << "| sign | " << slh.backend_probe.sign << " |\n";
+  o << "| verify valid | " << slh.backend_probe.verify_valid << " |\n";
+  o << "| verify mutated signature | "
+    << slh.backend_probe.verify_mutated_signature << " |\n";
+  o << "| public key bytes | " << slh.backend_probe.public_key_bytes << " |\n";
+  o << "| signature bytes | " << slh.backend_probe.signature_bytes << " |\n";
+  o << "| context string | " << slh.backend_probe.context_string << " |\n\n";
+
   o << "## Raw Timing Table\n\n";
   o << "Timing statistics are computed as the median of per-batch means, p95 of "
        "per-batch means, p99 of per-batch means, and max of per-batch means; "

@@ -199,6 +199,26 @@ def main() -> int:
     if slh["status"] == "available":
         require(slh["public_key_bytes"] == 32, "SLH-DSA public key must be 32 bytes")
         require(slh["signature_bytes"] == 7856, "SLH-DSA signature must be 7856 bytes")
+        probe = slh.get("slh_dsa_backend_probe", {})
+        require(probe.get("keygen") == "passed", "SLH-DSA backend probe keygen must pass")
+        require(probe.get("sign") == "passed", "SLH-DSA backend probe sign must pass")
+        require(
+            probe.get("verify_valid") == "passed",
+            "SLH-DSA backend probe valid verification must pass",
+        )
+        require(
+            probe.get("verify_mutated_signature") == "passed",
+            "SLH-DSA backend probe mutated signature rejection must pass",
+        )
+        require(probe.get("public_key_bytes") == 32, "SLH-DSA probe public key must be 32 bytes")
+        require(
+            probe.get("signature_bytes") == 7856,
+            "SLH-DSA probe signature must be 7856 bytes",
+        )
+        require(
+            probe.get("context_string") == "explicit_empty_context_set",
+            "SLH-DSA probe must assert an explicit empty context string",
+        )
         require(
             "context-string explicitly set to empty" in slh["mode"],
             "SLH-DSA mode must assert an explicitly empty context string",
@@ -325,6 +345,7 @@ def main() -> int:
             "explicit non-consensus prefixes" in md,
             "Markdown must identify modeled non-consensus QRS path prefixes",
         )
+        require("SLH-DSA Backend Probe" in md, "Markdown must include SLH-DSA backend probe")
         require(
             "QRS depth-sensitive saturated block estimates" in md,
             "Markdown must include QRS depth-sensitive block model",

@@ -27,6 +27,17 @@ The committed sample reports were generated with OpenSSL 3.6.1 from the
 version, provider configuration, and error output; the run is useful as an
 environment diagnostic but is not a strict reproduction.
 
+After building, a non-secret backend probe is available:
+
+```sh
+./build/qrs_native_bench --slh-probe
+```
+
+The probe prints OpenSSL version/provider metadata and confirms keygen, signing,
+valid verification, mutated fixed-length signature rejection, 32-byte public-key
+size, 7,856-byte signature size, and explicit empty-context configuration. It
+does not print generated private key material.
+
 CI structural checks run the build, provisional fixture checks, digest
 agreement, quick benchmark, and advisory resource-accounting evaluation. They
 are portability smoke checks when OpenSSL SLH-DSA is unavailable. They do not

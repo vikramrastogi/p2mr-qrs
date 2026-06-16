@@ -107,7 +107,7 @@
       "owner_type": "future_batch_schnorr_review",
       "description": "The bundled libsecp256k1 commit has no reviewed public BIP-340 batch verification API wired by this package.",
       "evidence_required": "Reviewed public batch-Schnorr baseline or explicit reviewer agreement that activation review can proceed without one.",
-      "current_repo_artifact": "04_batch_schnorr_baseline.md"
+      "current_repo_artifact": "docs/BATCH_SCHNORR_BASELINE_STATUS.md"
     },
     {
       "id": "wallet_descriptor_psbt_hardware_standards",
