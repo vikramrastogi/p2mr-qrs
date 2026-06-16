@@ -34,12 +34,12 @@
       "passed": true
     },
     {
-      "detail": "qrs_worst=156.628 ms, individual_schnorr=386.586 ms",
+      "detail": "qrs_worst=102.120 ms, individual_schnorr=358.329 ms",
       "name": "QRS worst p99 below individual Schnorr p99",
       "passed": true
     },
     {
-      "detail": "qrs_worst=156.628 ms, experimental_batch=507.659 ms",
+      "detail": "qrs_worst=102.120 ms, experimental_batch=239.453 ms",
       "name": "QRS worst p99 below experimental batch Schnorr p99",
       "passed": true
     }
@@ -49,10 +49,10 @@
   "explicit_qrs_budget_required": false,
   "fallback_budget_status": "not_required_by_current_draft_evidence",
   "p99_ms": {
-    "experimental_batch_schnorr_saturated_block": 507.659,
-    "individual_schnorr_saturated_block": 386.586,
-    "qrs_valid_saturated_block": 93.231,
-    "qrs_worst_invalid_fixed_length_saturated_block": 156.628,
+    "experimental_batch_schnorr_saturated_block": 239.453,
+    "individual_schnorr_saturated_block": 358.329,
+    "qrs_valid_saturated_block": 100.561,
+    "qrs_worst_invalid_fixed_length_saturated_block": 102.12,
     "reviewed_public_batch_schnorr_saturated_block": null
   },
   "schema": "qrs-native-bench/resource-accounting-decision/v0"

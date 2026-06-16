@@ -12,10 +12,10 @@
 
 | Estimate | p99 ms |
 | --- | ---: |
-| qrs_valid_saturated_block | 93.231 |
-| qrs_worst_invalid_fixed_length_saturated_block | 156.628 |
-| individual_schnorr_saturated_block | 386.586 |
-| experimental_batch_schnorr_saturated_block | 507.659 |
+| qrs_valid_saturated_block | 100.561 |
+| qrs_worst_invalid_fixed_length_saturated_block | 102.120 |
+| individual_schnorr_saturated_block | 358.329 |
+| experimental_batch_schnorr_saturated_block | 239.453 |
 | reviewed_public_batch_schnorr_saturated_block | unavailable |
 
 ## Checks
@@ -27,8 +27,8 @@
 | Individual Schnorr baseline available | pass | available |
 | Reviewed public batch status explicit | pass | unavailable |
 | Batch evidence forbids fake speedups | pass | No batch Schnorr timing is synthesized from assumed speedups. |
-| QRS worst p99 below individual Schnorr p99 | pass | qrs_worst=156.628 ms, individual_schnorr=386.586 ms |
-| QRS worst p99 below experimental batch Schnorr p99 | pass | qrs_worst=156.628 ms, experimental_batch=507.659 ms |
+| QRS worst p99 below individual Schnorr p99 | pass | qrs_worst=102.120 ms, individual_schnorr=358.329 ms |
+| QRS worst p99 below experimental batch Schnorr p99 | pass | qrs_worst=102.120 ms, experimental_batch=239.453 ms |
 
 ## Activation Blockers
 
