@@ -1,0 +1,270 @@
+<pre>
+  BIP: ?
+  Layer: Consensus (soft fork)
+  Title: P2MR SLH-DSA Leaf
+  Authors: Vikram Rastogi <vikramrastogi@gmail.com>
+  Status: Draft
+  Type: Specification
+  Assigned: ?
+  License: BSD-3-Clause
+  Version: 0.9.0
+  Requires: 341, 342, 360
+</pre>
+
+==Introduction==
+
+===Abstract===
+
+This document specifies a single new Pay-to-Merkle-Root (P2MR) leaf version that verifies one SLH-DSA-SHA2-128s signature. The leaf is valid only inside BIP-360 P2MR outputs and commits to exactly one 32-byte SLH-DSA-SHA2-128s public key. Spending it reveals the public key, a BIP-360 control block, and one 7,856-byte SLH-DSA-SHA2-128s signature over a BIP-341-style transaction digest.
+
+This BIP is purely additive. It does not restrict, freeze, burn, throttle, sunset, or otherwise encumber any existing output type, and it does not modify the validation of ECDSA, Schnorr, P2PK, P2PKH, P2SH, P2WPKH, P2WSH, or P2TR. It defines exactly one new, opt-in, post-quantum spending condition for new P2MR outputs, and nothing else.
+
+'''This BIP defines one opt-in P2MR SLH-DSA spend path. It does not decide the fate of unmigrated coins.'''
+
+===Copyright===
+
+This document is licensed under BSD-3-Clause.
+
+===Motivation===
+
+BIP-360 defines P2MR, a script-tree output that removes Taproot's key-path spend and therefore avoids long-term on-chain exposure of an elliptic-curve public key. BIP-360 explicitly does not provide post-quantum signatures, and so does not by itself defend against an attacker who can derive an elliptic-curve private key during the brief unconfirmed-transaction (short-exposure) window. BIP-361 proposes a migration-and-sunset process but its header requires a "TBD Post Quantum Signature BIP" — a destination scheme that does not yet exist as a specification.
+
+This BIP fills exactly that gap, and only that gap: a concrete, opt-in, post-quantum spend condition that can be committed inside a P2MR tree and revealed only if needed. A holder who wants a conservative fail-safe creates a P2MR output with an ordinary efficient spend leaf (today's classical signature) and an SLH-DSA leaf alongside it. While classical signatures remain safe, the efficient leaf is used and the SLH-DSA public key stays hidden. If the classical algorithm later becomes unsafe, the holder spends through the SLH-DSA leaf to migrate the coins.
+
+More precisely, the P2MR SLH-DSA leaf is a spend path: it lets an owner move funds out of a P2MR output without ever exposing an elliptic-curve public key, migrating them to a fresh output. In the special case of a P2MR output committing only to this leaf (no classical sibling), the output has no classical signature spend path. Its spendability depends on the SLH-DSA key rather than an elliptic-curve key.
+
+The design deliberately makes no decision about legacy-output policy. Whether already-exposed coins should be frozen, burned, throttled, rescued, or left untouched is a separate social-consensus question (the subject of BIP-361 and related proposals), and bundling it with an optional signing primitive is precisely what has prevented a minimal post-quantum signing change from converging.
+
+==Design goals==
+
+# Define one narrow consensus primitive, not a migration framework.
+# Depend on BIP-360 and reuse its Merkle-tree structure and control block.
+# Introduce no new address family beyond P2MR.
+# Use exactly one stateless, hash-based signature scheme.
+# Introduce no new lattice assumption in Bitcoin's first post-quantum consensus path.
+# Give large signatures no special block-weight discount.
+# Propose a concrete resource-accounting rule, and require native benchmark evidence before activation; if the evidence fails, add an explicit per-QRS validation budget before deployment.
+# Change the validity of no existing output type or signature.
+# Leave additional algorithms, wallet standards, and migration policy to later BIPs.
+
+==Specification==
+
+===Constants===
+
+<source>
+QRS_LEAF_VERSION = TBD_EVEN_LEAF_VERSION   # provisional; 0xc2 used in examples only
+QRS_CONTROL_BYTE = QRS_LEAF_VERSION | 0x01 # P2MR requires the low bit of c[0] to be set
+QRS_EXT_FLAG     = 2                        # domain separation from key-path (0) and BIP-342 tapscript (1)
+QRS_HASH_TYPE    = 0x00                     # SIGHASH_DEFAULT (the only mode defined here)
+</source>
+
+The value <code>0xc2</code> appears in examples only. The final even leaf version MUST be assigned after review for conflicts with other proposed or active leaf-version soft forks; BIP-341 constrains leaf versions to even values, with the control byte's low bit reserved (forced to 1 in P2MR per BIP-360; in Taproot this bit instead encodes key parity), and recommends they be shared across witness versions. The signature algorithm is SLH-DSA-SHA2-128s as specified by FIPS 205. The public key is 32 bytes; the signature is exactly 7,856 bytes.
+
+The <code>QRS_</code> prefix used in constants and <code>qrs_</code> witness-field names is a compact namespace for this P2MR SLH-DSA leaf. It does not denote a separate signature algorithm.
+
+===P2MR SLH-DSA leaf and Merkle commitment===
+
+A P2MR SLH-DSA leaf is a BIP-360 P2MR leaf whose leaf version is <code>QRS_LEAF_VERSION</code> and whose leaf payload <code>s</code> is exactly one 32-byte SLH-DSA-SHA2-128s public key. The payload is committed using the same TapLeaf serialization shape as BIP-341/BIP-360, but it is a non-tapscript leaf payload and is not interpreted as tapscript. The applicable validation rule for this future leaf version is the SLH-DSA rule defined here, not BIP-342 script execution. The leaf hash is:
+
+<source>
+leaf_hash = tagged_hash("TapLeaf", bytes([QRS_LEAF_VERSION]) || compact_size(32) || qrs_public_key)
+</source>
+
+The P2MR Merkle root is computed from this leaf hash and any sibling leaf hashes exactly as specified by BIP-360.
+
+===Activation dependency===
+
+This BIP has no effect unless BIP-360 is active. Its rules MUST NOT become active before the corresponding BIP-360 rules are active; deployment MAY be simultaneous with BIP-360. Before activation, a revealed P2MR SLH-DSA leaf may be treated according to BIP-360's unrecognized future-leaf rules and MUST NOT be relied on as enforcing SLH-DSA. Wallets MUST NOT treat such outputs as secure SLH-DSA outputs before activation.
+
+Because BIP-360 is still draft, the final version of this BIP MUST be checked against the final BIP-360 definitions for leaf hashing, branch hashing, sighash tagging, annex handling, and future-leaf behavior. If final BIP-360 uses P2MR-specific tagged hashes or changes the P2MR sighash construction, this BIP MUST adopt those final P2MR definitions rather than assuming Taproot tag reuse. The assignment of <code>QRS_EXT_FLAG = 2</code> is also provisional pending conflict review with any other <code>SigMsg</code>-extending proposals.
+
+===Witness structure===
+
+When spending a P2MR output through an SLH-DSA leaf, the witness stack MUST be:
+
+<source>
+qrs_signature        # exactly 7856 bytes
+qrs_public_key       # exactly 32 bytes
+control_block        # 1 + 32*m bytes, m in [0,128]
+[annex]              # optional, BIP-341/360 annex rules
+</source>
+
+The annex, if present, follows BIP-341/BIP-360 annex rules. After removing the annex, exactly three witness elements MUST remain. Validation requires:
+
+# <code>qrs_signature</code> length is exactly 7,856 bytes;
+# <code>qrs_public_key</code> length is exactly 32 bytes;
+# <code>control_block</code> length is <code>1 + 32*m</code> for integer <code>m</code> in [0,128];
+# <code>control_block[0] & 0xfe == QRS_LEAF_VERSION</code>;
+# <code>control_block[0] & 1 == 1</code>.
+
+For <code>QRS_LEAF_VERSION</code>, BIP-342 script execution and BIP-342 initial-stack resource limits are not invoked. This BIP defines its own fixed witness shape and fixed-size validation rule for this future leaf version. The P2MR Merkle root is recomputed from <code>leaf_hash</code> and the Merkle path in <code>control_block</code>; validation fails unless the recomputed root equals the 32-byte witness program of the spent output.
+
+This witness maps onto the generic BIP-360 P2MR witness layout (initial stack elements, leaf payload, control block, optional annex) as follows: the BIP-360 second-to-last witness element <code>s</code> is <code>qrs_public_key</code>, a 32-byte non-tapscript payload. The single preceding element, <code>qrs_signature</code>, occupies the initial-stack position in the generic layout and is interpreted by this BIP as the sole signature input. The validation rule defined here does not execute script and does not interpret any other initial stack elements; after annex removal, any witness with more or fewer than these three elements fails.
+
+===Signature message===
+
+Only <code>SIGHASH_DEFAULT</code> is defined. The transaction message uses the BIP-341 <code>SigMsg(hash_type, ext_flag)</code> function with <code>hash_type = QRS_HASH_TYPE</code> and <code>ext_flag = QRS_EXT_FLAG</code>. For this BIP, <code>ext_flag = 2</code> has exactly one extension field, <code>qrs_ext = leaf_hash</code>. The <code>spend_type</code> inside <code>SigMsg</code> is therefore <code>2 * QRS_EXT_FLAG + annex_present</code> (4 without annex, 5 with annex). No BIP-342 <code>key_version</code> or <code>codesep_pos</code> field is appended for this leaf version. The 32-byte message passed to SLH-DSA verification is:
+
+<source>
+qrs_msg = tagged_hash("TapSighash", bytes([0x00]) || SigMsg(QRS_HASH_TYPE, QRS_EXT_FLAG) || leaf_hash)
+</source>
+
+The leading <code>0x00</code> is the BIP-341 sighash epoch. <code>QRS_EXT_FLAG = 2</code> domain-separates QRS signatures from key-path and BIP-342 tapscript signatures; binding <code>leaf_hash</code> binds the signature to this exact leaf and public key, preventing cross-leaf and key-substitution malleability.
+
+===Signature verification===
+
+Validation succeeds if and only if all structural checks above pass and:
+
+<source>
+SLH_DSA_SHA2_128s_Verify(qrs_public_key, qrs_msg, qrs_signature) == valid
+</source>
+
+using the FIPS 205 SLH-DSA-SHA2-128s verification algorithm (<code>slh_verify</code>) in '''pure mode''' — not the HashSLH-DSA pre-hash variant — with an '''empty context string''' (a <code>ctx</code> of zero length) and <code>qrs_msg</code> supplied as the complete message. The verifier MUST accept only 32-byte public keys and 7,856-byte signatures for the SLH-DSA-SHA2-128s parameter set. No sighash flag byte is appended to <code>qrs_signature</code>; any witness that appends one has length other than 7,856 bytes and fails.
+
+===Resource accounting===
+
+QRS spends receive no special weight discount. The signature, public key, control block, and annex all contribute to transaction weight under existing BIP-141 rules.
+
+This draft proposes that validation for this leaf version require no additional consensus validation budget beyond existing SegWit weight accounting. That proposed rule is not activation-ready until confirmed by native, reproducible validation-cost benchmarks. If those benchmarks show that weight alone is not an adequate bound for SLH-DSA verification cost, this BIP MUST be amended before deployment to add an explicit per-QRS validation budget.
+
+The no-new-budget rule is a hypothesis to test, not a conclusion of this draft. Benchmark evidence is maintained outside the BIP body so measurements can be regenerated and reviewed without revising the normative specification.
+
+The rationale for first evaluating the no-new-budget rule is concrete and reviewable:
+
+# A single SLH-DSA-SHA2-128s signature is 7,856 bytes and contributes ≈ 7,856 weight units of witness data per QRS spend.
+# Under the BIP-342 validation-cost model, signature operations are bounded by a budget of 50 weight units of witness per signature operation. This leaf's signature witness weight therefore corresponds to ≈ 157 signature-operation budget units (7,856 / 50). The BIP-342 sigops calculation is used here only as a comparative cost model; this validation rule is not a tapscript signature opcode and does not consume the BIP-342 sigops budget.
+# Because every QRS spend carries its own ≈ 7,856-weight signature, a 4,000,000-weight block can contain at most ⌊4,000,000 / 7,856⌋ ≈ 509 QRS verifications even if verification were free — and fewer in practice once non-witness input/output bytes are counted at 4 WU/byte.
+# The binding test is per-block validation ''time'', not per-signature cost. Because a QRS spend's total weight (≈ 8,059 WU per input, including non-witness overhead) is ≈ 35× a Schnorr P2TR key-path input's (≈ 230 WU), a maximum-weight block holds ≈ 35× fewer QRS spends. A QRS-saturated block therefore costs more to validate than a Schnorr-key-path-saturated block only if one SLH-DSA-SHA2-128s verification exceeds ≈ 35 Schnorr verifications in CPU time, before accounting for batching or implementation-specific effects. Schnorr key-path saturation is used here as a verification-dense current-consensus comparison point; final activation review MUST compare QRS validation against the then-current worst-case Bitcoin Core validation path, not only this proxy.
+
+Before this BIP advances beyond Draft, a reference implementation MUST provide native benchmarks using a FIPS 205 SLH-DSA-SHA2-128s verifier, not a SPHINCS+ proxy or Python wrapper. The benchmark suite MUST include valid QRS spends, adversarial invalid fixed-length QRS signatures that reach the SLH-DSA verifier, tail latency, implementation variance, Bitcoin Core validation-path integration, and comparison against both individual Schnorr verification and any batch-verification baseline reviewers consider relevant. Results MUST identify hardware, operating system, compiler, compiler flags, verifier library commits, libsecp256k1 commit, and benchmark harness commit.
+
+The pre-review repository evaluates this proposed rule through an executable native benchmark package, <code>scripts/evaluate_resource_accounting.py</code>, and a decision record, <code>docs/RESOURCE_ACCOUNTING_DECISION.md</code>. That decision record maps the generated benchmark reports to the resource-accounting rule by comparing valid QRS saturated-block estimates, worst-observed adversarial invalid fixed-length QRS estimates, individual Schnorr estimates, experimental batch Schnorr estimates, and the reviewed-public batch Schnorr availability status. The decision record is review evidence and process, not activation-ready consensus evidence by itself.
+
+If those benchmarks fail to show that existing weight accounting adequately bounds QRS validation cost, this BIP MUST add an explicit per-QRS consensus validation budget before activation. The pre-review package includes an inactive fallback design in <code>docs/EXPLICIT_QRS_BUDGET_FALLBACK.md</code>: keep ordinary SegWit weight unchanged, add a reviewed per-QRS virtual validation-weight charge, and enforce the existing 4,000,000 weight-unit block limit against ordinary weight plus that QRS validation charge.
+
+===Reviewer objections addressed===
+
+This Draft-stage proposal deliberately tracks the main expected objections as explicit design constraints, tests, benchmarks, caveats, or non-goals:
+
+# '''520-byte tapscript limit.''' SLH-DSA-SHA2-128s signatures are 7,856 bytes and cannot fit within BIP-342's retained 520-byte tapscript stack-element limit. This BIP therefore defines new applicable validation rules for a future P2MR leaf version rather than invoking BIP-342 script execution.
+# '''BIP-360 draft dependency.''' This BIP requires BIP-360 and MUST be rechecked against BIP-360's final leaf hashing, branch hashing, sighash tagging, annex handling, and future-leaf behavior before activation.
+# '''<code>ext_flag</code> conflict review.''' <code>QRS_EXT_FLAG = 2</code> is provisional and MUST be checked against other <code>SigMsg</code>-extension proposals before assignment.
+# '''Batch Schnorr baseline.''' Batch Schnorr may tighten or invert the validation-cost comparison. The no-new-budget rule is a hypothesis to test, and benchmark evidence MUST distinguish individual Schnorr, reviewed-public batch Schnorr if available, and any experimental batch baseline.
+# '''Invalid fixed-length signatures.''' Invalid QRS signatures that have the correct 7,856-byte length MUST be measured separately from cheap structural rejects, because they reach the SLH-DSA verifier. Before activation, invalid-signature review also needs implementation-aware worst-case analysis, not only random bit flips.
+# '''Fixed-length encoding and witness malleability.''' Witness malleability for this leaf version is addressed by exact public-key and signature lengths, deterministic verification, and the absence of DER-style encoding choices; there is no ECDSA-style low-S rule to add.
+# '''No legacy-output policy.''' Legacy freeze, burn, throttle, sunset, rescue, and migration mandates are out of scope. This BIP defines one opt-in P2MR future leaf and no rule for existing output types.
+
+===Standardness policy (non-consensus)===
+
+Nodes SHOULD treat a QRS spend as standard only after this BIP is active and only if: the spent output is a BIP-360 P2MR output; the witness shape exactly matches this specification; existing standard weight and fee rules are satisfied; no more than one QRS signature is verified per input; and the transaction pays fees for the full witness weight. Wallets SHOULD use QRS leaves as emergency/migration leaves, not as the routine happy path while efficient classical signatures remain safe.
+
+==Recommended wallet construction==
+
+A conservative two-leaf P2MR output contains:
+
+# an ordinary efficient leaf for current use (e.g. a BIP-342 Schnorr <code>OP_CHECKSIG</code> leaf); and
+# an SLH-DSA leaf committing to a fresh SLH-DSA-SHA2-128s public key.
+
+Only the Merkle root appears on-chain; both public keys stay hidden until their leaf is used. The two leaves are independent spending alternatives (a logical OR): the holder spends the efficient leaf while classical signatures are safe, and the SLH-DSA leaf only as a fallback. Critically, the SLH-DSA leaf does '''not''' protect an output whose sibling leaf has already become spendable by an attacker — in a P2MR tree, any one valid leaf is sufficient to spend the output. The fallback model therefore assumes the ordinary efficient leaf remains hidden and uncompromised until the owner migrates: if the efficient leaf's script, public key, descriptor- or xpub-derived key material, or prior spend history has exposed a discrete-log-vulnerable public key, the owner should treat the output as vulnerable and migrate through the SLH-DSA leaf '''before''' an attacker can spend through the weaker sibling. The SLH-DSA spend ''path'' remains exclusively the holder's; the ''coin'' does not, once the sibling key is exposed.
+
+Wallets SHOULD generate a fresh QRS key per output, SHOULD NOT derive QRS keys by reusing an ECDSA or BIP-340 private key, SHOULD use domain-separated derivation from seed material, and SHOULD make QRS backup requirements explicit to users. Descriptor, PSBT, derivation-path, hardware-signer, and watch-only standards are out of scope and SHOULD be specified separately.
+
+==Rationale==
+
+===Why a P2MR leaf rather than a new witness version?===
+
+A leaf reuses the BIP-360 output type and lets a wallet combine the QRS condition with other leaves in one Merkle tree. A dedicated witness version for one post-quantum key type would create another address family and would not naturally support script trees.
+
+===Why a leaf version rather than a tapscript opcode (in v1)?===
+
+SLH-DSA-SHA2-128s signatures (7,856 bytes) far exceed the 520-byte tapscript stack-element limit that BIP-342 retains. This proposal therefore defines a future leaf version whose applicable validation rule does not invoke BIP-342 script execution or BIP-342 initial-stack resource limits. That keeps the first post-quantum primitive narrow: one leaf type, one key, one signature, one sighash mode. (A composable opcode is the right v2 tool; see Future Work.)
+
+===Why restrict to P2MR outputs?===
+
+P2MR is the only key-path-free output. Permitting an SLH-DSA leaf inside an output that still carries an exposed key path (e.g. P2TR) would offer false comfort, since the output would remain quantum-vulnerable through that key path. Confining this leaf to P2MR ensures the capability appears only where it actually delivers protection, and the leaf version enforces this naturally.
+
+===Why SLH-DSA-SHA2-128s, and only one algorithm?===
+
+SLH-DSA is stateless and hash-based, and the SHA2-128s parameter set avoids introducing a lattice assumption into the first post-quantum consensus verifier. SLH-DSA-SHA2-128s targets NIST Category 1, which is the closest NIST post-quantum category to Bitcoin's existing roughly 128-bit classical security target. The SHA2-128s parameter set keeps the public key at 32 bytes and the signature at 7,856 bytes; higher-category SLH-DSA parameter sets would materially increase signature size and need a separate weight, fee, wallet, and validation-cost review. Large signatures are acceptable for a fallback path that is rarely used, by design. Limiting v1 to a single algorithm minimises review burden, implementation risk, test-vector surface, and future deprecation politics; multiple algorithms would make activation hostage to an algorithm-selection debate. More compact schemes may be proposed later, after independent cryptographic, implementation, wallet, and resource-cost review.
+
+===Why only SIGHASH_DEFAULT?===
+
+The purpose is emergency migration. One sighash mode minimises consensus surface, test vectors, hardware-signer complexity, and cross-protocol signature confusion. Additional modes can be added by a later BIP if needed.
+
+===Why no witness discount?===
+
+A post-quantum signing BIP should not also be a blockspace-policy BIP. Large signatures must pay for their actual witness size; a discount would create a cheap data-carriage path and reopen unrelated block-weight debates.
+
+===Why no legacy-output policy?===
+
+Restricting legacy ECDSA/Schnorr spends, freezing exposed keys, burning unmigrated coins, or throttling P2PK are separate social and technical questions requiring a different BIP and a different consensus process. This BIP intentionally provides an opt-in P2MR spend condition for voluntary migration before the network is asked to decide what, if anything, should happen to unmigrated outputs. That separation is the entire point: the moment a signing BIP begins adjudicating already-exposed coins, it stops being a cryptography proposal and becomes a contested redistribution question.
+
+==Backward compatibility==
+
+This proposal is a soft fork. Before activation, upgraded BIP-360 implementations that do not implement this BIP apply BIP-360's rules for unrecognized future leaf versions; after activation, upgraded nodes enforce the QRS rules above for the assigned SLH-DSA leaf version. Like other soft forks using reserved future semantics, this proposal is additive at the output-type level but restrictive for the assigned future leaf version after activation: spends through that leaf must satisfy the new QRS validation rules. A witness that was valid before activation but fails the QRS checks becomes invalid after activation only if it attempts to spend through this leaf version. Existing UTXOs, output types, and legacy-signature validation are unchanged.
+
+==Security considerations==
+
+An SLH-DSA leaf protects only coins whose P2MR output commits to it and whose SLH-DSA private key remains available to the owner. In a two-leaf output, privacy and safety depend on operational behavior: if the ordinary elliptic-curve public key is leaked through address reuse, xpub or descriptor sharing, multisig coordination, watch-only infrastructure, or a prior spend, the efficient leaf may become exposed to long-exposure quantum key recovery, in which case the owner should migrate via the SLH-DSA leaf rather than broadcasting an elliptic-curve signature.
+
+This BIP does not protect already-exposed P2PK, P2MS, reused P2PKH/P2WPKH, P2TR key-path, or other legacy outputs, and does not solve lost-key recovery. Consensus implementations MUST use a deterministic, memory-safe, constant-time-where-applicable, consensus-reviewed SLH-DSA verifier, and SHOULD test at least two independent implementations against the same vectors before deployment. This BIP's use of SLH-DSA relies on consensus implementations using the same pure-mode FIPS 205 verification interface and context string. Implementations MUST NOT substitute HashSLH-DSA or pre-hash verification.
+
+Witness malleability: this leaf version has no ECDSA-style DER encoding malleability and no low-S analogue. The public key and signature are fixed-length byte strings, and verification is deterministic. A signer may be able to produce multiple valid randomized SLH-DSA signatures for the same message; this is signer-controlled behavior, not third-party witness malleability. Wallets that need stable wtxids SHOULD cache the final signature they intend to broadcast, and MAY use deterministic SLH-DSA signing if their reviewed implementation exposes it without changing the consensus verification interface. This BIP does not rely on encoding canonicalization beyond exact public-key and signature lengths.
+
+==Activation==
+
+Activation parameters are intentionally not specified in this draft; they should be proposed only after BIP-360 review, QRS implementation review, test-vector review, and wallet-prototype review. Because this BIP is additive and restricts no legacy output, it is designed to avoid the primary sources of contention in forced-migration proposals; this is a claim about scope, not a prediction that any particular activation mechanism (e.g. version-bits signalling) will be uncontroversial in practice. This BIP SHOULD NOT be activated in a deployment package that also freezes, burns, restricts, throttles, or sunsets legacy outputs.
+
+==Future work: a composable post-quantum opcode (v2)==
+
+The SLH-DSA leaf is deliberately non-composable: it is exactly one public key under one signature and cannot be combined, within a single spending condition, with other script logic such as timelocks (<code>OP_CHECKSEQUENCEVERIFY</code>), thresholds, or multisignature. Because P2MR leaves are independent spending alternatives (a logical OR), "a post-quantum signature AND a timelock AND a 2-of-3" cannot be expressed as one required condition under this BIP. Custody constructions — vaults, inheritance schemes, corporate multisig — frequently require exactly such conjunctive conditions, and supporting them requires a post-quantum signature opcode usable inside tapscript (e.g. <code>OP_CHECKSIG_PQ</code>).
+
+That opcode is out of scope here for three reasons: (1) it must resolve the 520-byte tapscript stack-element limit, which SLH-DSA signatures exceed; (2) it may be most useful with a more compact scheme, whose selection needs separate review; and (3) bundling agility and composability into the first primitive reintroduces the algorithm-selection and resource-modelling debates this BIP is scoped to avoid.
+
+When that opcode is specified, it SHOULD resolve the stack-element-size limit by a '''narrowly scoped uplift''' — permitting only that opcode's signature and public-key operands to exceed 520 bytes — rather than by canonical witness chunking. Chunking a large signature into ≤520-byte stack elements requires a canonical-form rule over chunk count and sizes plus rejection of all equivalent re-chunkings; getting it wrong makes the witness malleable and destabilises wtxid-dependent workflows such as CPFP. An operand-scoped uplift introduces no such malleability surface and no broad change to general script resource limits.
+
+==Rejected alternatives==
+
+* '''Mandating migration in this BIP.''' Rejected: legacy sunset is a separate social-consensus question and must not block an opt-in rescue primitive.
+* '''ML-DSA as the first rescue algorithm.''' Rejected for v1: smaller signatures, but it introduces a lattice assumption as Bitcoin's first post-quantum consensus signature. A separate ML-DSA BIP may follow.
+* '''Multiple algorithms at once (an "algorithm buffet").''' Rejected: more review burden and activation held hostage to algorithm-selection disagreement. One conservative fallback first.
+* '''A tapscript opcode in v1.''' Rejected: the signature exceeds tapscript stack-element limits without also changing general script resource rules. See Future Work.
+* '''Canonical witness chunking to carry the signature.''' Rejected in favour of validating the signature as a single leaf-version witness element (v1) or, in a future opcode, an operand-scoped size uplift — both of which avoid the malleability surface that chunking introduces.
+* '''A witness discount for QRS signatures.''' Rejected: the emergency path should pay for its size.
+
+==Test vectors==
+
+A Complete version MUST include vectors for: valid QRS spend without annex; valid QRS spend with annex; invalid fixed-length signature that reaches the SLH-DSA verifier and fails verification; invalid public-key length; invalid signature length; invalid control-block length; control byte with low bit unset; invalid leaf version; Merkle-root mismatch; malformed witness stack; cross-implementation transaction-digest agreement; large-weight consensus-valid (non-standard) cases; and maximum-depth Merkle path.
+
+==Reference implementation==
+
+Before this BIP can advance beyond Draft, a reference implementation is expected to include: P2MR SLH-DSA leaf validation; an audited, pinned SLH-DSA-SHA2-128s verifier; transaction-digest tests; consensus tests; fuzz tests for malformed witnesses and control blocks; worst-case per-block validation benchmarks (per Resource Accounting); and a native benchmark harness comparing this validation path against individual and batch BIP-340 verification baselines, with median, p95, p99, and maximum timings.
+
+The current pre-review repository contains the native benchmark harness, provisional executable structured fixtures, draft cryptographic vectors verified through OpenSSL SLH-DSA where available, and negative/fuzz cases for witness-shape failures. These artifacts are review scaffolding for the Draft stage; final consensus vectors remain pending final BIP-360/QRS hashing and transaction-digest definitions.
+
+==Acknowledgements==
+
+This proposal builds on BIP-360's P2MR construction and its stated goal of enabling future post-quantum signatures in key-path-free outputs. BIP-360's reference material includes exploratory P2MR/PQC examples using SLH-DSA in script-like leaves. This BIP takes a narrower consensus-design approach: a single P2MR future leaf version whose payload is one SLH-DSA-SHA2-128s public key and whose validation rule verifies one fixed-size SLH-DSA signature, without adding a tapscript opcode, witness discount, algorithm registry, or legacy-output migration policy.
+
+==Reference links==
+
+* [[bip-0341.mediawiki|BIP-341: Taproot]]
+* [[bip-0342.mediawiki|BIP-342: Validation of Taproot Scripts]]
+* [[bip-0360.mediawiki|BIP-360: Pay-to-Merkle-Root (P2MR)]]
+* [[bip-0361.mediawiki|BIP-361: Post Quantum Migration and Legacy Signature Sunset]]
+* [https://csrc.nist.gov/pubs/fips/205/final FIPS 205: Stateless Hash-Based Digital Signature Standard]
+
+==Changelog==
+
+* '''0.9.0''' — Hardened the pre-review package without changing the core design. Added an explicit reviewer-objections subsection; removed unsupported resource-cost conclusion language; required invalid fixed-length signature measurement; separated individual, reviewed-public batch, and experimental batch Schnorr baselines; and kept the no-new-budget rule framed as a hypothesis to test before activation.
+* '''0.8.3''' — Pre-review tightening: added BIP-342 as an explicit dependency; foregrounded that wrapper overhead and batch Schnorr may narrow the resource-accounting margin; added a BIP-360-finalization check for leaf hashing, branch hashing, sighash tagging, annex handling, and future-leaf behavior; and sharpened the witness-malleability discussion.
+* '''0.8.2''' — Tightened the resource-accounting stance: no-new-budget is now framed as a proposed rule contingent on native validation-cost review, with required invalid-signature, tail-latency, Bitcoin Core integration, implementation-variance, and individual/batch Schnorr baselines before activation. Clarified that the soft fork is additive at the output-type level but restrictive for the assigned QRS future leaf version after activation.
+* '''0.8.1''' — Consistency fix: aligned the BIP's benchmark caveat with the benchmark harness, so both artifacts describe wrapper overhead as likely lowering the measured SLH-DSA/Schnorr ratio.
+* '''0.8.0''' — Abstract scope tightened from destination framing to spend-path framing.
+* '''0.7.0''' — Hardened the benchmark and its citation after review of the harness. Switched the headline figures from minimum to median timing; qualified the result as a Python-wrapper benchmark and noted that wrapper overhead likely lowers the measured SLH-DSA/Schnorr ratio; relabelled the SPHINCS+ implementation a preliminary proxy; and weakened the conclusion to "plausible and worth testing, not established," with the reference-implementation benchmark now required to report median and tail latency against a named library commit. The accompanying harness was updated to match.
+* '''0.6.0''' — Final pre-posting edits (pre-review release). Labelled the benchmark non-consensus; softened the SPHINCS+ proxy from "faithful" to "preliminary"; and clarified that the BIP-342 sigops figure is a comparative cost model only, since QRS validation is a leaf-version rule and not a tapscript signature opcode that consumes the BIP-342 budget.
+* '''0.5.0''' — Pre-posting polish. Softened backward-compatibility wording to defer to BIP-360's unrecognized-future-leaf-version rules rather than restate their semantics; made the resource-accounting framing dryer ("may already provide an adequate bound" rather than "over-prices"); replaced the "canonical/non-canonical encoding" requirement — undefined for fixed-length SLH-DSA artifacts — with a plain fixed-length acceptance rule, and added a Security Considerations note explaining why no encoding-canonicalization or low-S-style malleability rule is needed for this scheme.
+* '''0.4.0''' — Added a preliminary verification benchmark to Resource Accounting. On one machine, SLH-DSA-SHA2-128s verification measured ≈ 22× a libsecp256k1 Schnorr verification. Reframed the binding threshold from the BIP-342 sigop-budget heuristic (≈ 157×) to the stricter per-block weight ratio (≈ 35×). The no-new-budget position remained provisional pending a FIPS 205 verifier on named production hardware.
+* '''0.3.0''' — Second review pass. Resolved a witness-semantics contradiction (<code>qrs_signature</code> occupies the initial-stack position; this leaf version does have one initial stack element, not zero); corrected control-byte terminology (P2MR forces the low bit of <code>c[0]</code> high as an error-detection measure, not as a Taproot Y-parity bit); and pinned the SLH-DSA verification API to pure mode with an empty context string and canonical FIPS 205 encodings, removing a consensus-determinism ambiguity.
+* '''0.2.0''' — Incorporated external review. Corrected the two-leaf sibling-leaf security language (in an OR tree the coin is spendable if the classical sibling is compromised, regardless of QRS-leaf safety); marked the leaf version provisional pending conflict review; made the no-new-budget resource-accounting position explicitly provisional pending benchmark, with a named comparison to libsecp256k1; clarified that <code>qrs_public_key</code> occupies the BIP-360 second-to-last witness-element position as a non-tapscript payload; clarified <code>ext_flag = 2</code> semantics; refined the spend-path framing; aligned the BIP header with the repository convention.
+* '''0.1.0''' — Initial consolidated draft: P2MR-only SLH-DSA-SHA2-128s leaf, exact witness encoding, concrete (provisional) resource-accounting rule, composable-opcode roadmap deferred to Future Work.

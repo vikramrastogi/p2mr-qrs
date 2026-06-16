@@ -33,7 +33,7 @@ validation budget before activation.
 
 ## Repository Map
 
-- `docs/bip-p2mr-quantum-rescue-leaf-v0.9.0.mediawiki` - BIP draft.
+- `docs/bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki` - canonical BIP draft.
 - `docs/REVIEWER_DOSSIER.md` - predictable objections mapped to evidence,
   blockers, or non-goals.
 - `docs/RESOURCE_ACCOUNTING_DECISION.md` - decision criteria and current
@@ -48,7 +48,8 @@ validation budget before activation.
 - `docs/RELEASE_CHECKLIST.md` - posting and release checks.
 - `src/` and `include/` - native benchmark harness.
 - `scripts/` - validation, report, and batch-Schnorr evidence scripts.
-- `test_vectors/` - provisional structured QRS fixture vectors.
+- `test_vectors/` - provisional executable structured fixtures and draft
+  cryptographic vectors.
 - `fuzz/` and `tests/` - malformed witness corpus and negative cases.
 - `out/sample-native-report.md` - sample native benchmark report.
 - `out/batch-evidence.md` - reviewed-public batch Schnorr status evidence.
@@ -73,13 +74,18 @@ python3 scripts/validate_test_vectors.py test_vectors/
 python3 scripts/verify_qrs_fixtures.py test_vectors/
 python3 scripts/verify_qrs_vectors.py test_vectors/ --binary build/qrs_native_bench
 python3 scripts/run_qrs_negative_tests.py
-python3 scripts/evaluate_resource_accounting.py --report-json out/quick.json --batch-evidence-json out/batch-evidence.json
+python3 scripts/evaluate_resource_accounting.py \
+  --report-json out/quick.json \
+  --batch-evidence-json out/batch-evidence.json \
+  --json out/resource-accounting-decision.json \
+  --markdown out/resource-accounting-decision.md \
+  --advisory
 bash scripts/release_check.sh
 ```
 
 `scripts/check_batch_schnorr_baseline.py` can refresh the batch-Schnorr evidence
-report. Use `--skip-upstream` for local-only checks; omit it when publishing
-network-checked upstream evidence.
+report. Local release checks use `--skip-upstream` by default; set
+`QRS_RELEASE_NETWORK_BATCH=1` when publishing network-checked upstream evidence.
 
 ## Current Status
 
@@ -92,9 +98,10 @@ network-checked upstream evidence.
   unavailable in this package.
 - The QRS validation-path section is a model, not Bitcoin Core consensus
   integration.
-- The fixture vectors are executable structured fixtures. Verifier-reaching
-  vectors carry real SLH-DSA-SHA2-128s signatures, but the vectors remain
-  provisional until final BIP-360/QRS hashing definitions are available.
+- The fixture vectors are provisional executable structured fixtures.
+  Verifier-reaching draft cryptographic vectors carry real
+  SLH-DSA-SHA2-128s signatures, but the vector set remains provisional until
+  final BIP-360/QRS hashing definitions are available.
 - The explicit QRS budget fallback is specified but inactive; it is only needed
   if native/Core review rejects weight-only accounting.
 

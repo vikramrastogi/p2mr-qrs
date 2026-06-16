@@ -1,15 +1,26 @@
-# QRS Structured Fixture Vectors
+# QRS Provisional Executable Structured Fixtures
 
-These are deterministic v0.9.0 structured fixtures, not final consensus vectors.
-They intentionally use provisional `QRS_LEAF_VERSION = 0xc2` and modeled
-transaction fields until BIP-360 finalizes P2MR leaf hashing, branch hashing,
-sighash tagging, annex handling, and future-leaf behavior.
+These are deterministic v0.9.0 provisional executable structured fixtures, not
+final consensus vectors. They intentionally use provisional
+`QRS_LEAF_VERSION = 0xc2` and modeled transaction fields until BIP-360
+finalizes P2MR leaf hashing, branch hashing, sighash tagging, annex handling,
+and future-leaf behavior.
 
 The fixture hashes are executable under `scripts/verify_qrs_fixtures.py`.
-Verifier-reaching vectors additionally carry real fixed-length
-SLH-DSA-SHA2-128s signatures checked by `scripts/verify_qrs_vectors.py` through
-the native benchmark binary. The vectors are still provisional because the
-hashing model is provisional pending final BIP-360/QRS definitions.
+Verifier-reaching draft cryptographic vectors additionally carry real
+fixed-length SLH-DSA-SHA2-128s signatures checked by
+`scripts/verify_qrs_vectors.py` through the native benchmark binary. The
+vectors are still provisional because the hashing model is provisional pending
+final BIP-360/QRS definitions.
+
+The provisional model intentionally follows the current BIP's structural
+preimage shape where it can: leaf hashes use
+`TapLeaf(version || compact_size(len(pubkey)) || pubkey)`, branch hashes use
+`TapBranch`, and message hashes use
+`TapSighash(0x00 || modeled_sigmsg || leaf_hash)` with an ext_flag=2
+spend-type byte. The modeled SigMsg is not a final BIP-341 transaction digest;
+it is a deterministic fixture payload until the final BIP-360/QRS digest rules
+exist.
 
 Each vector includes the fields required for final consensus-vector review:
 structured transaction fields, spent output scriptPubKey, witness stack,

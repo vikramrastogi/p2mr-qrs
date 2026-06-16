@@ -12,7 +12,7 @@
     "secp256k1_schnorrsig_verify"
   ],
   "public_schnorr_header": "third_party/secp256k1/include/secp256k1_schnorrsig.h",
-  "reason": "Bundled upstream bitcoin-core/secp256k1 commit aea86bc3509f3ceb5c047fe6567bf8910f72a728 exposes no public BIP-340 batch verification API; local schnorrsig tests still mark verify_batch as TODO; and the upstream head search found no batch/Schnorr/BIP-340 branch to wire as a reviewed experimental baseline.",
+  "reason": "Bundled upstream bitcoin-core/secp256k1 commit aea86bc3509f3ceb5c047fe6567bf8910f72a728 exposes no public BIP-340 batch verification API, and local schnorrsig tests still mark verify_batch as TODO. The upstream head search was skipped by caller request; run without --skip-upstream before treating this as network-checked evidence.",
   "schema": "qrs-native-bench/batch-baseline-evidence/v0",
   "status": "unavailable",
   "upstream_head_search": {
@@ -22,7 +22,7 @@
       "*schnorr*",
       "*bip340*"
     ],
-    "status": "ok",
+    "status": "skipped",
     "stderr": "",
     "timeout_seconds": 15.0,
     "url": "https://github.com/bitcoin-core/secp256k1.git"

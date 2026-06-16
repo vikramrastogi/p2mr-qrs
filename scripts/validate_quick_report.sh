@@ -15,7 +15,7 @@ fi
 python3 "$ROOT/scripts/check_batch_schnorr_baseline.py" \
   --json "$ROOT/out/batch-evidence.json" \
   --markdown "$ROOT/out/batch-evidence.md" \
-  --upstream-timeout-seconds "${UPSTREAM_TIMEOUT_SECONDS:-15}"
+  "${QRS_BATCH_EVIDENCE_MODE:---skip-upstream}"
 
 "$BUILD_DIR/qrs_native_bench" \
   --quick \

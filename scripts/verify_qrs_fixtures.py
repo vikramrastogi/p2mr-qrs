@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Execute the provisional QRS structured-fixture model.
 
-These fixtures are not final consensus vectors: the BIP-360/P2MR leaf hashing
-and QRS sighash rules are still draft material, and the fixture signatures are
-descriptor bytes rather than real SLH-DSA signatures. This verifier makes the
-current fixture model executable by recomputing modeled hashes and failure-stage
+These are provisional executable structured fixtures, not final consensus
+vectors: the BIP-360/P2MR leaf hashing and QRS sighash rules are still draft
+material. This verifier makes the current draft structure executable by
+recomputing leaf hashes, a SigMsg-shaped QRS message, and failure-stage
 classification, without pretending to provide final consensus-vector coverage.
 """
 
@@ -19,6 +19,8 @@ from pathlib import Path
 
 
 QRS_LEAF_VERSION = 0xC2
+QRS_HASH_TYPE = 0x00
+QRS_EXT_FLAG = 0x02
 P2MR_SCRIPT_PREFIX = "5120"
 STRUCTURAL_FAILURES = {
     "signature_length",
@@ -46,6 +48,20 @@ def tagged_hash(tag: str, payload: bytes) -> bytes:
 
 def canonical_json(value: object) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
+
+
+def compact_size(value: int) -> bytes:
+    if value < 0:
+        raise ValueError("compact_size cannot encode a negative value")
+    if value < 253:
+        return bytes([value])
+    if value <= 0xFFFF:
+        return b"\xfd" + value.to_bytes(2, "little")
+    if value <= 0xFFFFFFFF:
+        return b"\xfe" + value.to_bytes(4, "little")
+    if value <= 0xFFFFFFFFFFFFFFFF:
+        return b"\xff" + value.to_bytes(8, "little")
+    raise ValueError("compact_size value too large")
 
 
 def hex_bytes(value: str, path: Path, field: str) -> bytes:
@@ -89,7 +105,10 @@ def expand_descriptor(value: object, path: Path, field: str) -> bytes:
 
 
 def modeled_leaf_hash(pubkey: bytes) -> bytes:
-    return tagged_hash("QRSFixtureLeaf/v0.9.0", bytes([QRS_LEAF_VERSION]) + pubkey)
+    return tagged_hash(
+        "TapLeaf",
+        bytes([QRS_LEAF_VERSION]) + compact_size(len(pubkey)) + pubkey,
+    )
 
 
 def merkle_root(leaf_hash: bytes, control_block: bytes) -> bytes:
@@ -97,19 +116,32 @@ def merkle_root(leaf_hash: bytes, control_block: bytes) -> bytes:
     for offset in range(1, len(control_block), 32):
         sibling = control_block[offset : offset + 32]
         left, right = sorted([root, sibling])
-        root = tagged_hash("QRSFixtureBranch/v0.9.0", left + right)
+        root = tagged_hash("TapBranch", left + right)
     return root
 
 
-def modeled_qrs_msg(data: dict, pubkey: bytes, leaf_hash: bytes, annex: bytes) -> bytes:
-    payload = {
-        "transaction": data["transaction"],
-        "spent_output_scriptPubKey": data["spent_output_scriptPubKey"],
-        "qrs_public_key": pubkey.hex(),
-        "leaf_hash": leaf_hash.hex(),
-        "annex": annex.hex(),
-    }
-    return tagged_hash("QRSFixtureMsg/v0.9.0", canonical_json(payload))
+def modeled_sigmsg(data: dict, annex: bytes, path: Path) -> bytes:
+    """Return a deterministic SigMsg-shaped fixture payload.
+
+    This is not a final BIP-341 transaction digest. It intentionally mirrors the
+    current QRS draft's structural pieces: hash_type, spend_type for ext_flag=2,
+    transaction/spent-output/annex commitments, and a separate leaf_hash
+    extension appended by modeled_qrs_msg().
+    """
+
+    annex_present = 1 if annex else 0
+    spend_type = QRS_EXT_FLAG * 2 + annex_present
+    tx_digest = tagged_hash("QRSFixtureTransaction/v0.9.0", canonical_json(data["transaction"]))
+    spent_output_digest = tagged_hash(
+        "QRSFixtureSpentOutput/v0.9.0",
+        hex_bytes(data["spent_output_scriptPubKey"], path, "spent_output_scriptPubKey"),
+    )
+    annex_digest = tagged_hash("QRSFixtureAnnex/v0.9.0", annex)
+    return bytes([QRS_HASH_TYPE, spend_type]) + tx_digest + spent_output_digest + annex_digest
+
+
+def modeled_qrs_msg(data: dict, leaf_hash: bytes, annex: bytes, path: Path) -> bytes:
+    return tagged_hash("TapSighash", b"\x00" + modeled_sigmsg(data, annex, path) + leaf_hash)
 
 
 def p2mr_root(script_pubkey: str, path: Path) -> bytes:
@@ -160,14 +192,14 @@ def verify_one(path: Path, update: bool) -> dict:
     annex = hex_bytes(data.get("annex", ""), path, "annex")
 
     leaf_hash = modeled_leaf_hash(pubkey)
-    qrs_msg = modeled_qrs_msg(data, pubkey, leaf_hash, annex)
+    qrs_msg = modeled_qrs_msg(data, leaf_hash, annex, path)
 
     if update:
         data["expected_leaf_hash"] = leaf_hash.hex()
         data["expected_qrs_msg"] = qrs_msg.hex()
         if data["failure_stage"] in {"none", "slh_dsa_verify"}:
             update_spend_root(data, merkle_root(leaf_hash, control_block))
-            qrs_msg = modeled_qrs_msg(data, pubkey, leaf_hash, annex)
+            qrs_msg = modeled_qrs_msg(data, leaf_hash, annex, path)
             data["expected_qrs_msg"] = qrs_msg.hex()
         path.write_text(json.dumps(data, indent=2, sort_keys=False) + "\n", encoding="utf-8")
 
@@ -207,9 +239,9 @@ def main() -> int:
     verified = [verify_one(path, args.update) for path in paths]
     crypto_reaching = [v["name"] for v in verified if v["failure_stage"] in {"none", "slh_dsa_verify"}]
     print(
-        f"verified {len(verified)} provisional QRS structured fixtures "
+        f"verified {len(verified)} provisional executable QRS structured fixtures "
         f"({len(crypto_reaching)} reach the modeled SLH-DSA verifier boundary; "
-        "cryptographic fixture signatures are not final consensus vectors)"
+        "draft cryptographic vectors are checked separately by verify_qrs_vectors.py)"
     )
     return 0
 

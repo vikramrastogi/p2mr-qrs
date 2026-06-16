@@ -4,6 +4,7 @@
 #include "qrs_bench/experimental_batch_schnorr.h"
 
 #include <array>
+#include <cstdlib>
 #include <cstdint>
 #include <cstring>
 #include <memory>
@@ -221,9 +222,9 @@ SchnorrResult run_schnorr_benchmarks(BenchmarkMode mode) {
         "Bundled upstream bitcoin-core/secp256k1 commit "
         QRS_BENCH_SECP256K1_COMMIT
         " exposes only the public secp256k1_schnorrsig_verify API for BIP-340; "
-        "its schnorrsig tests still mark verify_batch as TODO, and git ls-remote "
-        "found no upstream heads matching batch/schnorr/bip340 for a reviewed "
-        "experimental baseline. No fake batch baseline is synthesized.";
+        "its schnorrsig tests still mark verify_batch as TODO. The separate "
+        "scripts/check_batch_schnorr_baseline.py evidence report records local API "
+        "status and optional upstream-head lookup status. No fake batch baseline is synthesized.";
     r.batch_reviewed_public_per_signature_verify.status = "unavailable";
 
     std::array<unsigned char, 32> seckey {};
@@ -231,6 +232,7 @@ SchnorrResult run_schnorr_benchmarks(BenchmarkMode mode) {
     std::array<unsigned char, 32> aux {};
     secp256k1_xonly_pubkey pubkey;
     secp256k1_xonly_pubkey parsed_pubkey;
+    std::array<unsigned char, 32> serialized_pubkey {};
     std::array<unsigned char, 64> sig {};
     std::array<unsigned char, 64> bad_sig = sig;
 
@@ -252,7 +254,6 @@ SchnorrResult run_schnorr_benchmarks(BenchmarkMode mode) {
       if (secp256k1_keypair_xonly_pub(ctx.get(), &pubkey, &pk_parity, &keypair) != 1) {
         throw std::runtime_error("secp256k1_keypair_xonly_pub failed");
       }
-      std::array<unsigned char, 32> serialized_pubkey {};
       if (secp256k1_xonly_pubkey_serialize(ctx.get(), serialized_pubkey.data(), &pubkey) != 1) {
         throw std::runtime_error("secp256k1_xonly_pubkey_serialize failed");
       }
@@ -313,12 +314,20 @@ SchnorrResult run_schnorr_benchmarks(BenchmarkMode mode) {
     }
 
     try {
+      const char* disable_experimental = std::getenv("QRS_BENCH_DISABLE_EXPERIMENTAL_BATCH");
+      if (disable_experimental != nullptr && disable_experimental[0] != '\0') {
+        throw std::runtime_error("experimental batch disabled by QRS_BENCH_DISABLE_EXPERIMENTAL_BATCH");
+      }
       if (qrs_exp_bip340_challenge_self_test() != 1) {
-        throw std::runtime_error("BIP-340 challenge self-test failed");
+        throw std::runtime_error("BIP-340 deterministic challenge self-test failed");
+      }
+      if (qrs_exp_bip340_challenge_self_test_with_input(
+              sig.data(), msg.data(), serialized_pubkey.data()) != 1) {
+        throw std::runtime_error("BIP-340 generated-signature challenge self-test failed");
       }
       r.batch_experimental_challenge_self_test_status = "available";
       r.batch_experimental_challenge_self_test_reason =
-          "BIP-340 challenge self-test passed: libsecp256k1 tagged SHA helper matched an independent tagged_hash construction over deterministic inputs.";
+          "BIP-340 challenge self-test passed: libsecp256k1 tagged SHA helper matched an independent tagged_hash construction over deterministic inputs and over the R || P || m tuple from a generated valid signature.";
       r.batch_experimental_valid = run_experimental_batch_benchmarks(ctx.get(), false, mode);
       r.batch_experimental_invalid = run_experimental_batch_benchmarks(ctx.get(), true, mode);
       if (r.batch_experimental_valid.empty()) {

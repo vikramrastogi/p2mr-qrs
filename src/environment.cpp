@@ -6,6 +6,18 @@
 #include <string>
 #include <sys/utsname.h>
 
+#ifndef QRS_BENCH_CMAKE_BUILD_TYPE
+#define QRS_BENCH_CMAKE_BUILD_TYPE "unspecified"
+#endif
+
+#ifndef QRS_BENCH_COMPILER_FLAGS
+#define QRS_BENCH_COMPILER_FLAGS "unavailable"
+#endif
+
+#ifndef QRS_BENCH_SCHEMA
+#define QRS_BENCH_SCHEMA "qrs-native-bench/v0"
+#endif
+
 #if defined(__APPLE__)
 #include <sys/sysctl.h>
 #endif
@@ -127,11 +139,14 @@ Environment collect_environment() {
 #endif
 
 #if defined(__clang__)
-  env.fields["compiler"] = std::string("clang ") + __clang_version__;
+  env.fields["compiler"] = "clang";
+  env.fields["compiler_version"] = __clang_version__;
 #elif defined(__GNUC__)
-  env.fields["compiler"] = std::string("gcc ") + __VERSION__;
+  env.fields["compiler"] = "gcc";
+  env.fields["compiler_version"] = __VERSION__;
 #else
   env.fields["compiler"] = "unknown";
+  env.fields["compiler_version"] = "unknown";
 #endif
 
 #if defined(NDEBUG)
@@ -142,7 +157,9 @@ Environment collect_environment() {
   env.fields["benchmark_binary_build_mode"] = "non-release";
 #endif
 
-  env.fields["compiler_flags"] = "CMake target: -O3 -Wall -Wextra -Wpedantic";
+  env.fields["benchmark_schema"] = QRS_BENCH_SCHEMA;
+  env.fields["cmake_build_type"] = QRS_BENCH_CMAKE_BUILD_TYPE;
+  env.fields["compiler_flags"] = QRS_BENCH_COMPILER_FLAGS;
   env.fields["git_commit"] = command_output("git rev-parse HEAD 2>/dev/null");
   env.fields["working_tree_dirty"] = git_dirty_state();
   env.fields["benchmark_commit"] = env.fields["git_commit"];

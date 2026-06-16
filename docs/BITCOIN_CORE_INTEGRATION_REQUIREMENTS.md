@@ -43,9 +43,11 @@ The modeled harness is sufficient for pre-review only. Before activation, the
 Core report must feed `scripts/evaluate_resource_accounting.py` or an equivalent
 reviewed evaluator and produce one of:
 
-- `pass_draft_no_additional_budget_supported`, with the remaining activation
+- `supports_no_additional_budget_for_draft`, with the remaining activation
   blockers independently resolved; or
-- `fail_explicit_qrs_budget_required`, followed by adoption of
+- `unresolved_requires_reviewer_decision`, with the batch-baseline or policy
+  question explicitly decided before activation; or
+- `explicit_budget_required_before_activation`, followed by adoption of
   `docs/EXPLICIT_QRS_BUDGET_FALLBACK.md` with a positive reviewed constant.
 
 ## Non-Claim

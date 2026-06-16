@@ -51,8 +51,13 @@ def main() -> int:
         env.get("benchmark_binary_build_mode"),
         "environment.benchmark_binary_build_mode must be present",
     )
+    require(env.get("benchmark_schema") == "qrs-native-bench/v0", "environment.benchmark_schema mismatch")
+    require(env.get("cmake_build_type"), "environment.cmake_build_type must be present")
     require(env.get("compiler"), "environment.compiler must be present")
+    require(env.get("compiler_version"), "environment.compiler_version must be present")
     require(env.get("compiler_flags"), "environment.compiler_flags must be present")
+    require(env.get("openssl_version"), "environment.openssl_version must be present")
+    require(env.get("openssl_provider"), "environment.openssl_provider must be present")
 
     schnorr = report["benchmarks"]["schnorr_bip340"]
     require(schnorr["status"] == "available", "individual Schnorr backend must be available")
@@ -94,6 +99,14 @@ def main() -> int:
         require(
             schnorr["batch_experimental_challenge_self_test"]["status"] == "available",
             "experimental batch must report a passing BIP-340 challenge self-test",
+        )
+        require(
+            schnorr["batch_experimental_challenge_self_test"]["result"] == "passed",
+            "experimental batch challenge self-test result must be passed",
+        )
+        require(
+            "independent BIP0340/challenge tagged-hash" in schnorr["batch_experimental_challenge_self_test"]["description"],
+            "BIP-340 challenge self-test description must identify independent tagged-hash comparison",
         )
         require(
             "tagged_hash" in schnorr["batch_experimental_challenge_self_test"]["reason"],

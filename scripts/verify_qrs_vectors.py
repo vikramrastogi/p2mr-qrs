@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Execute QRS vector validation, including native SLH-DSA checks.
 
-The vectors remain provisional until BIP-360/QRS hashing is final, but this
-script is intentionally stronger than metadata validation: it recomputes the
-modeled leaf/message hashes, checks structural failure staging, and verifies
-real fixed-length SLH-DSA signatures through the native benchmark binary.
+The vectors remain provisional until BIP-360/QRS hashing is final. This script
+checks the draft cryptographic vectors: it recomputes the modeled leaf/message
+hashes, checks structural failure staging, and verifies real fixed-length
+SLH-DSA signatures through the native benchmark binary.
 """
 
 from __future__ import annotations
@@ -124,7 +124,7 @@ def verify_model(path: Path, data: dict) -> tuple[str, str, str, str]:
     annex = hex_bytes(data.get("annex", ""), path, "annex")
 
     leaf_hash = modeled_leaf_hash(pubkey)
-    qrs_msg = modeled_qrs_msg(data, pubkey, leaf_hash, annex)
+    qrs_msg = modeled_qrs_msg(data, leaf_hash, annex, path)
     if data.get("expected_leaf_hash") != leaf_hash.hex():
         fail(path, "expected_leaf_hash does not match executable vector model")
     if data.get("expected_qrs_msg") != qrs_msg.hex():
@@ -174,7 +174,7 @@ def update_real_signatures(vectors: list[tuple[Path, dict]], binary: Path) -> No
             pubkey = bytes.fromhex(public_key_hex)
             leaf_hash = modeled_leaf_hash(pubkey)
             update_spend_root(data, merkle_root(leaf_hash, control_block))
-            qrs_msg = modeled_qrs_msg(data, pubkey, leaf_hash, hex_bytes(data.get("annex", ""), path, "annex"))
+            qrs_msg = modeled_qrs_msg(data, leaf_hash, hex_bytes(data.get("annex", ""), path, "annex"), path)
             sig_hex = native_sign(binary, private_key_hex, qrs_msg.hex())
             if stage == "slh_dsa_verify":
                 sig_hex = mutate_signature(sig_hex)
@@ -185,7 +185,7 @@ def update_real_signatures(vectors: list[tuple[Path, dict]], binary: Path) -> No
             sig = expand_descriptor(data["qrs_signature"], path, "qrs_signature")
             pubkey = expand_descriptor(data["qrs_public_key"], path, "qrs_public_key")
             leaf_hash = modeled_leaf_hash(pubkey)
-            qrs_msg = modeled_qrs_msg(data, pubkey, leaf_hash, hex_bytes(data.get("annex", ""), path, "annex"))
+            qrs_msg = modeled_qrs_msg(data, leaf_hash, hex_bytes(data.get("annex", ""), path, "annex"), path)
             data["expected_leaf_hash"] = leaf_hash.hex()
             data["expected_qrs_msg"] = qrs_msg.hex()
             data["qrs_signature"] = data["qrs_signature"] if sig else data["qrs_signature"]
@@ -251,7 +251,7 @@ def main() -> int:
     run_self_tests(args.binary, crypto_available, verified)
     suffix = "with native SLH-DSA crypto" if crypto_available else "without native SLH-DSA crypto"
     print(
-        f"verified {len(verified)} executable QRS vectors "
+        f"verified {len(verified)} draft cryptographic QRS vectors "
         f"({crypto_vectors} verifier-reaching, {structural_vectors} structural) {suffix}"
     )
     return 0

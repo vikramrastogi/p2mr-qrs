@@ -39,8 +39,8 @@
     "hex": "c5",
     "depth": 0
   },
-  "expected_leaf_hash": "a24454eac60681f07718f66640ee692f125b5582be6112b3833e75b40b885036",
-  "expected_qrs_msg": "525210612170db026c253cf8b5c17bca3f50639b8c9749fbb43889edebc58fec",
+  "expected_leaf_hash": "6c8f5be44278253b3d117542111ff92c68c80c23a4dfd01dcd3dab7e68584ccc",
+  "expected_qrs_msg": "ffd88bfe07f3b53bfd1548f89b5c53cb3ae0efa5e003d8604d5cc7620eed8d39",
   "expected_result": false,
   "failure_stage": "leaf_version",
   "reaches_slh_dsa_verifier": false

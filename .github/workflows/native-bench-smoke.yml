@@ -54,7 +54,7 @@ jobs:
           python3 scripts/check_batch_schnorr_baseline.py \
             --json out/batch-evidence.json \
             --markdown out/batch-evidence.md \
-            --upstream-timeout-seconds 15
+            --skip-upstream
 
       - name: Run quick benchmark
         run: ./build/qrs_native_bench --quick --json out/quick.json --markdown out/quick.md
