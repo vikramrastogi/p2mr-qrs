@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/vikramrastogi/p2mr-qrs/docs/consensus-gap-manifest.schema.json",
+  "title": "P2MR QRS Consensus Gap Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "status",
+    "description",
+    "gaps"
+  ],
+  "properties": {
+    "schema": {
+      "const": "p2mr-qrs/consensus-gap-manifest/v0"
+    },
+    "status": {
+      "const": "blocking_activation"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "gaps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "status",
+          "blocks",
+          "owner_type",
+          "description",
+          "evidence_required",
+          "current_repo_artifact"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+$"
+          },
+          "status": {
+            "const": "blocking_activation"
+          },
+          "blocks": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "enum": [
+                "activation",
+                "complete_vectors",
+                "draft_advancement",
+                "resource_accounting_decision",
+                "wallet_standards"
+              ]
+            },
+            "uniqueItems": true
+          },
+          "owner_type": {
+            "enum": [
+              "future_bip360_review",
+              "future_core_review",
+              "future_implementation_review",
+              "future_reviewer_reproduction",
+              "future_wallet_standards",
+              "future_activation_process",
+              "future_batch_schnorr_review"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence_required": {
+            "type": "string",
+            "minLength": 1
+          },
+          "current_repo_artifact": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

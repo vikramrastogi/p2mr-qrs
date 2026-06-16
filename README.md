@@ -47,8 +47,12 @@ validation budget before activation.
 - `docs/BITCOIN_CORE_INTEGRATION_REQUIREMENTS.md` - exact artifact required to
   close the Core validation-path caveat.
 - `docs/BIP360_DEPENDENCY_MATRIX.md` - BIP-360/P2MR dependency closure table.
+- `docs/CONSENSUS_GAP_MANIFEST.md` - machine-checked activation and final-vector
+  blocker manifest.
 - `docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md` - schema and requirements for final
   serialized consensus vectors.
+- `docs/VECTOR_COVERAGE_MATRIX.md` - machine-checked provisional fixture and
+  negative-case coverage matrix.
 - `docs/REPRODUCIBILITY.md` - independent rerun protocol.
 - `docs/REPRODUCTION_MATRIX.md` - public reproduction tracker and platform
   targets.
@@ -129,4 +133,5 @@ report. Local release checks use `--skip-upstream` by default; set
   if native/Core review rejects weight-only accounting.
 
 Known blockers before advancing beyond Draft are listed in
-`docs/REVIEWER_DOSSIER.md`.
+`docs/REVIEWER_DOSSIER.md` and machine-checked in
+`docs/CONSENSUS_GAP_MANIFEST.md`.

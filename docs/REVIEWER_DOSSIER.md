@@ -6,7 +6,8 @@ readiness.
 ## What this proposal does
 
 Defines one P2MR-only future leaf version that verifies one
-SLH-DSA-SHA2-128s signature over a BIP-341-style transaction digest. See
+SLH-DSA-SHA2-128s signature over a P2MR/QRS transaction digest derived from the
+BIP-341 `SigMsg` structure, pending final BIP-360 definitions. See
 `bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki`.
 
 ## What this proposal does not do
@@ -60,6 +61,10 @@ are explicitly hypothetical and must not be cited as measured batch evidence;
 their purpose is to show where reviewer concern about a faster batch baseline
 would make the no-additional-budget rule unresolved.
 
+The generated decision record also reports QRS depth sensitivity for depth 0
+and depth 128. This counts Merkle path witness weight and TapBranch hash counts,
+but does not benchmark Bitcoin Core branch-hash implementation overhead.
+
 A measured experimental batch implementation that is slower than individual
 Schnorr is not favorable evidence for QRS. It is reported as non-tightening and
 cannot support the no-additional-budget rule for activation review.
@@ -82,6 +87,14 @@ The BIP requires BIP-360 and remains blocked on final BIP-360 definitions for
 P2MR hashing, sighash tagging, annex handling, and future-leaf behavior. The
 vectors are marked provisional for the same reason. The dependency closure table
 is `BIP360_DEPENDENCY_MATRIX.md`.
+
+Known activation and final-vector gaps are also listed in
+`CONSENSUS_GAP_MANIFEST.md` and machine-checked by
+`scripts/validate_consensus_gap_manifest.py`. That manifest includes blocker
+IDs such as `bip360_final_leaf_hashing`,
+`bitcoin_core_validation_path_integration`,
+`reviewed_public_batch_schnorr_baseline`, and
+`final_serialized_consensus_vectors`.
 
 BIP-360's reference material includes exploratory P2MR/PQC examples using
 SLH-DSA in script-like leaves. This package does not claim to invent the general
@@ -130,12 +143,23 @@ which calls the native SLH-DSA-SHA2-128s verifier for valid and invalid
 fixed-length signatures. They are still not final consensus vectors because the
 modeled hashing rules remain provisional pending final BIP-360/QRS definitions.
 
+`VECTOR_COVERAGE_MATRIX.md` and
+`test_vectors/vector_coverage_matrix.json` make the current provisional
+coverage explicit across structured fixtures, negative/fuzz witness cases,
+digest mutation self-tests, and fixed-length invalid verifier cases.
+
 ## Benchmark status
 
 Native OpenSSL SLH-DSA-SHA2-128s, native individual libsecp256k1 BIP-340, and
 experimental native batch BIP-340 are measured. The QRS validation-path section
 is a model, not Bitcoin Core integration. The artifact required to close that
 caveat is specified in `BITCOIN_CORE_INTEGRATION_REQUIREMENTS.md`.
+
+The modeled validation path intentionally uses explicit non-consensus prefixes
+such as `QRS modeled TapLeaf v0`, `QRS modeled Branch v0`, and
+`QRS modeled SigMsg v0`. Those prefixes make the benchmark bucket stable for
+pre-review while preventing the report from being mistaken for final
+TapLeaf/TapBranch/TapSighash consensus code.
 
 The report now lists SLH-DSA backend status explicitly. Consensus readiness
 requires a reviewed/pinned verifier strategy and cross-backend agreement.
@@ -183,6 +207,7 @@ Markdown artifacts. The platform target table is `REPRODUCTION_MATRIX.md`.
 | How does evidence map to the budget rule? | The decision criteria and current conclusion are in a separate decision record. | `RESOURCE_ACCOUNTING_DECISION.md`; `../out/quick.md`; `../out/full.md`. |
 | What if the no-budget rule fails? | Use the inactive explicit QRS budget fallback before activation. | `EXPLICIT_QRS_BUDGET_FALLBACK.md`; `../scripts/evaluate_resource_accounting.py`. |
 | What if BIP-360 changes? | Advancement is blocked on final BIP-360 definitions. | BIP Dependencies and Rationale; provisional vector notes. |
+| Where is the blocker list? | Activation and final-vector gaps are machine-readable and release-checked. | `CONSENSUS_GAP_MANIFEST.md`; `consensus-gap-manifest.json`; `../scripts/validate_consensus_gap_manifest.py`. |
 | Is this activation-ready? | No. It is Draft-stage pre-review material. | `RELEASE_CHECKLIST.md`; this dossier's known blockers. |
 
 ## Known blockers before advancing beyond Draft
