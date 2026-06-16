@@ -61,6 +61,7 @@ validation budget before activation.
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j
 ./build/qrs_native_bench --quick --json out/quick.json --markdown out/quick.md
+./build/qrs_native_bench --standard --json out/standard.json --markdown out/standard.md
 python3 scripts/assert_quick_report.py out/quick.json out/quick.md
 python3 scripts/validate_test_vectors.py test_vectors/
 python3 scripts/verify_qrs_fixtures.py test_vectors/
@@ -80,7 +81,7 @@ network-checked upstream evidence.
   build exposes the algorithm.
 - Native libsecp256k1 individual BIP-340 Schnorr timing is measured.
 - Experimental native BIP-340 batch timing is included for sensitivity analysis
-  only.
+  only, with an executable BIP-340 challenge self-test before timing.
 - Reviewed public libsecp256k1 batch verification remains explicitly
   unavailable in this package.
 - The QRS validation-path section is a model, not Bitcoin Core consensus

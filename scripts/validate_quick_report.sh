@@ -29,8 +29,10 @@ python3 "$ROOT/scripts/assert_quick_report.py" \
 
 jq '.benchmarks.schnorr_bip340.batch.status' "$ROOT/out/quick.json"
 jq '.benchmarks.schnorr_bip340.batch_experimental_valid.status' "$ROOT/out/quick.json"
+jq '.benchmarks.schnorr_bip340.batch_experimental_challenge_self_test.status' "$ROOT/out/quick.json"
 jq '.benchmarks.schnorr_bip340.batch_reviewed_public_api_status' "$ROOT/out/quick.json"
 grep -n "experimental native BIP-340 batch baseline" "$ROOT/out/quick.md"
+grep -n "BIP-340 challenge self-test" "$ROOT/out/quick.md"
 grep -n "not a reviewed public libsecp256k1 API" "$ROOT/out/quick.md"
 grep -n "QRS vs experimental batch Schnorr" "$ROOT/out/quick.md"
 grep -n "reviewed public batch" "$ROOT/out/quick.md"

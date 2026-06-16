@@ -1,5 +1,6 @@
 #pragma once
 
+#include "qrs_bench/benchmark_mode.h"
 #include "qrs_bench/stats.h"
 
 #include <string>
@@ -32,6 +33,6 @@ struct SlhDsaResult {
   std::string invalid_fixed_length_case_name_worst;
 };
 
-SlhDsaResult run_slh_dsa_benchmarks(bool quick);
+SlhDsaResult run_slh_dsa_benchmarks(BenchmarkMode mode);
 
 }  // namespace qrs

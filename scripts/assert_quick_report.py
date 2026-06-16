@@ -91,6 +91,14 @@ def main() -> int:
             schnorr["batch_experimental_invalid"]["status"] == "available",
             "experimental invalid batch baseline must be available when experimental status is available",
         )
+        require(
+            schnorr["batch_experimental_challenge_self_test"]["status"] == "available",
+            "experimental batch must report a passing BIP-340 challenge self-test",
+        )
+        require(
+            "tagged_hash" in schnorr["batch_experimental_challenge_self_test"]["reason"],
+            "BIP-340 challenge self-test reason must identify independent tagged_hash construction",
+        )
     else:
         require(
             schnorr["batch_experimental"]["status"] == "unavailable",
@@ -212,6 +220,10 @@ def main() -> int:
         require(
             "not a reviewed public libsecp256k1 API" in md,
             "Markdown must distinguish experimental batch from reviewed public API",
+        )
+        require(
+            "BIP-340 challenge self-test" in md,
+            "Markdown must report the BIP-340 challenge self-test",
         )
         require(
             "QRS vs experimental batch Schnorr" in md,

@@ -92,6 +92,7 @@ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j
 python3 scripts/check_batch_schnorr_baseline.py --json out/batch-evidence.json --markdown out/batch-evidence.md
 ./build/qrs_native_bench --quick --json out/quick.json --markdown out/quick.md
+./build/qrs_native_bench --standard --json out/standard.json --markdown out/standard.md
 ./build/qrs_native_bench --full --json out/full.json --markdown out/full.md
 python3 scripts/assert_quick_report.py --json out/quick.json --markdown out/quick.md --batch-evidence-json out/batch-evidence.json
 python3 scripts/assert_quick_report.py out/quick.json out/quick.md
@@ -117,6 +118,7 @@ jq '.benchmarks.schnorr_bip340.batch_experimental_valid.status' out/quick.json
 jq '.benchmarks.schnorr_bip340.batch_reviewed_public_api_status' out/quick.json
 jq '.draft_rule_status' out/resource-accounting-decision.json
 grep -n "experimental native BIP-340 batch baseline" out/quick.md
+grep -n "BIP-340 challenge self-test" out/quick.md docs/REVIEWER_DOSSIER.md
 grep -n "not a reviewed public libsecp256k1 API" out/quick.md
 grep -n "QRS vs experimental batch Schnorr" out/quick.md
 ```

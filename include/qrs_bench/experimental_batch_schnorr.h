@@ -17,6 +17,8 @@ int qrs_exp_bip340_batch_verify(qrs_exp_bip340_batch_context* ctx,
                                 const unsigned char* msg32_flat,
                                 const unsigned char* pubkey32_flat);
 
+int qrs_exp_bip340_challenge_self_test(void);
+
 #ifdef __cplusplus
 }
 #endif

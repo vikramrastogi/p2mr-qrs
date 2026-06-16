@@ -232,7 +232,7 @@ Stats unavailable_stats() {
 
 }  // namespace
 
-QrsValidationPathResult run_qrs_validation_path_model(bool quick) {
+QrsValidationPathResult run_qrs_validation_path_model(BenchmarkMode mode) {
   QrsValidationPathResult r;
 
 #if !defined(QRS_BENCH_HAVE_OPENSSL)
@@ -293,11 +293,16 @@ QrsValidationPathResult run_qrs_validation_path_model(bool quick) {
       throw std::runtime_error("fixed-length crypto reject did not reach verifier");
     }
 
-    const std::size_t batches = quick ? 7 : 31;
-    const std::size_t verify_iters = quick ? 8 : 100;
-    const std::size_t cheap_iters = quick ? 2000 : 20000;
-    const std::size_t warmup_verify = quick ? 4 : 32;
-    const std::size_t warmup_cheap = quick ? 200 : 1000;
+    const std::size_t batches =
+        mode == BenchmarkMode::Quick ? 7 : (mode == BenchmarkMode::Standard ? 15 : 31);
+    const std::size_t verify_iters =
+        mode == BenchmarkMode::Quick ? 8 : (mode == BenchmarkMode::Standard ? 32 : 100);
+    const std::size_t cheap_iters =
+        mode == BenchmarkMode::Quick ? 2000 : (mode == BenchmarkMode::Standard ? 8000 : 20000);
+    const std::size_t warmup_verify =
+        mode == BenchmarkMode::Quick ? 4 : (mode == BenchmarkMode::Standard ? 8 : 32);
+    const std::size_t warmup_cheap =
+        mode == BenchmarkMode::Quick ? 200 : (mode == BenchmarkMode::Standard ? 400 : 1000);
 
     r.structural_checks = summarize(time_batches(
         "qrs_validation_path_structural_checks",

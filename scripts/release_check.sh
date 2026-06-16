@@ -13,6 +13,7 @@ BATCH_EVIDENCE_MD="$ROOT/out/batch-evidence.md"
 RESOURCE_DECISION_JSON="$ROOT/out/resource-accounting-decision.json"
 RESOURCE_DECISION_MD="$ROOT/out/resource-accounting-decision.md"
 BUILD_DIR="$ROOT/build"
+SECP_COMMIT_FILE="$ROOT/third_party/secp256k1.COMMIT"
 
 grep -n "Version: 0.9.0" "$BIP"
 grep -n "Requires: 341, 342, 360" "$BIP"
@@ -79,6 +80,32 @@ python3 "$ROOT/scripts/verify_qrs_vectors.py" \
 "$BUILD_DIR/qrs_native_bench" --quick --json "$QUICK_JSON" --markdown "$QUICK_MD"
 cp "$QUICK_MD" "$SAMPLE_MD"
 
+CURRENT_COMMIT="$(git -C "$ROOT" rev-parse HEAD)"
+REPORT_COMMIT="$(jq -r '.environment.git_commit' "$QUICK_JSON")"
+REPORT_DIRTY="$(jq -r '.environment.working_tree_dirty' "$QUICK_JSON")"
+if [ "$REPORT_COMMIT" != "$CURRENT_COMMIT" ]; then
+  echo "release_check.sh: quick report commit $REPORT_COMMIT does not match HEAD $CURRENT_COMMIT" >&2
+  exit 1
+fi
+if [ "$REPORT_DIRTY" != "false" ]; then
+  echo "release_check.sh: quick report was generated from a dirty source tree" >&2
+  exit 1
+fi
+
+EXPECTED_SECP_COMMIT="$(tr -d '[:space:]' < "$SECP_COMMIT_FILE")"
+REPORT_SECP_COMMIT="$(jq -r '.benchmarks.schnorr_bip340.libsecp256k1_commit' "$QUICK_JSON")"
+if [ "$REPORT_SECP_COMMIT" != "$EXPECTED_SECP_COMMIT" ]; then
+  echo "release_check.sh: reported secp256k1 commit $REPORT_SECP_COMMIT does not match $SECP_COMMIT_FILE $EXPECTED_SECP_COMMIT" >&2
+  exit 1
+fi
+if [ -d "$ROOT/third_party/secp256k1/.git" ]; then
+  ACTUAL_SECP_COMMIT="$(git -C "$ROOT/third_party/secp256k1" rev-parse HEAD)"
+  if [ "$ACTUAL_SECP_COMMIT" != "$EXPECTED_SECP_COMMIT" ]; then
+    echo "release_check.sh: actual secp256k1 commit $ACTUAL_SECP_COMMIT does not match $SECP_COMMIT_FILE $EXPECTED_SECP_COMMIT" >&2
+    exit 1
+  fi
+fi
+
 python3 "$ROOT/scripts/assert_quick_report.py" \
   --json "$QUICK_JSON" \
   --markdown "$QUICK_MD" \
@@ -94,6 +121,7 @@ jq '.benchmarks.slh_dsa_sha2_128s.valid_verify.status' "$QUICK_JSON"
 jq '.benchmarks.schnorr_bip340.individual_valid_verify.status' "$QUICK_JSON"
 jq '.benchmarks.schnorr_bip340.batch_reviewed_public_api.status' "$QUICK_JSON"
 jq '.benchmarks.schnorr_bip340.batch_experimental.status' "$QUICK_JSON"
+jq '.benchmarks.schnorr_bip340.batch_experimental_challenge_self_test.status' "$QUICK_JSON"
 jq '.benchmarks.qrs_validation_path.total_valid.status' "$QUICK_JSON"
 jq '.environment.git_commit' "$QUICK_JSON"
 jq '.environment.working_tree_dirty' "$QUICK_JSON"
@@ -103,5 +131,6 @@ jq '.activation_ready' "$RESOURCE_DECISION_JSON"
 jq '.explicit_qrs_budget_required' "$RESOURCE_DECISION_JSON"
 grep -n "Pass/Fail Conclusion" "$RESOURCE_DECISION_MD"
 grep -n "median of per-batch means" "$QUICK_MD"
+grep -n "BIP-340 challenge self-test" "$QUICK_MD" "$DOSSIER"
 
 echo "release checklist passed"
