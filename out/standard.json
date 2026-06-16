@@ -3,7 +3,7 @@
   "mode": "standard",
   "environment": {
     "benchmark_binary_build_mode": "Release/NDEBUG",
-    "benchmark_commit": "f09a5053a61b704bd8eb9b9742122b0ddb625cd5",
+    "benchmark_commit": "a76bb1c988678130fadfa041f68d1e5355e2491e",
     "benchmark_schema": "qrs-native-bench/v0",
     "build_type": "Release/NDEBUG",
     "cmake_build_type": "Release",
@@ -14,7 +14,7 @@
     "cpu_frequency": "unavailable",
     "cpu_model": "Apple M2 Pro",
     "frequency_scaling": "not controlled by harness; reviewer must record governor/power mode",
-    "git_commit": "f09a5053a61b704bd8eb9b9742122b0ddb625cd5",
+    "git_commit": "a76bb1c988678130fadfa041f68d1e5355e2491e",
     "openssl_provider": "default",
     "openssl_slh_dsa_algorithm": "SLH-DSA-SHA2-128s",
     "openssl_slh_dsa_mode": "EVP direct message signing/verification, no prehash digest, context-string explicitly set to empty",
@@ -32,6 +32,15 @@
       "mode": "EVP direct message signing/verification, no prehash digest, context-string explicitly set to empty",
       "public_key_bytes": 32,
       "signature_bytes": 7856,
+      "slh_dsa_backend_probe": {
+        "keygen": "passed",
+        "sign": "passed",
+        "verify_valid": "passed",
+        "verify_mutated_signature": "passed",
+        "public_key_bytes": 32,
+        "signature_bytes": 7856,
+        "context_string": "explicit_empty_context_set"
+      },
       "backends": {
         "openssl": {
           "status": "available",
@@ -54,197 +63,197 @@
         "status": "available",
         "samples": 15,
         "iterations_per_sample": 32,
-        "mean_ns": 184883.592,
-        "stddev_ns": 2520.105,
-        "median_ns": 184373.688,
-        "p95_ns": 188328.516,
-        "p99_ns": 188518.828,
-        "max_ns": 188566.406,
-        "ops_per_sec": 5408.809
+        "mean_ns": 184199.827,
+        "stddev_ns": 2201.859,
+        "median_ns": 183848.969,
+        "p95_ns": 188660.297,
+        "p99_ns": 188745.609,
+        "max_ns": 188766.938,
+        "ops_per_sec": 5428.887
       },
       "invalid_fixed_length_verify": {
         "status": "available",
         "samples": 15,
         "iterations_per_sample": 32,
-        "mean_ns": 209811.375,
-        "stddev_ns": 4185.868,
-        "median_ns": 209520.844,
-        "p95_ns": 215600.253,
-        "p99_ns": 215957.551,
-        "max_ns": 216046.875,
-        "ops_per_sec": 4766.186
+        "mean_ns": 199021.606,
+        "stddev_ns": 4283.259,
+        "median_ns": 198654.938,
+        "p95_ns": 206067.438,
+        "p99_ns": 208849.938,
+        "max_ns": 209545.562,
+        "ops_per_sec": 5024.580
       },
       "invalid_fixed_length_cases": {
         "byte0_bitflip": {
           "status": "available",
           "samples": 15,
           "iterations_per_sample": 32,
-          "mean_ns": 187966.577,
-          "stddev_ns": 2346.539,
-          "median_ns": 188045.594,
-          "p95_ns": 191420.703,
-          "p99_ns": 194065.391,
-          "max_ns": 194726.562,
-          "ops_per_sec": 5320.095
+          "mean_ns": 193159.025,
+          "stddev_ns": 1557.702,
+          "median_ns": 192453.125,
+          "p95_ns": 195391.528,
+          "p99_ns": 195580.406,
+          "max_ns": 195627.625,
+          "ops_per_sec": 5177.081
         },
         "middle_bitflip": {
           "status": "available",
           "samples": 15,
           "iterations_per_sample": 32,
-          "mean_ns": 184943.317,
-          "stddev_ns": 3861.973,
-          "median_ns": 185858.062,
-          "p95_ns": 190269.019,
-          "p99_ns": 192742.329,
-          "max_ns": 193360.656,
-          "ops_per_sec": 5407.062
+          "mean_ns": 184287.679,
+          "stddev_ns": 3095.168,
+          "median_ns": 183526.031,
+          "p95_ns": 189709.263,
+          "p99_ns": 190539.777,
+          "max_ns": 190747.406,
+          "ops_per_sec": 5426.299
         },
         "last_bitflip": {
           "status": "available",
           "samples": 15,
           "iterations_per_sample": 32,
-          "mean_ns": 184009.892,
-          "stddev_ns": 3416.672,
-          "median_ns": 184513.000,
-          "p95_ns": 188596.350,
-          "p99_ns": 189814.070,
-          "max_ns": 190118.500,
-          "ops_per_sec": 5434.490
+          "mean_ns": 186029.431,
+          "stddev_ns": 3520.371,
+          "median_ns": 186587.250,
+          "p95_ns": 190542.575,
+          "p99_ns": 193232.465,
+          "max_ns": 193904.938,
+          "ops_per_sec": 5375.494
         },
         "spread_32_bitflips": {
           "status": "available",
           "samples": 15,
           "iterations_per_sample": 32,
-          "mean_ns": 184589.410,
-          "stddev_ns": 3050.266,
-          "median_ns": 185053.375,
-          "p95_ns": 188141.928,
-          "p99_ns": 188491.911,
-          "max_ns": 188579.406,
-          "ops_per_sec": 5417.429
+          "mean_ns": 178500.352,
+          "stddev_ns": 3187.119,
+          "median_ns": 177458.344,
+          "p95_ns": 184231.647,
+          "p99_ns": 184554.679,
+          "max_ns": 184635.438,
+          "ops_per_sec": 5602.230
         },
         "all_zero": {
           "status": "available",
           "samples": 15,
           "iterations_per_sample": 32,
-          "mean_ns": 184964.490,
-          "stddev_ns": 2283.815,
-          "median_ns": 184760.406,
-          "p95_ns": 188818.362,
-          "p99_ns": 189952.223,
-          "max_ns": 190235.688,
-          "ops_per_sec": 5406.443
+          "mean_ns": 191086.198,
+          "stddev_ns": 4044.288,
+          "median_ns": 190113.281,
+          "p95_ns": 197688.281,
+          "p99_ns": 197937.656,
+          "max_ns": 198000.000,
+          "ops_per_sec": 5233.240
         },
         "all_ff": {
           "status": "available",
           "samples": 15,
           "iterations_per_sample": 32,
-          "mean_ns": 186773.783,
-          "stddev_ns": 2547.256,
-          "median_ns": 186736.969,
-          "p95_ns": 190618.106,
-          "p99_ns": 190748.621,
-          "max_ns": 190781.250,
-          "ops_per_sec": 5354.070
+          "mean_ns": 199021.606,
+          "stddev_ns": 4283.259,
+          "median_ns": 198654.938,
+          "p95_ns": 206067.438,
+          "p99_ns": 208849.938,
+          "max_ns": 209545.562,
+          "ops_per_sec": 5024.580
         },
         "deterministic_garbage": {
           "status": "available",
           "samples": 15,
           "iterations_per_sample": 32,
-          "mean_ns": 194834.465,
-          "stddev_ns": 3354.689,
-          "median_ns": 195237.000,
-          "p95_ns": 199840.100,
-          "p99_ns": 200419.070,
-          "max_ns": 200563.812,
-          "ops_per_sec": 5132.562
+          "mean_ns": 196981.940,
+          "stddev_ns": 4419.118,
+          "median_ns": 195436.188,
+          "p95_ns": 204755.075,
+          "p99_ns": 206696.840,
+          "max_ns": 207182.281,
+          "ops_per_sec": 5076.608
         },
         "wrong_message": {
           "status": "available",
           "samples": 15,
           "iterations_per_sample": 32,
-          "mean_ns": 209811.375,
-          "stddev_ns": 4185.868,
-          "median_ns": 209520.844,
-          "p95_ns": 215600.253,
-          "p99_ns": 215957.551,
-          "max_ns": 216046.875,
-          "ops_per_sec": 4766.186
+          "mean_ns": 188626.044,
+          "stddev_ns": 2749.442,
+          "median_ns": 187957.031,
+          "p95_ns": 193406.916,
+          "p99_ns": 195043.883,
+          "max_ns": 195453.125,
+          "ops_per_sec": 5301.495
         },
         "wrong_public_key": {
           "status": "available",
           "samples": 15,
           "iterations_per_sample": 32,
-          "mean_ns": 190184.465,
-          "stddev_ns": 3955.882,
-          "median_ns": 189738.281,
-          "p95_ns": 196429.441,
-          "p99_ns": 198934.863,
-          "max_ns": 199561.219,
-          "ops_per_sec": 5258.053
+          "mean_ns": 188581.685,
+          "stddev_ns": 4209.001,
+          "median_ns": 188503.906,
+          "p95_ns": 195096.091,
+          "p99_ns": 195399.418,
+          "max_ns": 195475.250,
+          "ops_per_sec": 5302.742
         }
       },
       "invalid_fixed_length_min_observed": {
         "status": "available",
         "samples": 15,
         "iterations_per_sample": 32,
-        "mean_ns": 184589.410,
-        "stddev_ns": 3050.266,
-        "median_ns": 185053.375,
-        "p95_ns": 188141.928,
-        "p99_ns": 188491.911,
-        "max_ns": 188579.406,
-        "ops_per_sec": 5417.429
+        "mean_ns": 178500.352,
+        "stddev_ns": 3187.119,
+        "median_ns": 177458.344,
+        "p95_ns": 184231.647,
+        "p99_ns": 184554.679,
+        "max_ns": 184635.438,
+        "ops_per_sec": 5602.230
       },
       "invalid_fixed_length_best_observed": {
         "status": "available",
         "samples": 15,
         "iterations_per_sample": 32,
-        "mean_ns": 184589.410,
-        "stddev_ns": 3050.266,
-        "median_ns": 185053.375,
-        "p95_ns": 188141.928,
-        "p99_ns": 188491.911,
-        "max_ns": 188579.406,
-        "ops_per_sec": 5417.429
+        "mean_ns": 178500.352,
+        "stddev_ns": 3187.119,
+        "median_ns": 177458.344,
+        "p95_ns": 184231.647,
+        "p99_ns": 184554.679,
+        "max_ns": 184635.438,
+        "ops_per_sec": 5602.230
       },
       "invalid_fixed_length_median_observed": {
         "status": "available",
         "samples": 15,
         "iterations_per_sample": 32,
-        "mean_ns": 184943.317,
-        "stddev_ns": 3861.973,
-        "median_ns": 185858.062,
-        "p95_ns": 190269.019,
-        "p99_ns": 192742.329,
-        "max_ns": 193360.656,
-        "ops_per_sec": 5407.062
+        "mean_ns": 188581.685,
+        "stddev_ns": 4209.001,
+        "median_ns": 188503.906,
+        "p95_ns": 195096.091,
+        "p99_ns": 195399.418,
+        "max_ns": 195475.250,
+        "ops_per_sec": 5302.742
       },
       "invalid_fixed_length_p99_observed": {
         "status": "available",
         "samples": 15,
         "iterations_per_sample": 32,
-        "mean_ns": 209811.375,
-        "stddev_ns": 4185.868,
-        "median_ns": 209520.844,
-        "p95_ns": 215600.253,
-        "p99_ns": 215957.551,
-        "max_ns": 216046.875,
-        "ops_per_sec": 4766.186
+        "mean_ns": 199021.606,
+        "stddev_ns": 4283.259,
+        "median_ns": 198654.938,
+        "p95_ns": 206067.438,
+        "p99_ns": 208849.938,
+        "max_ns": 209545.562,
+        "ops_per_sec": 5024.580
       },
       "invalid_fixed_length_worst_observed": {
         "status": "available",
         "samples": 15,
         "iterations_per_sample": 32,
-        "mean_ns": 209811.375,
-        "stddev_ns": 4185.868,
-        "median_ns": 209520.844,
-        "p95_ns": 215600.253,
-        "p99_ns": 215957.551,
-        "max_ns": 216046.875,
-        "ops_per_sec": 4766.186
+        "mean_ns": 199021.606,
+        "stddev_ns": 4283.259,
+        "median_ns": 198654.938,
+        "p95_ns": 206067.438,
+        "p99_ns": 208849.938,
+        "max_ns": 209545.562,
+        "ops_per_sec": 5024.580
       },
-      "invalid_fixed_length_case_name_worst": "wrong_message"
+      "invalid_fixed_length_case_name_worst": "all_ff"
     },
     "schnorr_bip340": {
       "status": "available",
@@ -255,25 +264,25 @@
         "status": "available",
         "samples": 25,
         "iterations_per_sample": 8000,
-        "mean_ns": 20698.209,
-        "stddev_ns": 337.193,
-        "median_ns": 20613.974,
-        "p95_ns": 21014.079,
-        "p99_ns": 21903.537,
-        "max_ns": 22177.234,
-        "ops_per_sec": 48313.360
+        "mean_ns": 20560.123,
+        "stddev_ns": 269.602,
+        "median_ns": 20571.922,
+        "p95_ns": 20940.562,
+        "p99_ns": 21114.107,
+        "max_ns": 21165.438,
+        "ops_per_sec": 48637.842
       },
       "individual_invalid_verify": {
         "status": "available",
         "samples": 25,
         "iterations_per_sample": 8000,
-        "mean_ns": 20566.430,
-        "stddev_ns": 376.710,
-        "median_ns": 20527.979,
-        "p95_ns": 20928.391,
-        "p99_ns": 21747.854,
-        "max_ns": 22005.141,
-        "ops_per_sec": 48622.925
+        "mean_ns": 20530.198,
+        "stddev_ns": 528.438,
+        "median_ns": 20468.594,
+        "p95_ns": 21030.150,
+        "p99_ns": 22329.687,
+        "max_ns": 22726.677,
+        "ops_per_sec": 48708.737
       },
       "batch_reviewed_public_api_status": "unavailable",
       "batch_reviewed_public_api_reason": "Bundled upstream bitcoin-core/secp256k1 commit aea86bc3509f3ceb5c047fe6567bf8910f72a728 exposes only the public secp256k1_schnorrsig_verify API for BIP-340; its schnorrsig tests still mark verify_batch as TODO. The separate scripts/check_batch_schnorr_baseline.py evidence report records local API status and optional upstream-head lookup status. No fake batch baseline is synthesized.",
@@ -317,13 +326,13 @@
           "status": "available",
           "samples": 11,
           "iterations_per_sample": 1,
-          "mean_ns": 14154.210,
-          "stddev_ns": 58.735,
-          "median_ns": 14151.625,
-          "p95_ns": 14227.581,
-          "p99_ns": 14232.199,
-          "max_ns": 14233.353,
-          "ops_per_sec": 70650.358
+          "mean_ns": 13642.566,
+          "stddev_ns": 91.812,
+          "median_ns": 13639.450,
+          "p95_ns": 13757.431,
+          "p99_ns": 13768.903,
+          "max_ns": 13771.771,
+          "ops_per_sec": 73299.992
         },
         "batch_sizes": [
           {
@@ -332,25 +341,25 @@
               "status": "available",
               "samples": 11,
               "iterations_per_sample": 6,
-              "mean_ns": 1383745.576,
-              "stddev_ns": 11960.014,
-              "median_ns": 1384166.667,
-              "p95_ns": 1401569.417,
-              "p99_ns": 1410097.217,
-              "max_ns": 1412229.167,
-              "ops_per_sec": 722.676
+              "mean_ns": 1420578.924,
+              "stddev_ns": 18798.100,
+              "median_ns": 1421201.500,
+              "p95_ns": 1449163.167,
+              "p99_ns": 1449227.033,
+              "max_ns": 1449243.000,
+              "ops_per_sec": 703.938
             },
             "per_signature_verify": {
               "status": "available",
               "samples": 11,
               "iterations_per_sample": 6,
-              "mean_ns": 21621.025,
-              "stddev_ns": 186.875,
-              "median_ns": 21627.604,
-              "p95_ns": 21899.522,
-              "p99_ns": 22032.769,
-              "max_ns": 22066.081,
-              "ops_per_sec": 46251.277
+              "mean_ns": 22196.546,
+              "stddev_ns": 293.720,
+              "median_ns": 22206.273,
+              "p95_ns": 22643.174,
+              "p99_ns": 22644.172,
+              "max_ns": 22644.422,
+              "ops_per_sec": 45052.055
             }
           },
           {
@@ -359,25 +368,25 @@
               "status": "available",
               "samples": 11,
               "iterations_per_sample": 6,
-              "mean_ns": 2591214.000,
-              "stddev_ns": 50497.251,
-              "median_ns": 2582736.000,
-              "p95_ns": 2669888.833,
-              "p99_ns": 2678061.100,
-              "max_ns": 2680104.167,
-              "ops_per_sec": 385.919
+              "mean_ns": 2502916.667,
+              "stddev_ns": 58246.766,
+              "median_ns": 2487416.667,
+              "p95_ns": 2597302.083,
+              "p99_ns": 2660393.750,
+              "max_ns": 2676166.667,
+              "ops_per_sec": 399.534
             },
             "per_signature_verify": {
               "status": "available",
               "samples": 11,
               "iterations_per_sample": 6,
-              "mean_ns": 20243.859,
-              "stddev_ns": 394.510,
-              "median_ns": 20177.625,
-              "p95_ns": 20858.507,
-              "p99_ns": 20922.352,
-              "max_ns": 20938.314,
-              "ops_per_sec": 49397.695
+              "mean_ns": 19554.036,
+              "stddev_ns": 455.053,
+              "median_ns": 19432.943,
+              "p95_ns": 20291.423,
+              "p99_ns": 20784.326,
+              "max_ns": 20907.552,
+              "ops_per_sec": 51140.336
             }
           },
           {
@@ -386,25 +395,25 @@
               "status": "available",
               "samples": 11,
               "iterations_per_sample": 6,
-              "mean_ns": 8927186.258,
-              "stddev_ns": 168323.082,
-              "median_ns": 8853312.500,
-              "p95_ns": 9221885.500,
-              "p99_ns": 9278616.033,
-              "max_ns": 9292798.667,
-              "ops_per_sec": 112.017
+              "mean_ns": 8780609.227,
+              "stddev_ns": 97304.218,
+              "median_ns": 8764013.833,
+              "p95_ns": 8933864.667,
+              "p99_ns": 9046667.467,
+              "max_ns": 9074868.167,
+              "ops_per_sec": 113.887
             },
             "per_signature_verify": {
               "status": "available",
               "samples": 11,
               "iterations_per_sample": 6,
-              "mean_ns": 17435.911,
-              "stddev_ns": 328.756,
-              "median_ns": 17291.626,
-              "p95_ns": 18011.495,
-              "p99_ns": 18122.297,
-              "max_ns": 18149.997,
-              "ops_per_sec": 57352.898
+              "mean_ns": 17149.627,
+              "stddev_ns": 190.047,
+              "median_ns": 17117.215,
+              "p95_ns": 17448.954,
+              "p99_ns": 17669.272,
+              "max_ns": 17724.352,
+              "ops_per_sec": 58310.305
             }
           },
           {
@@ -413,25 +422,25 @@
               "status": "available",
               "samples": 11,
               "iterations_per_sample": 3,
-              "mean_ns": 32623151.485,
-              "stddev_ns": 1415077.262,
-              "median_ns": 32355944.333,
-              "p95_ns": 34864382.000,
-              "p99_ns": 36497743.067,
-              "max_ns": 36906083.333,
-              "ops_per_sec": 30.653
+              "mean_ns": 31696185.606,
+              "stddev_ns": 417054.725,
+              "median_ns": 31674361.333,
+              "p95_ns": 32317874.833,
+              "p99_ns": 32359985.900,
+              "max_ns": 32370513.667,
+              "ops_per_sec": 31.550
             },
             "per_signature_verify": {
               "status": "available",
               "samples": 11,
               "iterations_per_sample": 3,
-              "mean_ns": 15929.273,
-              "stddev_ns": 690.956,
-              "median_ns": 15798.801,
-              "p95_ns": 17023.624,
-              "p99_ns": 17821.164,
-              "max_ns": 18020.549,
-              "ops_per_sec": 62777.503
+              "mean_ns": 15476.653,
+              "stddev_ns": 203.640,
+              "median_ns": 15465.997,
+              "p95_ns": 15780.212,
+              "p99_ns": 15800.774,
+              "max_ns": 15805.915,
+              "ops_per_sec": 64613.453
             }
           },
           {
@@ -440,25 +449,25 @@
               "status": "available",
               "samples": 11,
               "iterations_per_sample": 1,
-              "mean_ns": 246155863.545,
-              "stddev_ns": 1021463.416,
-              "median_ns": 246110917.000,
-              "p95_ns": 247431854.000,
-              "p99_ns": 247512170.800,
-              "max_ns": 247532250.000,
-              "ops_per_sec": 4.062
+              "mean_ns": 237257871.364,
+              "stddev_ns": 1596709.219,
+              "median_ns": 237203667.000,
+              "p95_ns": 239255479.000,
+              "p99_ns": 239454995.800,
+              "max_ns": 239504875.000,
+              "ops_per_sec": 4.215
             },
             "per_signature_verify": {
               "status": "available",
               "samples": 11,
               "iterations_per_sample": 1,
-              "mean_ns": 14154.210,
-              "stddev_ns": 58.735,
-              "median_ns": 14151.625,
-              "p95_ns": 14227.581,
-              "p99_ns": 14232.199,
-              "max_ns": 14233.353,
-              "ops_per_sec": 70650.358
+              "mean_ns": 13642.566,
+              "stddev_ns": 91.812,
+              "median_ns": 13639.450,
+              "p95_ns": 13757.431,
+              "p99_ns": 13768.903,
+              "max_ns": 13771.771,
+              "ops_per_sec": 73299.992
             }
           }
         ]
@@ -478,25 +487,25 @@
               "status": "available",
               "samples": 11,
               "iterations_per_sample": 6,
-              "mean_ns": 1391585.833,
-              "stddev_ns": 18547.735,
-              "median_ns": 1392743.000,
-              "p95_ns": 1415441.000,
-              "p99_ns": 1416477.133,
-              "max_ns": 1416736.167,
-              "ops_per_sec": 718.605
+              "mean_ns": 1346804.909,
+              "stddev_ns": 21126.590,
+              "median_ns": 1342236.167,
+              "p95_ns": 1380461.750,
+              "p99_ns": 1391847.817,
+              "max_ns": 1394694.333,
+              "ops_per_sec": 742.498
             },
             "per_signature_verify": {
               "status": "available",
               "samples": 11,
               "iterations_per_sample": 6,
-              "mean_ns": 21743.529,
-              "stddev_ns": 289.808,
-              "median_ns": 21761.609,
-              "p95_ns": 22116.266,
-              "p99_ns": 22132.455,
-              "max_ns": 22136.503,
-              "ops_per_sec": 45990.695
+              "mean_ns": 21043.827,
+              "stddev_ns": 330.103,
+              "median_ns": 20972.440,
+              "p95_ns": 21569.715,
+              "p99_ns": 21747.622,
+              "max_ns": 21792.099,
+              "ops_per_sec": 47519.874
             }
           },
           {
@@ -505,25 +514,25 @@
               "status": "available",
               "samples": 11,
               "iterations_per_sample": 6,
-              "mean_ns": 2559132.591,
-              "stddev_ns": 29774.981,
-              "median_ns": 2558284.667,
-              "p95_ns": 2604166.750,
-              "p99_ns": 2613027.883,
-              "max_ns": 2615243.167,
-              "ops_per_sec": 390.757
+              "mean_ns": 2510882.576,
+              "stddev_ns": 14912.839,
+              "median_ns": 2515132.000,
+              "p95_ns": 2527465.250,
+              "p99_ns": 2529898.650,
+              "max_ns": 2530507.000,
+              "ops_per_sec": 398.266
             },
             "per_signature_verify": {
               "status": "available",
               "samples": 11,
               "iterations_per_sample": 6,
-              "mean_ns": 19993.223,
-              "stddev_ns": 232.617,
-              "median_ns": 19986.599,
-              "p95_ns": 20345.053,
-              "p99_ns": 20414.280,
-              "max_ns": 20431.587,
-              "ops_per_sec": 50016.947
+              "mean_ns": 19616.270,
+              "stddev_ns": 116.507,
+              "median_ns": 19649.469,
+              "p95_ns": 19745.822,
+              "p99_ns": 19764.833,
+              "max_ns": 19769.586,
+              "ops_per_sec": 50978.091
             }
           },
           {
@@ -532,25 +541,25 @@
               "status": "available",
               "samples": 11,
               "iterations_per_sample": 6,
-              "mean_ns": 8867966.591,
-              "stddev_ns": 58522.015,
-              "median_ns": 8882750.000,
-              "p95_ns": 8952361.167,
-              "p99_ns": 8953433.433,
-              "max_ns": 8953701.500,
-              "ops_per_sec": 112.765
+              "mean_ns": 8849950.742,
+              "stddev_ns": 217319.612,
+              "median_ns": 8741173.667,
+              "p95_ns": 9255131.917,
+              "p99_ns": 9317865.317,
+              "max_ns": 9333548.667,
+              "ops_per_sec": 112.995
             },
             "per_signature_verify": {
               "status": "available",
               "samples": 11,
               "iterations_per_sample": 6,
-              "mean_ns": 17320.247,
-              "stddev_ns": 114.301,
-              "median_ns": 17349.121,
-              "p95_ns": 17485.080,
-              "p99_ns": 17487.175,
-              "max_ns": 17487.698,
-              "ops_per_sec": 57735.896
+              "mean_ns": 17285.060,
+              "stddev_ns": 424.452,
+              "median_ns": 17072.605,
+              "p95_ns": 18076.430,
+              "p99_ns": 18198.956,
+              "max_ns": 18229.587,
+              "ops_per_sec": 57853.429
             }
           },
           {
@@ -559,25 +568,25 @@
               "status": "available",
               "samples": 11,
               "iterations_per_sample": 3,
-              "mean_ns": 31971434.394,
-              "stddev_ns": 256963.490,
-              "median_ns": 31882875.000,
-              "p95_ns": 32381243.167,
-              "p99_ns": 32610248.633,
-              "max_ns": 32667500.000,
-              "ops_per_sec": 31.278
+              "mean_ns": 31083088.364,
+              "stddev_ns": 276150.657,
+              "median_ns": 30981875.000,
+              "p95_ns": 31582215.333,
+              "p99_ns": 31674331.867,
+              "max_ns": 31697361.000,
+              "ops_per_sec": 32.172
             },
             "per_signature_verify": {
               "status": "available",
               "samples": 11,
               "iterations_per_sample": 3,
-              "mean_ns": 15611.052,
-              "stddev_ns": 125.470,
-              "median_ns": 15567.810,
-              "p95_ns": 15811.154,
-              "p99_ns": 15922.973,
-              "max_ns": 15950.928,
-              "ops_per_sec": 64057.182
+              "mean_ns": 15177.289,
+              "stddev_ns": 134.839,
+              "median_ns": 15127.869,
+              "p95_ns": 15421.004,
+              "p99_ns": 15465.982,
+              "max_ns": 15477.227,
+              "ops_per_sec": 65887.919
             }
           },
           {
@@ -586,25 +595,25 @@
               "status": "available",
               "samples": 11,
               "iterations_per_sample": 1,
-              "mean_ns": 241065159.091,
-              "stddev_ns": 835876.070,
-              "median_ns": 241164042.000,
-              "p95_ns": 242201208.500,
-              "p99_ns": 242324608.100,
-              "max_ns": 242355458.000,
-              "ops_per_sec": 4.148
+              "mean_ns": 235816363.727,
+              "stddev_ns": 4632596.210,
+              "median_ns": 234221833.000,
+              "p95_ns": 245121145.500,
+              "p99_ns": 245290861.900,
+              "max_ns": 245333291.000,
+              "ops_per_sec": 4.241
             },
             "per_signature_verify": {
               "status": "available",
               "samples": 11,
               "iterations_per_sample": 1,
-              "mean_ns": 13861.489,
-              "stddev_ns": 48.064,
-              "median_ns": 13867.175,
-              "p95_ns": 13926.813,
-              "p99_ns": 13933.909,
-              "max_ns": 13935.683,
-              "ops_per_sec": 72142.321
+              "mean_ns": 13559.678,
+              "stddev_ns": 266.379,
+              "median_ns": 13467.991,
+              "p95_ns": 14094.713,
+              "p99_ns": 14104.471,
+              "max_ns": 14106.911,
+              "ops_per_sec": 73748.063
             }
           }
         ]
@@ -614,78 +623,78 @@
       "status": "available",
       "reason": "",
       "scope": "Modeled validation path only; not Bitcoin Core consensus integration.",
-      "qrs_msg_scope": "Modeled qrs_msg construction over deterministic fixture fields; final BIP-360 sighash integration remains a blocker.",
+      "qrs_msg_scope": "Modeled qrs_msg construction over deterministic fixture fields using explicit non-consensus prefixes QRS modeled TapLeaf v0, QRS modeled Branch v0, and QRS modeled SigMsg v0; final BIP-360 sighash integration remains a blocker.",
       "structural_checks": {
         "status": "available",
         "samples": 15,
         "iterations_per_sample": 8000,
-        "mean_ns": 358.751,
-        "stddev_ns": 8.596,
-        "median_ns": 357.526,
-        "p95_ns": 374.208,
-        "p99_ns": 375.208,
-        "max_ns": 375.458,
-        "ops_per_sec": 2787445.568
+        "mean_ns": 355.760,
+        "stddev_ns": 6.333,
+        "median_ns": 352.625,
+        "p95_ns": 364.290,
+        "p99_ns": 364.346,
+        "max_ns": 364.359,
+        "ops_per_sec": 2810883.215
       },
       "qrs_msg_construction": {
         "status": "available",
         "samples": 15,
         "iterations_per_sample": 8000,
-        "mean_ns": 741.472,
-        "stddev_ns": 23.092,
-        "median_ns": 737.365,
-        "p95_ns": 778.474,
-        "p99_ns": 805.686,
-        "max_ns": 812.490,
-        "ops_per_sec": 1348668.200
+        "mean_ns": 727.851,
+        "stddev_ns": 13.920,
+        "median_ns": 729.974,
+        "p95_ns": 749.880,
+        "p99_ns": 755.305,
+        "max_ns": 756.661,
+        "ops_per_sec": 1373907.509
       },
       "verifier_valid": {
         "status": "available",
         "samples": 15,
         "iterations_per_sample": 32,
-        "mean_ns": 190822.825,
-        "stddev_ns": 3476.475,
-        "median_ns": 190772.125,
-        "p95_ns": 195993.888,
-        "p99_ns": 196395.652,
-        "max_ns": 196496.094,
-        "ops_per_sec": 5240.463
+        "mean_ns": 172650.521,
+        "stddev_ns": 2743.586,
+        "median_ns": 173199.219,
+        "p95_ns": 177034.628,
+        "p99_ns": 178275.676,
+        "max_ns": 178585.938,
+        "ops_per_sec": 5792.047
       },
       "total_valid": {
         "status": "available",
         "samples": 15,
         "iterations_per_sample": 32,
-        "mean_ns": 190895.485,
-        "stddev_ns": 3746.349,
-        "median_ns": 191276.062,
-        "p95_ns": 195683.062,
-        "p99_ns": 197069.938,
-        "max_ns": 197416.656,
-        "ops_per_sec": 5238.469
+        "mean_ns": 174152.950,
+        "stddev_ns": 2522.854,
+        "median_ns": 175000.000,
+        "p95_ns": 177198.828,
+        "p99_ns": 178867.891,
+        "max_ns": 179285.156,
+        "ops_per_sec": 5742.079
       },
       "invalid_structural": {
         "status": "available",
         "samples": 15,
         "iterations_per_sample": 8000,
-        "mean_ns": 2.770,
-        "stddev_ns": 0.006,
-        "median_ns": 2.771,
-        "p95_ns": 2.778,
-        "p99_ns": 2.781,
-        "max_ns": 2.781,
-        "ops_per_sec": 360945677.676
+        "mean_ns": 2.739,
+        "stddev_ns": 0.166,
+        "median_ns": 2.651,
+        "p95_ns": 3.068,
+        "p99_ns": 3.068,
+        "max_ns": 3.068,
+        "ops_per_sec": 365158965.870
       },
       "invalid_fixed_length": {
         "status": "available",
         "samples": 15,
         "iterations_per_sample": 32,
-        "mean_ns": 193964.669,
-        "stddev_ns": 3519.871,
-        "median_ns": 193792.969,
-        "p95_ns": 198819.812,
-        "p99_ns": 199637.938,
-        "max_ns": 199842.469,
-        "ops_per_sec": 5155.578
+        "mean_ns": 181535.590,
+        "stddev_ns": 3161.934,
+        "median_ns": 180643.219,
+        "p95_ns": 186930.609,
+        "p99_ns": 187046.547,
+        "max_ns": 187075.531,
+        "ops_per_sec": 5508.562
       }
     }
   },
@@ -702,10 +711,10 @@
       "merkle_path_hashes_per_block": 0,
       "input_weight_wu": 8059,
       "max_inputs": 496,
-      "median_ms": 91.449,
-      "p95_ms": 93.411,
-      "p99_ms": 93.505,
-      "max_ms": 93.529
+      "median_ms": 91.189,
+      "p95_ms": 93.576,
+      "p99_ms": 93.618,
+      "max_ms": 93.628
     },
     "qrs_saturated_block_invalid_fixed_length": {
       "status": "available",
@@ -714,10 +723,10 @@
       "merkle_path_hashes_per_block": 0,
       "input_weight_wu": 8059,
       "max_inputs": 496,
-      "median_ms": 103.922,
-      "p95_ms": 106.938,
-      "p99_ms": 107.115,
-      "max_ms": 107.159
+      "median_ms": 98.533,
+      "p95_ms": 102.209,
+      "p99_ms": 103.590,
+      "max_ms": 103.935
     },
     "qrs_saturated_block_valid_by_depth": [
       {
@@ -727,10 +736,10 @@
         "merkle_path_hashes_per_block": 0,
         "input_weight_wu": 8059,
         "max_inputs": 496,
-        "median_ms": 91.449,
-        "p95_ms": 93.411,
-        "p99_ms": 93.505,
-        "max_ms": 93.529
+        "median_ms": 91.189,
+        "p95_ms": 93.576,
+        "p99_ms": 93.618,
+        "max_ms": 93.628
       },
       {
         "status": "available",
@@ -739,10 +748,10 @@
         "merkle_path_hashes_per_block": 494,
         "input_weight_wu": 8091,
         "max_inputs": 494,
-        "median_ms": 91.081,
-        "p95_ms": 93.034,
-        "p99_ms": 93.128,
-        "max_ms": 93.152
+        "median_ms": 90.821,
+        "p95_ms": 93.198,
+        "p99_ms": 93.240,
+        "max_ms": 93.251
       },
       {
         "status": "available",
@@ -751,10 +760,10 @@
         "merkle_path_hashes_per_block": 1470,
         "input_weight_wu": 8155,
         "max_inputs": 490,
-        "median_ms": 90.343,
-        "p95_ms": 92.281,
-        "p99_ms": 92.374,
-        "max_ms": 92.398
+        "median_ms": 90.086,
+        "p95_ms": 92.444,
+        "p99_ms": 92.485,
+        "max_ms": 92.496
       },
       {
         "status": "available",
@@ -763,10 +772,10 @@
         "merkle_path_hashes_per_block": 42112,
         "input_weight_wu": 12155,
         "max_inputs": 329,
-        "median_ms": 60.659,
-        "p95_ms": 61.960,
-        "p99_ms": 62.023,
-        "max_ms": 62.038
+        "median_ms": 60.486,
+        "p95_ms": 62.069,
+        "p99_ms": 62.097,
+        "max_ms": 62.104
       }
     ],
     "qrs_saturated_block_invalid_fixed_length_by_depth": [
@@ -777,10 +786,10 @@
         "merkle_path_hashes_per_block": 0,
         "input_weight_wu": 8059,
         "max_inputs": 496,
-        "median_ms": 103.922,
-        "p95_ms": 106.938,
-        "p99_ms": 107.115,
-        "max_ms": 107.159
+        "median_ms": 98.533,
+        "p95_ms": 102.209,
+        "p99_ms": 103.590,
+        "max_ms": 103.935
       },
       {
         "status": "available",
@@ -789,10 +798,10 @@
         "merkle_path_hashes_per_block": 494,
         "input_weight_wu": 8091,
         "max_inputs": 494,
-        "median_ms": 103.503,
-        "p95_ms": 106.507,
-        "p99_ms": 106.683,
-        "max_ms": 106.727
+        "median_ms": 98.136,
+        "p95_ms": 101.797,
+        "p99_ms": 103.172,
+        "max_ms": 103.516
       },
       {
         "status": "available",
@@ -801,10 +810,10 @@
         "merkle_path_hashes_per_block": 1470,
         "input_weight_wu": 8155,
         "max_inputs": 490,
-        "median_ms": 102.665,
-        "p95_ms": 105.644,
-        "p99_ms": 105.819,
-        "max_ms": 105.863
+        "median_ms": 97.341,
+        "p95_ms": 100.973,
+        "p99_ms": 102.336,
+        "max_ms": 102.677
       },
       {
         "status": "available",
@@ -813,10 +822,10 @@
         "merkle_path_hashes_per_block": 42112,
         "input_weight_wu": 12155,
         "max_inputs": 329,
-        "median_ms": 68.932,
-        "p95_ms": 70.932,
-        "p99_ms": 71.050,
-        "max_ms": 71.079
+        "median_ms": 65.357,
+        "p95_ms": 67.796,
+        "p99_ms": 68.712,
+        "max_ms": 68.940
       }
     ],
     "schnorr_individual_saturated_block": {
@@ -826,10 +835,10 @@
       "merkle_path_hashes_per_block": 0,
       "input_weight_wu": 230,
       "max_inputs": 17391,
-      "median_ms": 358.498,
-      "p95_ms": 365.456,
-      "p99_ms": 380.924,
-      "max_ms": 385.684
+      "median_ms": 357.766,
+      "p95_ms": 364.177,
+      "p99_ms": 367.195,
+      "max_ms": 368.088
     },
     "schnorr_experimental_batch_saturated_block": {
       "status": "available",
@@ -838,10 +847,10 @@
       "merkle_path_hashes_per_block": 0,
       "input_weight_wu": 230,
       "max_inputs": 17391,
-      "median_ms": 246.111,
-      "p95_ms": 247.432,
-      "p99_ms": 247.512,
-      "max_ms": 247.532
+      "median_ms": 237.204,
+      "p95_ms": 239.255,
+      "p99_ms": 239.455,
+      "max_ms": 239.505
     },
     "schnorr_batch_saturated_block": {
       "status": "unavailable",
