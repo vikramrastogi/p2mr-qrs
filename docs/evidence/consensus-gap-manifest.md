@@ -23,8 +23,8 @@ must not be hidden by benchmark prose.
 | `second_reviewed_slh_dsa_backend` | activation | `docs/evidence/slh-dsa-verify-cost-analysis.md` |
 | `cross_hardware_reproduction` | activation, resource accounting | `docs/reproducibility/reproduction-matrix.md` |
 | `reviewed_public_batch_schnorr_baseline` | activation, resource accounting | `docs/evidence/batch-schnorr-baseline-status.md` |
-| `wallet_descriptor_psbt_hardware_standards` | activation, wallet standards | `docs/review/public-review-readiness.md` |
-| `activation_parameters` | activation | `docs/review/public-review-post-draft.md` |
+| `wallet_descriptor_psbt_hardware_standards` | activation, wallet standards | `docs/review/start-here.md` |
+| `activation_parameters` | activation | `docs/review/start-here.md` |
 | `final_serialized_consensus_vectors` | activation, complete vectors | `docs/spec/final-transaction-vector-schema.md` |
 
 ## Release Rule
