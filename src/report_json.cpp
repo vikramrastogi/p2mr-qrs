@@ -136,12 +136,18 @@ std::string render_json(const Environment& env,
   json_stats(o, slh.invalid_fixed_length_verify, 6);
   o << ",\n      \"invalid_fixed_length_cases\": ";
   json_named_stats(o, slh.invalid_fixed_length_cases, 6);
+  o << ",\n      \"invalid_fixed_length_min_observed\": ";
+  json_stats(o, slh.invalid_fixed_length_min_observed, 6);
   o << ",\n      \"invalid_fixed_length_best_observed\": ";
   json_stats(o, slh.invalid_fixed_length_best_observed, 6);
   o << ",\n      \"invalid_fixed_length_median_observed\": ";
   json_stats(o, slh.invalid_fixed_length_median_observed, 6);
+  o << ",\n      \"invalid_fixed_length_p99_observed\": ";
+  json_stats(o, slh.invalid_fixed_length_p99_observed, 6);
   o << ",\n      \"invalid_fixed_length_worst_observed\": ";
   json_stats(o, slh.invalid_fixed_length_worst_observed, 6);
+  o << ",\n      \"invalid_fixed_length_case_name_worst\": \""
+    << esc(slh.invalid_fixed_length_case_name_worst) << "\"";
   o << "\n    },\n";
   o << "    \"schnorr_bip340\": {\n";
   o << "      \"status\": \"" << esc(schnorr.status) << "\",\n";

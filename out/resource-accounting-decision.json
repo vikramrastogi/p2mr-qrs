@@ -1,0 +1,59 @@
+{
+  "activation_blockers": [
+    "Reviewed public batch Schnorr baseline unavailable.",
+    "Bitcoin Core validation-path integration not implemented.",
+    "Final BIP-360/QRS transaction digest definitions not available.",
+    "Independent cross-hardware reproduction not attached.",
+    "Second reviewed SLH-DSA implementation not wired."
+  ],
+  "activation_ready": false,
+  "checks": [
+    {
+      "detail": "available",
+      "name": "SLH-DSA timings available",
+      "passed": true
+    },
+    {
+      "detail": "available",
+      "name": "QRS validation-path model available",
+      "passed": true
+    },
+    {
+      "detail": "available",
+      "name": "Individual Schnorr baseline available",
+      "passed": true
+    },
+    {
+      "detail": "unavailable",
+      "name": "Reviewed public batch status explicit",
+      "passed": true
+    },
+    {
+      "detail": "No batch Schnorr timing is synthesized from assumed speedups.",
+      "name": "Batch evidence forbids fake speedups",
+      "passed": true
+    },
+    {
+      "detail": "qrs_worst=156.628 ms, individual_schnorr=386.586 ms",
+      "name": "QRS worst p99 below individual Schnorr p99",
+      "passed": true
+    },
+    {
+      "detail": "qrs_worst=156.628 ms, experimental_batch=507.659 ms",
+      "name": "QRS worst p99 below experimental batch Schnorr p99",
+      "passed": true
+    }
+  ],
+  "conclusion": "Current native evidence supports continuing with the no-additional-budget rule as Draft-stage review material.",
+  "draft_rule_status": "pass_draft_no_additional_budget_supported",
+  "explicit_qrs_budget_required": false,
+  "fallback_budget_status": "not_required_by_current_draft_evidence",
+  "p99_ms": {
+    "experimental_batch_schnorr_saturated_block": 507.659,
+    "individual_schnorr_saturated_block": 386.586,
+    "qrs_valid_saturated_block": 93.231,
+    "qrs_worst_invalid_fixed_length_saturated_block": 156.628,
+    "reviewed_public_batch_schnorr_saturated_block": null
+  },
+  "schema": "qrs-native-bench/resource-accounting-decision/v0"
+}

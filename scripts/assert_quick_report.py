@@ -41,6 +41,18 @@ def main() -> int:
 
     report = json.loads(args.json.read_text(encoding="utf-8"))
     require(report.get("schema") == "qrs-native-bench/v0", "unexpected report schema")
+    env = report["environment"]
+    require(env.get("git_commit"), "environment.git_commit must be present")
+    require(
+        env.get("working_tree_dirty") in {"true", "false", "unavailable"},
+        "environment.working_tree_dirty must be true, false, or unavailable",
+    )
+    require(
+        env.get("benchmark_binary_build_mode"),
+        "environment.benchmark_binary_build_mode must be present",
+    )
+    require(env.get("compiler"), "environment.compiler must be present")
+    require(env.get("compiler_flags"), "environment.compiler_flags must be present")
 
     schnorr = report["benchmarks"]["schnorr_bip340"]
     require(schnorr["status"] == "available", "individual Schnorr backend must be available")
@@ -126,16 +138,28 @@ def main() -> int:
             slh["invalid_fixed_length_verify"]["status"] == "available",
             "invalid fixed-length SLH timing missing",
         )
+        case_names = set(slh["invalid_fixed_length_cases"].keys())
         require(
-            len(slh["invalid_fixed_length_cases"]) >= 7,
+            len(case_names) >= 9,
             "invalid fixed-length SLH timing suite must include adversarial mutations",
         )
+        for case_name in ["wrong_message", "wrong_public_key"]:
+            require(
+                case_name in case_names,
+                f"invalid fixed-length SLH timing suite must include {case_name}",
+            )
         for key in [
+            "invalid_fixed_length_min_observed",
             "invalid_fixed_length_best_observed",
             "invalid_fixed_length_median_observed",
+            "invalid_fixed_length_p99_observed",
             "invalid_fixed_length_worst_observed",
         ]:
             require(slh[key]["status"] == "available", f"{key} timing missing")
+        require(
+            slh["invalid_fixed_length_case_name_worst"] in slh["invalid_fixed_length_cases"],
+            "worst invalid fixed-length case name must identify a reported case",
+        )
         require(
             slh["invalid_fixed_length_verify"]["p99_ns"]
             == slh["invalid_fixed_length_worst_observed"]["p99_ns"],
@@ -196,6 +220,10 @@ def main() -> int:
         require(
             "SLH-DSA Invalid Fixed-Length Suite" in md,
             "Markdown must include adversarial invalid fixed-length suite",
+        )
+        require(
+            "Worst observed invalid fixed-length case" in md,
+            "Markdown must identify the worst invalid fixed-length case",
         )
         require(
             "median of per-batch means" in md,

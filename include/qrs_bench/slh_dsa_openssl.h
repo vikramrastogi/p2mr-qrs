@@ -24,9 +24,12 @@ struct SlhDsaResult {
   Stats valid_verify;
   Stats invalid_fixed_length_verify;
   std::vector<NamedStats> invalid_fixed_length_cases;
+  Stats invalid_fixed_length_min_observed;
   Stats invalid_fixed_length_best_observed;
   Stats invalid_fixed_length_median_observed;
+  Stats invalid_fixed_length_p99_observed;
   Stats invalid_fixed_length_worst_observed;
+  std::string invalid_fixed_length_case_name_worst;
 };
 
 SlhDsaResult run_slh_dsa_benchmarks(bool quick);

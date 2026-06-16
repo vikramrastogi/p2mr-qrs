@@ -18,6 +18,7 @@ add_executable(qrs_native_bench
   src/report_json.cpp
   src/report_markdown.cpp
   src/schnorr_secp256k1.cpp
+  src/slh_dsa_cli.cpp
   src/slh_dsa_openssl.cpp
   src/stats.cpp
 )

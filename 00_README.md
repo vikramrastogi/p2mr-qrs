@@ -8,7 +8,7 @@ Repo / branch:
 - Branch: `main`.
 
 Exact goal:
-- Publish a narrow pre-review package for the P2MR Quantum-Rescue Leaf BIP.
+- Publish a narrow pre-review package for the P2MR SLH-DSA Leaf BIP.
 - Keep the proposal scoped to one P2MR-only future leaf, one SLH-DSA-SHA2-128s signature, no legacy-output policy, no witness discount, no algorithm registry, and no tapscript opcode in v1.
 - Produce evidence for whether QRS validation can safely rely on existing SegWit weight accounting or needs an explicit per-QRS consensus validation budget.
 
@@ -62,6 +62,12 @@ Current implementation status:
 - The harness writes JSON and Markdown reports and includes the requested saturated-block model fields.
 - Provisional structured QRS fixture vectors live in `test_vectors/`; malformed witness and negative cases live in `fuzz/` and `tests/`.
 - `docs/REVIEWER_DOSSIER.md` maps predictable objections to evidence, caveats, blockers, or non-goals.
+- `docs/RESOURCE_ACCOUNTING_DECISION.md` maps benchmark evidence to the current Draft-stage resource-accounting conclusion.
+- `scripts/evaluate_resource_accounting.py` emits a machine-readable pass/fail resource-accounting decision from generated reports.
+- `docs/EXPLICIT_QRS_BUDGET_FALLBACK.md` specifies the inactive per-QRS virtual validation-weight fallback if weight-only accounting fails.
+- `docs/BITCOIN_CORE_INTEGRATION_REQUIREMENTS.md` defines the Core validation-path artifact required before activation.
+- `docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md` and `test_vectors/qrs_transaction_vector.schema.json` define the final serialized-vector shape once BIP-360/QRS definitions are final.
+- `docs/REPRODUCIBILITY.md` and `.github/ISSUE_TEMPLATE/benchmark-reproduction.yml` define the independent rerun protocol.
 - `docs/RELEASE_CHECKLIST.md` lists the posting checks enforced by `scripts/release_check.sh`.
 - `THIRD_PARTY_NOTICES.md` identifies vendored third-party code and license locations.
 - `out/sample-native-report.md` is the stable sample Markdown report alias for public review.
@@ -89,9 +95,11 @@ python3 scripts/check_batch_schnorr_baseline.py --json out/batch-evidence.json -
 ./build/qrs_native_bench --full --json out/full.json --markdown out/full.md
 python3 scripts/assert_quick_report.py --json out/quick.json --markdown out/quick.md --batch-evidence-json out/batch-evidence.json
 python3 scripts/assert_quick_report.py out/quick.json out/quick.md
+python3 scripts/evaluate_resource_accounting.py --report-json out/full.json --batch-evidence-json out/batch-evidence.json --json out/resource-accounting-decision.json --markdown out/resource-accounting-decision.md
 python3 scripts/check_batch_schnorr_baseline.py --skip-upstream --markdown out/batch-evidence.md --json out/batch-evidence.json
 python3 scripts/validate_test_vectors.py test_vectors/
 python3 scripts/verify_qrs_fixtures.py test_vectors/
+python3 scripts/verify_qrs_vectors.py test_vectors/ --binary build/qrs_native_bench
 python3 scripts/run_qrs_negative_tests.py
 bash scripts/release_check.sh
 grep -n "Version: 0.9.0" docs/bip-p2mr-quantum-rescue-leaf-v0.9.0.mediawiki
@@ -107,6 +115,7 @@ jq '.block_model.schnorr_experimental_batch_saturated_block.p99_ms' out/full.jso
 jq '.block_model.schnorr_batch_saturated_block.p99_ms' out/full.json
 jq '.benchmarks.schnorr_bip340.batch_experimental_valid.status' out/quick.json
 jq '.benchmarks.schnorr_bip340.batch_reviewed_public_api_status' out/quick.json
+jq '.draft_rule_status' out/resource-accounting-decision.json
 grep -n "experimental native BIP-340 batch baseline" out/quick.md
 grep -n "not a reviewed public libsecp256k1 API" out/quick.md
 grep -n "QRS vs experimental batch Schnorr" out/quick.md

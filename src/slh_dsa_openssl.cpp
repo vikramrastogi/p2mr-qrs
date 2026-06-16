@@ -155,40 +155,72 @@ bool verify_message(EVP_PKEY* key,
 
 struct InvalidSignatureCase {
   std::string name;
+  PkeyPtr public_key;
+  std::array<unsigned char, 32> msg;
   std::vector<unsigned char> sig;
+
+  InvalidSignatureCase(std::string name_in,
+                       PkeyPtr public_key_in,
+                       std::array<unsigned char, 32> msg_in,
+                       std::vector<unsigned char> sig_in)
+      : name(std::move(name_in)),
+        public_key(std::move(public_key_in)),
+        msg(msg_in),
+        sig(std::move(sig_in)) {}
+
+  InvalidSignatureCase(const InvalidSignatureCase&) = delete;
+  InvalidSignatureCase& operator=(const InvalidSignatureCase&) = delete;
+  InvalidSignatureCase(InvalidSignatureCase&&) noexcept = default;
+  InvalidSignatureCase& operator=(InvalidSignatureCase&&) noexcept = default;
 };
 
 std::vector<InvalidSignatureCase> make_invalid_fixed_length_cases(
+    const std::vector<unsigned char>& raw_pub,
+    const std::array<unsigned char, 32>& msg,
     const std::vector<unsigned char>& sig) {
   std::vector<InvalidSignatureCase> cases;
 
   auto byte0 = sig;
   byte0[0] ^= 0x01;
-  cases.push_back({"byte0_bitflip", std::move(byte0)});
+  cases.emplace_back("byte0_bitflip", import_public_key(raw_pub), msg, std::move(byte0));
 
   auto middle = sig;
   middle[middle.size() / 2] ^= 0x02;
-  cases.push_back({"middle_bitflip", std::move(middle)});
+  cases.emplace_back("middle_bitflip", import_public_key(raw_pub), msg, std::move(middle));
 
   auto last = sig;
   last.back() ^= 0x04;
-  cases.push_back({"last_bitflip", std::move(last)});
+  cases.emplace_back("last_bitflip", import_public_key(raw_pub), msg, std::move(last));
 
   auto spread = sig;
   for (std::size_t i = 0; i < 32; ++i) {
     const std::size_t pos = (17 + i * 251) % spread.size();
     spread[pos] ^= static_cast<unsigned char>(1U << (i % 8));
   }
-  cases.push_back({"spread_32_bitflips", std::move(spread)});
+  cases.emplace_back("spread_32_bitflips", import_public_key(raw_pub), msg, std::move(spread));
 
-  cases.push_back({"all_zero", std::vector<unsigned char>(sig.size(), 0x00)});
-  cases.push_back({"all_ff", std::vector<unsigned char>(sig.size(), 0xff)});
+  cases.emplace_back("all_zero", import_public_key(raw_pub), msg,
+                     std::vector<unsigned char>(sig.size(), 0x00));
+  cases.emplace_back("all_ff", import_public_key(raw_pub), msg,
+                     std::vector<unsigned char>(sig.size(), 0xff));
 
   std::vector<unsigned char> deterministic_garbage(sig.size());
   for (std::size_t i = 0; i < deterministic_garbage.size(); ++i) {
     deterministic_garbage[i] = static_cast<unsigned char>((7 + i * 131) & 0xffU);
   }
-  cases.push_back({"deterministic_garbage", std::move(deterministic_garbage)});
+  cases.emplace_back("deterministic_garbage", import_public_key(raw_pub), msg,
+                     std::move(deterministic_garbage));
+
+  auto wrong_msg = msg;
+  wrong_msg[0] ^= 0x80;
+  cases.emplace_back("wrong_message", import_public_key(raw_pub), wrong_msg, sig);
+
+  auto wrong_key = generate_key();
+  const std::vector<unsigned char> wrong_raw_pub = raw_public_key(wrong_key.get());
+  if (wrong_raw_pub.size() != raw_pub.size()) {
+    throw std::runtime_error("wrong-public-key SLH-DSA case changed public key length");
+  }
+  cases.emplace_back("wrong_public_key", import_public_key(wrong_raw_pub), msg, sig);
 
   return cases;
 }
@@ -206,9 +238,12 @@ void select_invalid_summary_stats(SlhDsaResult& r) {
   std::sort(available.begin(), available.end(), [](const NamedStats& a, const NamedStats& b) {
     return a.stats.p99_ns < b.stats.p99_ns;
   });
+  r.invalid_fixed_length_min_observed = available.front().stats;
   r.invalid_fixed_length_best_observed = available.front().stats;
   r.invalid_fixed_length_median_observed = available[available.size() / 2].stats;
+  r.invalid_fixed_length_p99_observed = available.back().stats;
   r.invalid_fixed_length_worst_observed = available.back().stats;
+  r.invalid_fixed_length_case_name_worst = available.back().name;
   r.invalid_fixed_length_verify = r.invalid_fixed_length_worst_observed;
 }
 #endif
@@ -223,8 +258,10 @@ SlhDsaResult run_slh_dsa_benchmarks(bool quick) {
   r.reason = "built without OpenSSL";
   r.valid_verify.status = "unavailable";
   r.invalid_fixed_length_verify.status = "unavailable";
+  r.invalid_fixed_length_min_observed.status = "unavailable";
   r.invalid_fixed_length_best_observed.status = "unavailable";
   r.invalid_fixed_length_median_observed.status = "unavailable";
+  r.invalid_fixed_length_p99_observed.status = "unavailable";
   r.invalid_fixed_length_worst_observed.status = "unavailable";
   return r;
 #else
@@ -253,13 +290,14 @@ SlhDsaResult run_slh_dsa_benchmarks(bool quick) {
     if (!verify_message(public_key.get(), msg, sig)) {
       throw std::runtime_error("valid SLH-DSA signature failed before timing");
     }
-    std::vector<InvalidSignatureCase> invalid_cases = make_invalid_fixed_length_cases(sig);
+    std::vector<InvalidSignatureCase> invalid_cases =
+        make_invalid_fixed_length_cases(raw_pub, msg, sig);
     for (const auto& c : invalid_cases) {
       if (c.sig.size() != sig.size()) {
         throw std::runtime_error("invalid SLH-DSA case " + c.name +
                                  " changed signature length");
       }
-      if (verify_message(public_key.get(), msg, c.sig)) {
+      if (verify_message(c.public_key.get(), c.msg, c.sig)) {
         throw std::runtime_error("invalid fixed-length SLH-DSA signature case " + c.name +
                                  " verified before timing");
       }
@@ -277,7 +315,7 @@ SlhDsaResult run_slh_dsa_benchmarks(bool quick) {
       timed.name = c.name;
       timed.stats = summarize(time_batches(
           "slh_dsa_sha2_128s_invalid_fixed_length_" + c.name + "_verify",
-          [&]() { return verify_message(public_key.get(), msg, c.sig); }, batches, iters,
+          [&]() { return verify_message(c.public_key.get(), c.msg, c.sig); }, batches, iters,
           warmup));
       r.invalid_fixed_length_cases.push_back(std::move(timed));
     }
@@ -291,8 +329,10 @@ SlhDsaResult run_slh_dsa_benchmarks(bool quick) {
     r.reason = e.what();
     r.valid_verify.status = "unavailable";
     r.invalid_fixed_length_verify.status = "unavailable";
+    r.invalid_fixed_length_min_observed.status = "unavailable";
     r.invalid_fixed_length_best_observed.status = "unavailable";
     r.invalid_fixed_length_median_observed.status = "unavailable";
+    r.invalid_fixed_length_p99_observed.status = "unavailable";
     r.invalid_fixed_length_worst_observed.status = "unavailable";
     return r;
   }

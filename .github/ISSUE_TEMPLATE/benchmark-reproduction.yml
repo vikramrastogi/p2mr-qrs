@@ -1,0 +1,60 @@
+name: Native benchmark reproduction
+description: Submit an independent QRS native benchmark rerun.
+title: "Benchmark reproduction: <hardware / OS>"
+labels:
+  - benchmark
+  - review
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please run the protocol in `docs/REPRODUCIBILITY.md` and attach the generated artifacts.
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Hardware, OS, compiler, compiler flags, OpenSSL version/provider, and build mode.
+      placeholder: Apple M2 Pro, Darwin 25.x, clang ..., OpenSSL ...
+    validations:
+      required: true
+  - type: textarea
+    id: commits
+    attributes:
+      label: Commits
+      description: Benchmark harness commit, libsecp256k1 commit, and working-tree dirty status.
+      placeholder: benchmark_commit=..., libsecp256k1=..., working_tree_dirty=false
+    validations:
+      required: true
+  - type: textarea
+    id: p99
+    attributes:
+      label: p99 saturated-block estimates
+      description: Paste the p99 values from `out/resource-accounting-decision.md`.
+      placeholder: |
+        qrs_valid_saturated_block=...
+        qrs_worst_invalid_fixed_length_saturated_block=...
+        individual_schnorr_saturated_block=...
+        experimental_batch_schnorr_saturated_block=...
+    validations:
+      required: true
+  - type: textarea
+    id: attachments
+    attributes:
+      label: Attached artifacts
+      description: Confirm that raw JSON/Markdown reports are attached.
+      placeholder: |
+        - out/full.json
+        - out/full.md
+        - out/batch-evidence.json
+        - out/batch-evidence.md
+        - out/resource-accounting-decision.json
+        - out/resource-accounting-decision.md
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Any deviations from the reproducibility protocol or unusual local conditions.
+    validations:
+      required: false

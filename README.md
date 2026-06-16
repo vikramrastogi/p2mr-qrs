@@ -1,4 +1,4 @@
-# P2MR Quantum-Rescue Leaf
+# P2MR SLH-DSA Leaf
 
 Draft-stage pre-review package for a narrow post-quantum signing primitive in
 the P2MR / quantum-migration discussion.
@@ -36,6 +36,15 @@ validation budget before activation.
 - `docs/bip-p2mr-quantum-rescue-leaf-v0.9.0.mediawiki` - BIP draft.
 - `docs/REVIEWER_DOSSIER.md` - predictable objections mapped to evidence,
   blockers, or non-goals.
+- `docs/RESOURCE_ACCOUNTING_DECISION.md` - decision criteria and current
+  Draft-stage conclusion for the proposed no-additional-budget rule.
+- `docs/EXPLICIT_QRS_BUDGET_FALLBACK.md` - inactive fallback rule if weight
+  alone fails native validation-cost review.
+- `docs/BITCOIN_CORE_INTEGRATION_REQUIREMENTS.md` - exact artifact required to
+  close the Core validation-path caveat.
+- `docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md` - schema and requirements for final
+  serialized consensus vectors.
+- `docs/REPRODUCIBILITY.md` - independent rerun protocol.
 - `docs/RELEASE_CHECKLIST.md` - posting and release checks.
 - `src/` and `include/` - native benchmark harness.
 - `scripts/` - validation, report, and batch-Schnorr evidence scripts.
@@ -55,7 +64,9 @@ cmake --build build -j
 python3 scripts/assert_quick_report.py out/quick.json out/quick.md
 python3 scripts/validate_test_vectors.py test_vectors/
 python3 scripts/verify_qrs_fixtures.py test_vectors/
+python3 scripts/verify_qrs_vectors.py test_vectors/ --binary build/qrs_native_bench
 python3 scripts/run_qrs_negative_tests.py
+python3 scripts/evaluate_resource_accounting.py --report-json out/quick.json --batch-evidence-json out/batch-evidence.json
 bash scripts/release_check.sh
 ```
 
@@ -74,8 +85,11 @@ network-checked upstream evidence.
   unavailable in this package.
 - The QRS validation-path section is a model, not Bitcoin Core consensus
   integration.
-- The fixture vectors are executable structured fixtures, not final consensus
-  vectors or final SLH-DSA signature vectors.
+- The fixture vectors are executable structured fixtures. Verifier-reaching
+  vectors carry real SLH-DSA-SHA2-128s signatures, but the vectors remain
+  provisional until final BIP-360/QRS hashing definitions are available.
+- The explicit QRS budget fallback is specified but inactive; it is only needed
+  if native/Core review rejects weight-only accounting.
 
 Known blockers before advancing beyond Draft are listed in
 `docs/REVIEWER_DOSSIER.md`.

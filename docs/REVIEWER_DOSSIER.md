@@ -72,14 +72,43 @@ Structured provisional fixture vectors exist in `test_vectors/` and are checked
 by `scripts/validate_test_vectors.py` and
 `scripts/verify_qrs_fixtures.py`. They recompute the modeled fixture hashes and
 distinguish structural rejects from the invalid fixed-length signature case
-that reaches the modeled SLH-DSA verifier boundary. They are not final
-consensus vectors and do not contain final SLH-DSA signature vectors.
+that reaches the modeled SLH-DSA verifier boundary. Verifier-reaching vectors
+are checked by `scripts/verify_qrs_vectors.py`, which calls the native
+SLH-DSA-SHA2-128s verifier for valid and invalid fixed-length signatures. They
+are still not final consensus vectors because the modeled hashing rules remain
+provisional pending final BIP-360/QRS definitions.
 
 ## Benchmark status
 
 Native OpenSSL SLH-DSA-SHA2-128s, native individual libsecp256k1 BIP-340, and
 experimental native batch BIP-340 are measured. The QRS validation-path section
-is a model, not Bitcoin Core integration.
+is a model, not Bitcoin Core integration. The artifact required to close that
+caveat is specified in `BITCOIN_CORE_INTEGRATION_REQUIREMENTS.md`.
+
+## Resource-accounting decision status
+
+`RESOURCE_ACCOUNTING_DECISION.md` records the current decision criteria and
+Draft-stage conclusion. It does not establish activation readiness; it states
+whether the current native evidence supports continuing to evaluate the
+no-additional-budget rule or whether an explicit per-QRS validation budget must
+be added before activation.
+
+`scripts/evaluate_resource_accounting.py` turns generated benchmark reports
+into `out/resource-accounting-decision.json` and
+`out/resource-accounting-decision.md`. If the current evidence fails the stated
+criteria, the script reports that an explicit QRS budget is required or that
+activation remains unresolved.
+
+The inactive fallback budget design is in
+`EXPLICIT_QRS_BUDGET_FALLBACK.md`. It uses additional per-QRS virtual
+validation weight rather than a witness discount.
+
+## Reproducibility status
+
+`REPRODUCIBILITY.md` defines the independent rerun protocol and the repository
+includes a benchmark-reproduction issue template. Local sample reports are not
+independent evidence until another reviewer attaches comparable raw JSON and
+Markdown artifacts.
 
 ## Objection map
 
@@ -90,6 +119,8 @@ is a model, not Bitcoin Core integration.
 | Why not a tapscript opcode? | The 7,856-byte signature exceeds the retained 520-byte tapscript stack-element limit. | BIP Rationale; `../test_vectors/`. |
 | Why no witness discount? | The proposal does not hide a blockspace-policy change inside the crypto primitive. | BIP Resource accounting; `../out/full.md`. |
 | What about batch Schnorr? | Reviewed public batch API status is explicit; experimental batch is labeled non-consensus. | `../out/batch-evidence.md`; `../04_batch_schnorr_baseline.md`. |
+| How does evidence map to the budget rule? | The decision criteria and current conclusion are in a separate decision record. | `RESOURCE_ACCOUNTING_DECISION.md`; `../out/quick.md`; `../out/full.md`. |
+| What if the no-budget rule fails? | Use the inactive explicit QRS budget fallback before activation. | `EXPLICIT_QRS_BUDGET_FALLBACK.md`; `../scripts/evaluate_resource_accounting.py`. |
 | What if BIP-360 changes? | Advancement is blocked on final BIP-360 definitions. | BIP Dependencies and Rationale; provisional vector notes. |
 | Is this activation-ready? | No. It is Draft-stage pre-review material. | `RELEASE_CHECKLIST.md`; this dossier's known blockers. |
 

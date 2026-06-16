@@ -4,6 +4,7 @@
 #include "qrs_bench/report_json.h"
 #include "qrs_bench/report_markdown.h"
 #include "qrs_bench/schnorr_secp256k1.h"
+#include "qrs_bench/slh_dsa_cli.h"
 #include "qrs_bench/slh_dsa_openssl.h"
 
 #include <iostream>
@@ -55,6 +56,9 @@ Args parse_args(int argc, char** argv) {
 
 int main(int argc, char** argv) {
   try {
+    if (argc > 1 && qrs::is_slh_dsa_cli_command(argv[1])) {
+      return qrs::run_slh_dsa_cli(argc, argv);
+    }
     const Args args = parse_args(argc, argv);
     const bool run_slh = args.only == "all" || args.only == "slh-dsa";
     const bool run_schnorr = args.only == "all" || args.only == "schnorr" ||
