@@ -108,6 +108,13 @@ same model in the native binary, and `scripts/check_qrs_digest_agreement.py`
 checks cross-implementation agreement on `leaf_hash`, `merkle_root`, and
 `qrs_msg`.
 
+The fixture verifier enforces exact QRS witness cardinality after optional
+annex-label removal. Extra witness elements remain malformed and do not reach
+the modeled SLH-DSA verifier boundary. The vector set also includes a
+multi-input fixture with explicit, different `spent_outputs` entries so the
+Python and native digest models agree on per-input amount and scriptPubKey
+commitments instead of relying on transaction-output fallbacks.
+
 The fixture verifier includes a regression self-test proving the executable
 leaf-hash fixture uses the BIP-form TapLeaf preimage with CompactSize length
 prefix, and rejects the previously incorrect no-length-prefix form.

@@ -68,8 +68,20 @@ def run_native(binary: Path, args: list[str]) -> tuple[str, str]:
 def native_available(binary: Path) -> bool:
     if not binary.exists():
         return False
-    stdout, stderr = run_native(binary, ["--slh-verify", "--public-key-hex", "00" * 32, "--message-hex", "00" * 32, "--signature-hex", "00" * 7856])
-    return stdout in {"valid", "invalid"} and not stderr
+    try:
+        key = native_keygen(binary)
+        pubkey_hex = key["public_key_hex"]
+        private_key_hex = key["private_key_hex"]
+        msg_hex = "a5" * 32
+        sig_hex = native_sign(binary, private_key_hex, msg_hex)
+        probe_path = Path("<native-slh-dsa-self-test>")
+        if native_verify(binary, pubkey_hex, msg_hex, sig_hex, probe_path) != "valid":
+            return False
+        if native_verify(binary, pubkey_hex, msg_hex, mutate_signature(sig_hex), probe_path) != "invalid":
+            return False
+        return True
+    except (VectorError, KeyError, json.JSONDecodeError):
+        return False
 
 
 def native_verify(binary: Path, pubkey_hex: str, msg_hex: str, sig_hex: str, path: Path) -> str:

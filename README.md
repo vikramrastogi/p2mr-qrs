@@ -93,6 +93,9 @@ bash scripts/release_check.sh
 
 The commands above are local smoke/reproduction checks. Publication or pre-review release readiness is defined only by `bash scripts/release_check.sh`.
 A passing quick benchmark alone is not release evidence.
+The release gate validates freshly generated reports under `build/release-check/`;
+checked-in `out/` files are sample artifacts unless refreshed with
+`QRS_RELEASE_UPDATE_ARTIFACTS=1` and committed.
 
 For stricter publication evidence, run `bash scripts/full_release_check.sh`.
 This omits advisory mode and fails if the current benchmark evidence requires

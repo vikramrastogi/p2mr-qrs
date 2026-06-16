@@ -36,6 +36,19 @@ void block_row(std::ostringstream& o, const std::string& name, const BlockEstima
     << e.ms.at("p99_ms") << " | " << e.ms.at("max_ms") << " |\n";
 }
 
+void qrs_depth_row(std::ostringstream& o, const std::string& name, const BlockEstimate& e) {
+  if (!e.available) {
+    o << "| " << name << " | " << e.qrs_merkle_depth << " | " << e.status << " | "
+      << e.input_weight_wu << " | " << e.max_inputs << " | "
+      << e.merkle_path_hashes_per_block << " | | | |\n";
+    return;
+  }
+  o << "| " << name << " | " << e.qrs_merkle_depth << " | available | "
+    << e.input_weight_wu << " | " << e.max_inputs << " | "
+    << e.merkle_path_hashes_per_block << " | " << e.ms.at("median_ms")
+    << " | " << e.ms.at("p99_ms") << " | " << e.ms.at("max_ms") << " |\n";
+}
+
 std::string conclusion(const SlhDsaResult& slh,
                        const SchnorrResult& schnorr,
                        const BlockModel& model) {
@@ -189,7 +202,10 @@ std::string render_markdown(const Environment& env,
 
   o << "\n## Block Model\n\n";
   o << "Simplified per-input saturation approximation. Real blocks include transaction "
-       "overhead and outputs.\n\n";
+       "overhead and outputs. QRS depth rows include the control-block witness weight "
+       "for the Merkle path and report the resulting TapBranch hash-operation count; "
+       "timing estimates still use the measured QRS validation-path timing multiplied "
+       "by the depth-specific weight-limited input count.\n\n";
   o << "| Model | Status | Max inputs | Median ms | p95 ms | p99 ms | Max ms |\n";
   o << "|---|---:|---:|---:|---:|---:|---:|\n";
   block_row(o, "QRS valid saturated block", block_model.qrs_saturated_block_valid);
@@ -201,6 +217,17 @@ std::string render_markdown(const Environment& env,
             block_model.schnorr_experimental_batch_saturated_block);
   block_row(o, "Schnorr reviewed-public batch saturated block",
             block_model.schnorr_batch_saturated_block);
+
+  o << "\n## QRS Depth-Sensitive Block Model\n\n";
+  o << "| Model | QRS Merkle depth | Status | Input WU | Max inputs | "
+       "TapBranch hashes/block | Median ms | p99 ms | Max ms |\n";
+  o << "|---|---:|---:|---:|---:|---:|---:|---:|---:|\n";
+  for (const auto& e : block_model.qrs_saturated_block_valid_by_depth) {
+    qrs_depth_row(o, "QRS valid saturated block", e);
+  }
+  for (const auto& e : block_model.qrs_saturated_block_invalid_fixed_length_by_depth) {
+    qrs_depth_row(o, "QRS invalid fixed-length saturated block", e);
+  }
 
   o << "\n## QRS vs experimental batch Schnorr\n\n";
   if (block_model.qrs_saturated_block_valid.available &&

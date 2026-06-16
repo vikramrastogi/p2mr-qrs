@@ -1,0 +1,48 @@
+{
+  "name": "qrs_malformed_witness_extra_element",
+  "version": "0.9.0-provisional",
+  "provisional_leaf_version": "c2",
+  "finalization_blocker": "BIP-360 final hashing and sighash definitions are not final.",
+  "transaction": {
+    "version": 2,
+    "lock_time": 0,
+    "inputs": [
+      {
+        "prevout": "22:0",
+        "sequence": 4294967295
+      }
+    ],
+    "outputs": [
+      {
+        "value_sat": 1000,
+        "script_pubkey": "51200000000000000000000000000000000000000000000000000000000000000000"
+      }
+    ]
+  },
+  "spent_output_scriptPubKey": "51200000000000000000000000000000000000000000000000000000000000000000",
+  "witness_stack": [
+    "qrs_signature",
+    "qrs_public_key",
+    "control_block",
+    "extra_witness_element"
+  ],
+  "qrs_public_key": {
+    "encoding": "repeat_byte",
+    "byte": "12",
+    "bytes": 32
+  },
+  "qrs_signature": {
+    "encoding": "repeat_byte",
+    "byte": "34",
+    "bytes": 7856
+  },
+  "control_block": {
+    "hex": "c3",
+    "depth": 0
+  },
+  "expected_leaf_hash": "3d42b343f0a0e01e39546ffc81f8b408d8f6b7447bd5d1d5fa0fd154930d915e",
+  "expected_qrs_msg": "0278e5f03ae449f45439c4d9a227bfccfe99909764a2e7e32a61e84026bc23a9",
+  "expected_result": false,
+  "failure_stage": "malformed_witness",
+  "reaches_slh_dsa_verifier": false
+}
