@@ -55,20 +55,21 @@ Current sample run metadata from `out/full.json`:
 - libsecp256k1 commit:
   `aea86bc3509f3ceb5c047fe6567bf8910f72a728`
 - Benchmark commit recorded by the sample report:
-  `39d81a4ae633b7637e88fdfece9a94a77f9de3bc`
+  `b1bcd3bdb3211ff9f69263bbf0d228c8e8969b53`
+- Working tree dirty status recorded by the sample report: `false`
 
 Current full-report p99 saturated-block estimates:
 
 | Estimate | p99 ms | Status |
 | --- | ---: | --- |
-| QRS valid saturated block | 94.543 | available |
-| QRS worst-observed invalid fixed-length saturated block | 96.855 | available |
-| Individual BIP-340 Schnorr saturated block | 357.754 | available |
-| Experimental batch BIP-340 Schnorr saturated block | 239.471 | available, sensitivity analysis only |
+| QRS valid saturated block | 92.054 | available |
+| QRS worst-observed invalid fixed-length saturated block | 125.273 | available |
+| Individual BIP-340 Schnorr saturated block | 352.399 | available |
+| Experimental batch BIP-340 Schnorr saturated block | 241.392 | available, sensitivity analysis only |
 | Reviewed public batch BIP-340 Schnorr saturated block | unavailable | no reviewed public API wired |
 
 The worst observed invalid fixed-length SLH-DSA case in the sample run is
-`all_ff`. The invalid-fixed-length bucket is a crypto bucket: every case keeps
+`middle_bitflip`. The invalid-fixed-length bucket is a crypto bucket: every case keeps
 the 7,856-byte signature length and is asserted to fail through the SLH-DSA
 verifier before timing.
 
