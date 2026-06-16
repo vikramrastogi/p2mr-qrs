@@ -63,7 +63,7 @@ Source reports:
 The generated `out/resource-accounting-decision.*` files are the current
 machine-readable decision artifacts. This document records the decision rule and
 the committed sample full-run evidence; reviewers should regenerate `out/full.*`
-using `docs/REPRODUCIBILITY.md` before citing local performance numbers.
+using `docs/reproducibility/reproducibility.md` before citing local performance numbers.
 
 Current sample run metadata from `out/full.json`:
 
@@ -109,7 +109,7 @@ fallback trigger is not an activation rule by itself; it is a flag that the BIP
 must either add an explicit QRS validation budget before activation or remain
 unresolved. Current trigger checks include individual Schnorr, a 2.5x hypothetical reviewed-batch-Schnorr baseline, a 3.0x hypothetical reviewed-batch-Schnorr baseline, any reviewed public batch-Schnorr implementation becomes available, and Bitcoin Core validation-path integration overhead.
 
-The generated decision also references `docs/consensus-gap-manifest.json`.
+The generated decision also references `docs/evidence/consensus-gap-manifest.json`.
 That manifest is the machine-readable activation blocker list; resource
 accounting cannot become activation evidence while IDs such as
 `bitcoin_core_validation_path_integration`,
@@ -121,7 +121,7 @@ The worst observed invalid fixed-length SLH-DSA case in the sample run is
 the 7,856-byte signature length and is asserted to fail through the SLH-DSA
 verifier before timing, including wrong-message and wrong-public-key cases.
 Verifier-cost review still requires algorithmic worst-case analysis; see
-`SLH_DSA_VERIFY_COST_ANALYSIS.md`.
+`docs/evidence/slh-dsa-verify-cost-analysis.md`.
 
 ## Decision
 
@@ -147,4 +147,4 @@ This conclusion is deliberately narrow:
 If future native benchmarks, Bitcoin Core integration, implementation-variance
 checks, or reviewed batch-Schnorr evidence fail the criteria above, the BIP must
 add an explicit per-QRS validation budget before activation. The inactive
-fallback design is specified in `docs/EXPLICIT_QRS_BUDGET_FALLBACK.md`.
+fallback design is specified in `docs/evidence/explicit-qrs-budget-fallback.md`.

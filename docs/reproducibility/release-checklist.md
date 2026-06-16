@@ -40,9 +40,9 @@ explicit QRS validation budget or leaves the resource-accounting decision
 unresolved.
 Failure of `full_release_check.sh` means the current machine's standard-run evidence is not strong enough for the stricter gate; it does not change the Draft-stage status of the BIP.
 
-See `PUBLIC_REVIEW_READINESS.md` for the public pre-review readiness checklist
-`REVIEW_THIS_FIRST.md` for the reviewer entrypoint, and
-`PUBLIC_REVIEW_POST_DRAFT.md` for the short public-posting draft.
+See `docs/review/public-review-readiness.md` for the public pre-review readiness checklist
+`docs/review/start-here.md` for the reviewer entrypoint, and
+`docs/review/public-review-post-draft.md` for the short public-posting draft.
 
 Checklist enforced by the script:
 
@@ -90,28 +90,28 @@ Checklist enforced by the script:
 - `scripts/full_release_check.sh` is available as the stricter non-advisory
   evidence gate for standard benchmark runs, and requires
   `draft_rule_status == "supports_no_additional_budget_for_draft_review"`.
-- `docs/RESOURCE_ACCOUNTING_DECISION.md` maps the benchmark evidence to the
+- `docs/evidence/resource-accounting-decision.md` maps the benchmark evidence to the
   draft resource-accounting decision.
-- `docs/EXPLICIT_QRS_BUDGET_FALLBACK.md` specifies the inactive per-QRS budget
+- `docs/evidence/explicit-qrs-budget-fallback.md` specifies the inactive per-QRS budget
   fallback if weight-only accounting fails.
-- `docs/BITCOIN_CORE_INTEGRATION_REQUIREMENTS.md` states the exact Core
+- `docs/evidence/bitcoin-core-integration-requirements.md` states the exact Core
   validation-path artifact required before activation.
-- `docs/BIP360_DEPENDENCY_MATRIX.md` tracks final BIP-360/P2MR dependencies.
-- `docs/CONSENSUS_GAP_MANIFEST.md` and
-  `docs/consensus-gap-manifest.json` track machine-checked activation and
+- `docs/spec/bip360-dependency-matrix.md` tracks final BIP-360/P2MR dependencies.
+- `docs/evidence/consensus-gap-manifest.md` and
+  `docs/evidence/consensus-gap-manifest.json` track machine-checked activation and
   final-vector blockers.
-- `docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md` and
+- `docs/spec/final-transaction-vector-schema.md` and
   `test_vectors/qrs_transaction_vector.schema.json` define the final serialized
   vector shape once BIP-360/QRS definitions are final.
-- `docs/VECTOR_COVERAGE_MATRIX.md` and
+- `docs/evidence/vector-coverage-matrix.md` and
   `test_vectors/vector_coverage_matrix.json` make provisional fixture,
   executable negative/corpus, digest-mutation, and invalid-verifier coverage
   explicit.
-- `docs/REPRODUCIBILITY.md` and the benchmark reproduction issue template
+- `docs/reproducibility/reproducibility.md` and the benchmark reproduction issue template
   define the independent rerun protocol.
-- `docs/REPRODUCTION_MATRIX.md` tracks Apple Silicon macOS, Linux x86_64, and
+- `docs/reproducibility/reproduction-matrix.md` tracks Apple Silicon macOS, Linux x86_64, and
   pre-activation reproduction targets.
-- `docs/SLH_DSA_VERIFY_COST_ANALYSIS.md` separates empirical timing evidence
+- `docs/evidence/slh-dsa-verify-cost-analysis.md` separates empirical timing evidence
   from algorithmic worst-case review.
 - BIP-360 final dependency is documented.
 - README states package is Draft-stage pre-review.

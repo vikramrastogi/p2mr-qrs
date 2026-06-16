@@ -22,8 +22,8 @@ advancement, or a reproducible release check.
 
 ## Evidence Package
 
-- `docs/bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki` is the canonical BIP draft.
-- `docs/REVIEWER_DOSSIER.md` maps predictable objections to evidence,
+- `docs/spec/bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki` is the canonical BIP draft.
+- `docs/review/reviewer-dossier.md` maps predictable objections to evidence,
   non-goals, or blockers.
 - `src/` and `include/` implement the native benchmark harness.
 - `scripts/evaluate_resource_accounting.py` generates the resource-accounting
@@ -33,8 +33,8 @@ advancement, or a reproducible release check.
   digest model across Python and native implementations.
 - `scripts/release_check.sh` rebuilds the benchmark binary, regenerates reports,
   verifies vectors, and checks the public release contract.
-- `docs/BIP360_DEPENDENCY_MATRIX.md`, `docs/REPRODUCTION_MATRIX.md`, and
-  `docs/SLH_DSA_VERIFY_COST_ANALYSIS.md` track the main external blockers.
+- `docs/spec/bip360-dependency-matrix.md`, `docs/reproducibility/reproduction-matrix.md`, and
+  `docs/evidence/slh-dsa-verify-cost-analysis.md` track the main external blockers.
 - `test_vectors/` contains provisional executable structured fixtures and draft
   cryptographic vectors. Final consensus vectors are blocked on final
   BIP-360/QRS hashing and sighash definitions.

@@ -48,7 +48,7 @@ reviewed evaluator and produce one of:
 - `unresolved_requires_reviewer_decision`, with the batch-baseline or policy
   question explicitly decided before activation; or
 - `explicit_budget_required_before_activation`, followed by adoption of
-  `docs/EXPLICIT_QRS_BUDGET_FALLBACK.md` with a positive reviewed constant.
+  `docs/evidence/explicit-qrs-budget-fallback.md` with a positive reviewed constant.
 
 ## Non-Claim
 

@@ -11,7 +11,7 @@ from typing import Any
 
 
 HYPOTHETICAL_BATCH_SPEEDUPS = (1.5, 2.0, 2.5, 3.0, 4.0, 5.0)
-CONSENSUS_GAP_MANIFEST = "docs/consensus-gap-manifest.json"
+CONSENSUS_GAP_MANIFEST = "docs/evidence/consensus-gap-manifest.json"
 ACTIVATION_BLOCKER_IDS = [
     "bip360_final_leaf_hashing",
     "bip360_final_branch_hashing",

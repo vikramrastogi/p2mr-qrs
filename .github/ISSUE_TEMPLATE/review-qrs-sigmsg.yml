@@ -20,7 +20,7 @@ body:
     id: affected_section
     attributes:
       label: Affected file or section
-      placeholder: scripts/compute_qrs_digest_model.py, src/qrs_digest_model.cpp, docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md
+      placeholder: scripts/compute_qrs_digest_model.py, src/qrs_digest_model.cpp, docs/spec/final-transaction-vector-schema.md
     validations:
       required: true
   - type: textarea

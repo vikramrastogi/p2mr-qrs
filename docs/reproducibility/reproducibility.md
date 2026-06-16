@@ -5,9 +5,9 @@ reviewer rerun should produce raw JSON and Markdown artifacts that can be
 compared mechanically, while still recognizing that timing results are
 machine-specific.
 
-The platform target table is maintained in `REPRODUCTION_MATRIX.md`. The
+The platform target table is maintained in `docs/reproducibility/reproduction-matrix.md`. The
 SLH-DSA verifier-cost caveat is maintained in
-`SLH_DSA_VERIFY_COST_ANALYSIS.md`.
+`docs/evidence/slh-dsa-verify-cost-analysis.md`.
 
 ## Minimum Toolchain
 

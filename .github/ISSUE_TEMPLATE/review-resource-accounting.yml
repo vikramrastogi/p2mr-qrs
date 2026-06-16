@@ -20,7 +20,7 @@ body:
     id: affected_section
     attributes:
       label: Affected file or section
-      placeholder: scripts/evaluate_resource_accounting.py, docs/RESOURCE_ACCOUNTING_DECISION.md, out/*.json
+      placeholder: scripts/evaluate_resource_accounting.py, docs/evidence/resource-accounting-decision.md, out/*.json
     validations:
       required: true
   - type: textarea

@@ -8,7 +8,7 @@ readiness.
 Defines one P2MR-only future leaf version that verifies one
 SLH-DSA-SHA2-128s signature over a P2MR/QRS transaction digest derived from the
 BIP-341 `SigMsg` structure, pending final BIP-360 definitions. See
-`bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki`.
+`docs/spec/bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki`.
 
 ## What this proposal does not do
 
@@ -20,7 +20,7 @@ or a tapscript opcode.
 
 P2MR is key-path-free. An SLH-DSA leaf inside an output with an
 exposed key path would not remove the discrete-log exposure. See the BIP
-Rationale section and `../docs/bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki`.
+Rationale section and `docs/spec/bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki`.
 
 ## Why this is not just BIP-360
 
@@ -60,14 +60,14 @@ treats that as an explicit non-goal, not an omission.
 
 The signature, public key, control block, and annex are counted under existing
 SegWit weight rules. See Resource accounting in the v0.9.0 BIP and
-`../docs/RESOURCE_ACCOUNTING_DECISION.md`.
+`docs/evidence/resource-accounting-decision.md`.
 
 ## Resource-accounting status
 
 No-new-budget is a hypothesis to test, not an established consensus conclusion.
 The harness emits QRS, individual Schnorr, experimental batch Schnorr, and
-reviewed-public batch status separately. See `../out/full.md` and
-`../out/full.json`.
+reviewed-public batch status separately. See `out/full.md` and
+`out/full.json`.
 
 The generated decision record also includes batch-speedup sensitivity rows. They
 are explicitly hypothetical and must not be cited as measured batch evidence;
@@ -86,8 +86,8 @@ cannot support the no-additional-budget rule for activation review.
 
 Reviewed public libsecp256k1 batch API: unavailable in the bundled upstream
 commit. Experimental native BIP-340 batch baseline: available as sensitivity
-analysis only, not reviewed consensus code. See `BATCH_SCHNORR_BASELINE_STATUS.md`
-and `../scripts/check_batch_schnorr_baseline.py`.
+analysis only, not reviewed consensus code. See `docs/evidence/batch-schnorr-baseline-status.md`
+and `scripts/check_batch_schnorr_baseline.py`.
 
 The experimental batch path includes a BIP-340 challenge self-test. The test
 compares libsecp256k1's tagged-SHA helper against an independent
@@ -99,10 +99,10 @@ experimental batch verification.
 The BIP requires BIP-360 and remains blocked on final BIP-360 definitions for
 P2MR hashing, sighash tagging, annex handling, and future-leaf behavior. The
 vectors are marked provisional for the same reason. The dependency closure table
-is `BIP360_DEPENDENCY_MATRIX.md`.
+is `docs/spec/bip360-dependency-matrix.md`.
 
 Known activation and final-vector gaps are also listed in
-`CONSENSUS_GAP_MANIFEST.md` and machine-checked by
+`docs/evidence/consensus-gap-manifest.md` and machine-checked by
 `scripts/validate_consensus_gap_manifest.py`. That manifest includes blocker
 IDs such as `bip360_final_leaf_hashing`,
 `bitcoin_core_validation_path_integration`,
@@ -158,7 +158,7 @@ which calls the native SLH-DSA-SHA2-128s verifier for valid and invalid
 fixed-length signatures. They are still not final consensus vectors because the
 modeled hashing rules remain provisional pending final BIP-360/QRS definitions.
 
-`VECTOR_COVERAGE_MATRIX.md` and
+`docs/evidence/vector-coverage-matrix.md` and
 `test_vectors/vector_coverage_matrix.json` make the current provisional
 coverage explicit across structured fixtures, executable negative cases, the
 structured malformed-witness corpus, digest mutation self-tests, and
@@ -172,7 +172,7 @@ target.
 Native OpenSSL SLH-DSA-SHA2-128s, native individual libsecp256k1 BIP-340, and
 experimental native batch BIP-340 are measured. The QRS validation-path section
 is a model, not Bitcoin Core integration. The artifact required to close that
-caveat is specified in `BITCOIN_CORE_INTEGRATION_REQUIREMENTS.md`.
+caveat is specified in `docs/evidence/bitcoin-core-integration-requirements.md`.
 
 The modeled validation path intentionally uses explicit non-consensus prefixes
 such as `QRS modeled TapLeaf v0`, `QRS modeled Branch v0`, and
@@ -187,11 +187,11 @@ selection. The second reviewed SLH-DSA backend remains unavailable in this
 package.
 
 Verifier cost review also needs algorithmic worst-case analysis, not only
-empirical timing evidence. See `SLH_DSA_VERIFY_COST_ANALYSIS.md`.
+empirical timing evidence. See `docs/evidence/slh-dsa-verify-cost-analysis.md`.
 
 ## Resource-accounting decision status
 
-`RESOURCE_ACCOUNTING_DECISION.md` records the current decision criteria and
+`docs/evidence/resource-accounting-decision.md` records the current decision criteria and
 Draft-stage conclusion. It does not establish activation readiness; it states
 whether the current native evidence supports continuing to evaluate the
 no-additional-budget rule or whether an explicit per-QRS validation budget must
@@ -204,32 +204,32 @@ criteria, the script reports that an explicit QRS budget is required or that
 activation remains unresolved.
 
 The inactive fallback budget design is in
-`EXPLICIT_QRS_BUDGET_FALLBACK.md`. It uses additional per-QRS virtual
+`docs/evidence/explicit-qrs-budget-fallback.md`. It uses additional per-QRS virtual
 validation weight rather than a witness discount.
 
 ## Reproducibility status
 
-`REPRODUCIBILITY.md` defines the independent rerun protocol and the repository
+`docs/reproducibility/reproducibility.md` defines the independent rerun protocol and the repository
 includes a benchmark-reproduction issue template. Local sample reports are not
 independent evidence until another reviewer attaches comparable raw JSON and
-Markdown artifacts. The platform target table is `REPRODUCTION_MATRIX.md`.
+Markdown artifacts. The platform target table is `docs/reproducibility/reproduction-matrix.md`.
 
 ## Objection map
 
 | Objection | Answer | Evidence |
 | --- | --- | --- |
-| Why not just BIP-360? | BIP-360 defines the P2MR container; this package defines one concrete SLH-DSA future-leaf validation rule for that container. | BIP Motivation and Rationale; `BIP360_DEPENDENCY_MATRIX.md`. |
-| Is this redundant with BIP-360? | No. This package is complementary: BIP-360 can remain algorithm-neutral and not an algorithm registry, while this draft specifies one concrete dependent SLH-DSA future leaf. | BIP Rationale; `BIP360_DEPENDENCY_MATRIX.md`; `REVIEW_THIS_FIRST.md`. |
+| Why not just BIP-360? | BIP-360 defines the P2MR container; this package defines one concrete SLH-DSA future-leaf validation rule for that container. | BIP Motivation and Rationale; `docs/spec/bip360-dependency-matrix.md`. |
+| Is this redundant with BIP-360? | No. This package is complementary: BIP-360 can remain algorithm-neutral and not an algorithm registry, while this draft specifies one concrete dependent SLH-DSA future leaf. | BIP Rationale; `docs/spec/bip360-dependency-matrix.md`; `docs/review/start-here.md`. |
 | Why not solve old coins? | Legacy-output policy is out of scope. | BIP Abstract and Backward compatibility; this dossier's non-goals. |
 | Why not ML-DSA? | This draft tests one conservative hash-based primitive first. | BIP Motivation and Rationale. |
-| Why not a tapscript opcode? | The 7,856-byte signature exceeds the retained 520-byte tapscript stack-element limit. | BIP Rationale; `../test_vectors/`. |
-| Why no witness discount? | The proposal does not hide a blockspace-policy change inside the crypto primitive. | BIP Resource accounting; `../out/full.md`. |
-| What about batch Schnorr? | Reviewed public batch API status is explicit; experimental batch is labeled non-consensus. | `../out/batch-evidence.md`; `BATCH_SCHNORR_BASELINE_STATUS.md`; `../scripts/check_batch_schnorr_baseline.py`. |
-| How does evidence map to the budget rule? | The decision criteria and current conclusion are in a separate decision record. | `RESOURCE_ACCOUNTING_DECISION.md`; `../out/quick.md`; `../out/full.md`. |
-| What if the no-budget rule fails? | Use the inactive explicit QRS budget fallback before activation. | `EXPLICIT_QRS_BUDGET_FALLBACK.md`; `../scripts/evaluate_resource_accounting.py`. |
+| Why not a tapscript opcode? | The 7,856-byte signature exceeds the retained 520-byte tapscript stack-element limit. | BIP Rationale; `test_vectors/`. |
+| Why no witness discount? | The proposal does not hide a blockspace-policy change inside the crypto primitive. | BIP Resource accounting; `out/full.md`. |
+| What about batch Schnorr? | Reviewed public batch API status is explicit; experimental batch is labeled non-consensus. | `out/batch-evidence.md`; `docs/evidence/batch-schnorr-baseline-status.md`; `scripts/check_batch_schnorr_baseline.py`. |
+| How does evidence map to the budget rule? | The decision criteria and current conclusion are in a separate decision record. | `docs/evidence/resource-accounting-decision.md`; `out/quick.md`; `out/full.md`. |
+| What if the no-budget rule fails? | Use the inactive explicit QRS budget fallback before activation. | `docs/evidence/explicit-qrs-budget-fallback.md`; `scripts/evaluate_resource_accounting.py`. |
 | What if BIP-360 changes? | Advancement is blocked on final BIP-360 definitions. | BIP Dependencies and Rationale; provisional vector notes. |
-| Where is the blocker list? | Activation and final-vector gaps are machine-readable and release-checked. | `CONSENSUS_GAP_MANIFEST.md`; `consensus-gap-manifest.json`; `../scripts/validate_consensus_gap_manifest.py`. |
-| Is this activation-ready? | No. It is Draft-stage pre-review material. | `RELEASE_CHECKLIST.md`; this dossier's known blockers. |
+| Where is the blocker list? | Activation and final-vector gaps are machine-readable and release-checked. | `docs/evidence/consensus-gap-manifest.md`; `docs/evidence/consensus-gap-manifest.json`; `scripts/validate_consensus_gap_manifest.py`. |
+| Is this activation-ready? | No. It is Draft-stage pre-review material. | `docs/reproducibility/release-checklist.md`; this dossier's known blockers. |
 
 ## Known blockers before advancing beyond Draft
 
