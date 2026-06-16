@@ -58,7 +58,7 @@ validate_committed_sample_reports() {
       "$report" >/dev/null
   done
   grep -n "$sample_commit" "$ROOT/docs/RESOURCE_ACCOUNTING_DECISION.md"
-  if ! jq -e \
+  if ! jq -n -e \
     --slurpfile full_report "$FULL_JSON" \
     --slurpfile decision_report "$RESOURCE_DECISION_JSON" '
       ($decision_report[0].p99_ms.qrs_valid_saturated_block
