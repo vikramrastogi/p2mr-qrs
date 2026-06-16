@@ -149,18 +149,36 @@ def main() -> int:
         == ("available" if experimental_available else "unavailable"),
         "experimental batch block model must match experimental batch availability",
     )
-    qrs_depths = block.get("qrs_saturated_block_valid_by_depth", {})
-    require(isinstance(qrs_depths, dict), "QRS depth-sensitive block model must be an object")
-    for depth in ["depth_0", "depth_1", "depth_3", "depth_128"]:
-        require(depth in qrs_depths, f"QRS depth-sensitive block model missing {depth}")
+    qrs_depths = block.get("qrs_saturated_block_valid_by_depth", [])
+    qrs_invalid_depths = block.get("qrs_saturated_block_invalid_fixed_length_by_depth", [])
+    require(isinstance(qrs_depths, list), "QRS valid depth-sensitive block model must be an array")
+    require(
+        isinstance(qrs_invalid_depths, list),
+        "QRS invalid depth-sensitive block model must be an array",
+    )
+    require(len(qrs_depths) == 4, "QRS valid depth-sensitive block model must report 4 rows")
+    require(len(qrs_invalid_depths) == 4, "QRS invalid depth-sensitive block model must report 4 rows")
+    by_depth = {row["qrs_merkle_depth"]: row for row in qrs_depths}
+    invalid_by_depth = {row["qrs_merkle_depth"]: row for row in qrs_invalid_depths}
+    for depth in [0, 1, 3, 128]:
+        require(depth in by_depth, f"QRS valid depth-sensitive block model missing depth {depth}")
         require(
-            qrs_depths[depth]["qrs_merkle_depth"] == int(depth.split("_")[1]),
+            depth in invalid_by_depth,
+            f"QRS invalid depth-sensitive block model missing depth {depth}",
+        )
+        require(
+            by_depth[depth]["qrs_merkle_depth"] == depth,
             f"QRS depth-sensitive row {depth} has wrong depth",
         )
         require(
-            qrs_depths[depth]["merkle_path_hashes_per_block"]
-            == qrs_depths[depth]["qrs_merkle_depth"] * qrs_depths[depth]["max_inputs"],
+            by_depth[depth]["merkle_path_hashes_per_block"]
+            == by_depth[depth]["qrs_merkle_depth"] * by_depth[depth]["max_inputs"],
             f"QRS depth-sensitive row {depth} has inconsistent Merkle hash count",
+        )
+        require(
+            invalid_by_depth[depth]["merkle_path_hashes_per_block"]
+            == invalid_by_depth[depth]["qrs_merkle_depth"] * invalid_by_depth[depth]["max_inputs"],
+            f"QRS invalid depth-sensitive row {depth} has inconsistent Merkle hash count",
         )
 
     slh = report["benchmarks"]["slh_dsa_sha2_128s"]
@@ -295,7 +313,7 @@ def main() -> int:
         )
         require("QRS Validation Path Model" in md, "Markdown must include QRS path model")
         require(
-            "QRS Depth-Sensitive Block Model" in md,
+            "QRS depth-sensitive saturated block estimates" in md,
             "Markdown must include QRS depth-sensitive block model",
         )
         require("TapBranch hashes/block" in md, "Markdown must report depth hash overhead")

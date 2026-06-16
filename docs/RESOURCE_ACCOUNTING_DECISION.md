@@ -98,6 +98,12 @@ baseline, and several illustrative speedup rows. Those rows are sensitivity
 analysis only. They are not measured baselines and are not used as fake batch
 evidence.
 
+The generated decision also includes `depth_sensitivity` with
+`qrs_depth0_p99_ms`, `qrs_depth128_p99_ms`, and `qrs_depth_binding_case`.
+Depth-sensitive rows count Merkle path witness weight and TapBranch hash
+counts. They do not benchmark Bitcoin Core branch-hash implementation overhead;
+that remains part of the Core validation-path integration blocker.
+
 The generated decision also includes explicit fallback trigger checks. A
 fallback trigger is not an activation rule by itself; it is a flag that the BIP
 must either add an explicit QRS validation budget before activation or remain
