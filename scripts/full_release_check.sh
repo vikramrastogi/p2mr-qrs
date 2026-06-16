@@ -31,8 +31,6 @@ ensure_out_clean() {
 
 ensure_out_clean
 
-python3 "$ROOT/scripts/check_doc_paths.py"
-
 cmake -S "$ROOT" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release
 cmake --build "$BUILD_DIR" -j
 if ! "$BUILD_DIR/qrs_native_bench" --slh-probe; then

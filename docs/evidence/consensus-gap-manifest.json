@@ -119,7 +119,7 @@
       "owner_type": "future_wallet_standards",
       "description": "Wallet descriptor, PSBT, hardware-signing, and backup standards for QRS spends are outside this benchmark package.",
       "evidence_required": "Wallet-facing standards or draft guidance for representing, signing, exporting, and recovering QRS leaves.",
-      "current_repo_artifact": "docs/review/public-review-readiness.md"
+      "current_repo_artifact": "docs/review/start-here.md"
     },
     {
       "id": "activation_parameters",
@@ -130,7 +130,7 @@
       "owner_type": "future_activation_process",
       "description": "The Draft intentionally does not propose activation parameters.",
       "evidence_required": "Separate activation proposal only after BIP-360/QRS definitions, Core integration, vectors, and resource accounting are resolved.",
-      "current_repo_artifact": "docs/review/public-review-post-draft.md"
+      "current_repo_artifact": "docs/review/start-here.md"
     },
     {
       "id": "final_serialized_consensus_vectors",

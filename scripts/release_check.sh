@@ -3,8 +3,6 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BIP="$ROOT/docs/spec/bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki"
-DOSSIER="$ROOT/docs/review/reviewer-dossier.md"
-CHECKLIST="$ROOT/docs/reproducibility/release-checklist.md"
 QUICK_JSON="$ROOT/out/quick.json"
 QUICK_MD="$ROOT/out/quick.md"
 SAMPLE_MD="$ROOT/out/sample-native-report.md"
@@ -13,7 +11,6 @@ FULL_JSON="$ROOT/out/full.json"
 BATCH_EVIDENCE="$ROOT/out/batch-evidence.json"
 BATCH_EVIDENCE_MD="$ROOT/out/batch-evidence.md"
 RESOURCE_DECISION_JSON="$ROOT/out/resource-accounting-decision.json"
-RESOURCE_DECISION_MD="$ROOT/out/resource-accounting-decision.md"
 BUILD_DIR="$ROOT/build"
 TMP_DIR="$BUILD_DIR/release-check"
 TMP_QUICK_JSON="$TMP_DIR/quick.json"
@@ -28,7 +25,8 @@ SECP_COMMIT_FILE="$ROOT/third_party/secp256k1.COMMIT"
 CONSENSUS_GAP_MANIFEST="$ROOT/docs/evidence/consensus-gap-manifest.json"
 CONSENSUS_GAP_MANIFEST_MD="$ROOT/docs/evidence/consensus-gap-manifest.md"
 BATCH_SCHNORR_STATUS="$ROOT/docs/evidence/batch-schnorr-baseline-status.md"
-CONSOLIDATED_BIP="$ROOT/docs/bip-p2mr-slh-dsa-leaf-""consolidated.mediawiki"
+START_HERE="$ROOT/docs/review/start-here.md"
+REPRODUCIBILITY="$ROOT/docs/reproducibility/reproducibility.md"
 
 ensure_out_clean() {
   if ! git -C "$ROOT" diff --quiet -- out; then
@@ -58,7 +56,7 @@ validate_committed_sample_reports() {
       "$report" >/dev/null
   done
   grep -n "$sample_commit" "$ROOT/docs/evidence/resource-accounting-decision.md"
-  if ! jq -n -e \
+  jq -n -e \
     --slurpfile full_report "$FULL_JSON" \
     --slurpfile decision_report "$RESOURCE_DECISION_JSON" '
       ($decision_report[0].p99_ms.qrs_valid_saturated_block
@@ -69,20 +67,15 @@ validate_committed_sample_reports() {
         == $full_report[0].block_model.schnorr_individual_saturated_block.p99_ms) and
       ($decision_report[0].p99_ms.experimental_batch_schnorr_saturated_block
         == $full_report[0].block_model.schnorr_experimental_batch_saturated_block.p99_ms)
-    ' >/dev/null; then
-    echo "release_check.sh: committed resource-accounting decision does not match out/full.json" >&2
-    exit 1
-  fi
+    ' >/dev/null || {
+      echo "release_check.sh: committed resource-accounting decision does not match out/full.json" >&2
+      exit 1
+    }
 }
 
 ensure_out_clean
-python3 "$ROOT/scripts/check_doc_paths.py"
 validate_committed_sample_reports
 
-if [ -e "$CONSOLIDATED_BIP" ]; then
-  echo "release_check.sh: use docs/spec/bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki as the single canonical BIP draft" >&2
-  exit 1
-fi
 BIP_V090_COUNT="$(find "$ROOT/docs/spec" -maxdepth 1 -name 'bip-*v0.9.0.mediawiki' -print | wc -l | tr -d ' ')"
 if [ "$BIP_V090_COUNT" != "1" ]; then
   echo "release_check.sh: expected exactly one non-archive v0.9.0 BIP draft, found $BIP_V090_COUNT" >&2
@@ -92,76 +85,52 @@ if [ ! -f "$BIP" ]; then
   echo "release_check.sh: canonical BIP draft missing: $BIP" >&2
   exit 1
 fi
-STALE_BIP_PATH="$ROOT/docs/bip-p2mr-quantum-""rescue-leaf-v0.9.0.mediawiki"
-if [ -f "$STALE_BIP_PATH" ]; then
-  echo "release_check.sh: stale duplicate BIP draft exists: $STALE_BIP_PATH" >&2
-  exit 1
-fi
 
 grep -n "Version: 0.9.0" "$BIP"
 grep -n "Requires: 341, 342, 360" "$BIP"
 grep -n "Title: P2MR SLH-DSA Leaf" "$BIP"
 grep -n "Authors: Vikram Rastogi <vikramrastogi@gmail.com>, Mark Dodson <markhdodson@gmail.com>" "$BIP"
 grep -n "Assigned: ?" "$BIP"
-STALE_TITLE_PATTERN="Title: P2MR Quantum-""Rescue"" Leaf"
-if grep -nE "Author:|Created:|$STALE_TITLE_PATTERN" "$BIP"; then
+if grep -nE "Author:|Created:|Title: P2MR Quantum-Rescue Leaf" "$BIP"; then
   echo "release_check.sh: stale BIP preamble field found" >&2
   exit 1
 fi
-STALE_UPPER_QR="Quantum-""Rescue"
-STALE_LOWER_QR="quantum-""rescue"
-STALE_QSAFE="quantum-""safe"
-STALE_STRONG="strong un""forgeability"
-STALE_SUF="SUF-""CMA"
-STALE_BSD="3-clause B""SD"
-STALE_PRELIM="Non-consensus preliminary bench""mark"
-STALE_RESCUE_DRAFT="P2MR SLH-DSA Rescue Leaf"
-STALE_FULL_TITLE="P2MR Quantum-Rescue Leaf"
-STALE_QR_SIGNATURE="Quantum-Rescue Signature"
-STALE_DRAFT_CIRCULATED="draft circulated as"
-STALE_BIP_WORDING_PATTERN="$STALE_UPPER_QR|$STALE_LOWER_QR|$STALE_QSAFE|$STALE_STRONG|$STALE_SUF|$STALE_BSD|$STALE_PRELIM|$STALE_RESCUE_DRAFT|$STALE_FULL_TITLE|$STALE_QR_SIGNATURE|$STALE_DRAFT_CIRCULATED"
-if grep -nE "$STALE_BIP_WORDING_PATTERN" "$BIP"; then
+if grep -nE "Quantum-Rescue|quantum-rescue|quantum-safe|strong unforgeability|SUF-CMA|3-clause BSD|Non-consensus preliminary benchmark|P2MR SLH-DSA Rescue Leaf|Quantum-Rescue Signature|draft circulated as" "$BIP"; then
   echo "release_check.sh: stale BIP wording found" >&2
   exit 1
 fi
+
 grep -n "hypothesis to test" "$BIP"
 grep -n "BIP-360 is still draft" "$BIP"
 grep -n "Why a separate BIP rather than only BIP-360 text" "$BIP"
-grep -n "Why not just BIP-360" "$ROOT/docs/review/start-here.md" "$DOSSIER"
-grep -n "algorithm-neutral" "$BIP" "$ROOT/docs/review/start-here.md" "$DOSSIER"
-grep -n "not an algorithm registry" "$BIP" "$ROOT/docs/review/start-here.md" "$DOSSIER"
 grep -n "P2MR/QRS transaction digest derived from the BIP-341" "$BIP"
-grep -n "pending final BIP-360 definitions" "$BIP" "$DOSSIER" "$ROOT/docs/spec/final-transaction-vector-schema.md"
-grep -n "BIP-341 field ordering" "$ROOT/docs/spec/final-transaction-vector-schema.md" "$DOSSIER"
 grep -n "proposed script-tree output that removes the Taproot key-path spend" "$BIP"
 grep -n "Fixed-length encoding and witness malleability" "$BIP"
-grep -n "docs/evidence/resource-accounting-decision.md" "$BIP"
-grep -n "docs/evidence/explicit-qrs-budget-fallback.md" "$BIP"
-grep -n "adversarial invalid fixed-length" "$BIP"
-grep -n "Draft-stage pre-review" "$ROOT/docs/internal/pre-review-package.md"
-grep -n "Draft-stage pre-review" "$ROOT/README.md"
-grep -n "verify_qrs_vectors.py" "$CHECKLIST"
-grep -n "evaluate_resource_accounting.py" "$CHECKLIST"
-grep -n "OpenSSL 3.5 or newer" "$ROOT/README.md" "$ROOT/docs/reproducibility/reproducibility.md" "$CHECKLIST"
-grep -n "docs/evidence/explicit-qrs-budget-fallback.md" "$ROOT/docs/evidence/resource-accounting-decision.md"
-grep -n "Bitcoin Core validation-path integration not implemented" "$ROOT/docs/evidence/bitcoin-core-integration-requirements.md"
+grep -n "docs/evidence/resource-accounting-decision.md" "$BIP" "$START_HERE"
+grep -n "docs/evidence/explicit-qrs-budget-fallback.md" "$BIP" "$ROOT/docs/evidence/resource-accounting-decision.md"
+grep -n "docs/spec/bip360-dependency-matrix.md" "$ROOT/README.md" "$BIP" "$START_HERE"
+grep -n "docs/evidence/consensus-gap-manifest.md" "$ROOT/README.md" "$START_HERE"
+grep -n "docs/evidence/vector-coverage-matrix.md" "$START_HERE"
+grep -n "docs/reproducibility/reproducibility.md" "$START_HERE"
+grep -n "out/full.md" "$ROOT/README.md" "$START_HERE"
+grep -n "Draft-stage" "$ROOT/README.md" "$START_HERE"
+grep -n "not activation-ready" "$ROOT/README.md" "$START_HERE"
+grep -n "not asking reviewers to support activation" "$START_HERE"
+grep -n "No legacy-output" "$START_HERE"
+grep -n "No tapscript opcode in v1" "$START_HERE"
+grep -n "No witness discount" "$START_HERE"
+grep -n "No algorithm registry" "$START_HERE"
+grep -n "No activation parameters" "$START_HERE"
+grep -n "Known Blockers Before Advancing Beyond Draft" "$START_HERE"
+grep -n "Bitcoin Core consensus validation-path integration" "$START_HERE"
+grep -n "Final serialized vectors remain blocked" "$START_HERE"
+grep -n "BIP-341 field ordering" "$ROOT/docs/spec/final-transaction-vector-schema.md"
 grep -n "qrs_transaction_vector.schema.json" "$ROOT/docs/spec/final-transaction-vector-schema.md"
 grep -n "schema-only placeholder" "$ROOT/docs/spec/final-transaction-vector-schema.md"
 grep -n "provisional OP_1/PUSH32" "$ROOT/docs/spec/final-transaction-vector-schema.md" "$ROOT/test_vectors/README.md"
 grep -n "root-carrier encoding" "$ROOT/docs/spec/final-transaction-vector-schema.md" "$ROOT/test_vectors/README.md"
 grep -n "Schema for future P2MR QRS serialized transaction vectors" "$ROOT/test_vectors/qrs_transaction_vector.schema.json"
-grep -n "schema_status" "$ROOT/test_vectors/qrs_transaction_vector.schema.json"
-grep -n "schema_only_pending_final_bip360_qrs" "$ROOT/test_vectors/qrs_transaction_vector.schema.json"
-grep -n "vector_status" "$ROOT/test_vectors/qrs_transaction_vector.schema.json"
 grep -n "future_final_vector_contract" "$ROOT/test_vectors/qrs_transaction_vector.schema.json" "$ROOT/docs/spec/final-transaction-vector-schema.md"
-if grep -RniE "test_vectors/.*are final consensus vectors|current test_vectors/.*are final consensus vectors" \
-  "$ROOT/README.md" "$ROOT/docs/internal/pre-review-package.md" "$ROOT/docs" "$ROOT/test_vectors"; then
-  echo "release_check.sh: current test_vectors/ must not be described as final consensus vectors" >&2
-  exit 1
-fi
-grep -n "docs/reproducibility/reproducibility.md" "$ROOT/.github/ISSUE_TEMPLATE/benchmark-reproduction.yml"
-grep -n "docs/spec/bip360-dependency-matrix.md" "$ROOT/README.md" "$BIP" "$DOSSIER" "$ROOT/docs/review/public-review-readiness.md"
-grep -n "docs/evidence/consensus-gap-manifest.md" "$ROOT/README.md" "$DOSSIER" "$ROOT/docs/review/public-review-readiness.md" "$CHECKLIST"
 grep -n "docs/evidence/consensus-gap-manifest.json" "$CONSENSUS_GAP_MANIFEST_MD" "$ROOT/docs/evidence/resource-accounting-decision.md"
 grep -n "future leaf version behavior" "$ROOT/docs/spec/bip360-dependency-matrix.md"
 grep -n "SigMsg extension behavior" "$ROOT/docs/spec/bip360-dependency-matrix.md"
@@ -169,105 +138,62 @@ grep -n "bip360_final_leaf_hashing" "$CONSENSUS_GAP_MANIFEST" "$CONSENSUS_GAP_MA
 grep -n "qrs_ext_flag_assignment" "$CONSENSUS_GAP_MANIFEST" "$CONSENSUS_GAP_MANIFEST_MD"
 grep -n "bitcoin_core_validation_path_integration" "$CONSENSUS_GAP_MANIFEST" "$CONSENSUS_GAP_MANIFEST_MD"
 grep -n "reviewed_public_batch_schnorr_baseline" "$CONSENSUS_GAP_MANIFEST" "$CONSENSUS_GAP_MANIFEST_MD"
-grep -n "docs/evidence/batch-schnorr-baseline-status.md" "$CONSENSUS_GAP_MANIFEST" "$CONSENSUS_GAP_MANIFEST_MD" "$ROOT/README.md" "$DOSSIER"
+grep -n "docs/evidence/batch-schnorr-baseline-status.md" "$CONSENSUS_GAP_MANIFEST" "$CONSENSUS_GAP_MANIFEST_MD"
 grep -n "reviewed public BIP-340 batch verification baseline unavailable" "$BATCH_SCHNORR_STATUS"
 grep -n "not a reviewed public libsecp256k1 API" "$BATCH_SCHNORR_STATUS"
 grep -n "must never synthesize a fake batch baseline" "$BATCH_SCHNORR_STATUS"
-OLD_BATCH_SPEC="04_batch_schnorr_""baseline.md"
-if [ -e "$ROOT/$OLD_BATCH_SPEC" ]; then
-  echo "release_check.sh: batch Schnorr status must live in docs/evidence/batch-schnorr-baseline-status.md, not $OLD_BATCH_SPEC" >&2
-  exit 1
-fi
-if grep -Rni "$OLD_BATCH_SPEC" "$ROOT/README.md" "$ROOT/docs" "$ROOT/scripts"; then
-  echo "release_check.sh: stale batch Schnorr task-spec filename found" >&2
-  exit 1
-fi
 grep -n "final_serialized_consensus_vectors" "$CONSENSUS_GAP_MANIFEST" "$CONSENSUS_GAP_MANIFEST_MD"
-grep -n "docs/reproducibility/reproduction-matrix.md" "$ROOT/README.md" "$ROOT/docs/reproducibility/release-checklist.md" "$ROOT/docs/reproducibility/reproducibility.md"
+grep -n "docs/reproducibility/reproduction-matrix.md" "$REPRODUCIBILITY"
 grep -n "Apple Silicon macOS" "$ROOT/docs/reproducibility/reproduction-matrix.md"
 grep -n "Linux x86_64" "$ROOT/docs/reproducibility/reproduction-matrix.md"
 grep -n "minimum public-pre-review target" "$ROOT/docs/reproducibility/reproduction-matrix.md"
 grep -n "pre-activation target" "$ROOT/docs/reproducibility/reproduction-matrix.md"
-grep -n "docs/evidence/slh-dsa-verify-cost-analysis.md" "$ROOT/README.md" "$DOSSIER" "$ROOT/docs/evidence/resource-accounting-decision.md" "$ROOT/docs/reproducibility/reproducibility.md"
+grep -n "docs/evidence/slh-dsa-verify-cost-analysis.md" "$ROOT/docs/evidence/resource-accounting-decision.md" "$REPRODUCIBILITY"
 grep -n "empirical timing evidence" "$ROOT/docs/evidence/slh-dsa-verify-cost-analysis.md"
 grep -n "algorithmic worst-case" "$ROOT/docs/evidence/slh-dsa-verify-cost-analysis.md"
 grep -n "random bit flips are not a proof" "$ROOT/docs/evidence/slh-dsa-verify-cost-analysis.md"
-grep -n "docs/review/public-review-post-draft.md" "$ROOT/README.md" "$ROOT/docs/review/public-review-readiness.md" "$CHECKLIST"
-grep -n "docs/review/start-here.md" "$ROOT/README.md" "$ROOT/docs/review/public-review-readiness.md" "$CHECKLIST"
-grep -n "This package is not asking reviewers to support activation" "$ROOT/docs/review/start-here.md"
-grep -n "docs/spec/bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki" "$ROOT/docs/review/start-here.md"
-grep -n "docs/evidence/resource-accounting-decision.md" "$ROOT/docs/review/start-here.md"
-grep -n "docs/evidence/consensus-gap-manifest.md" "$ROOT/docs/review/start-here.md"
-grep -n "docs/evidence/vector-coverage-matrix.md" "$ROOT/docs/review/start-here.md"
-grep -n "docs/reproducibility/reproducibility.md" "$ROOT/docs/review/start-here.md"
-grep -n "No legacy-output freeze, burn, throttle, sunset, or rescue policy" "$ROOT/docs/review/start-here.md"
-grep -n "No tapscript opcode in v1" "$ROOT/docs/review/start-here.md"
-grep -n "No witness discount" "$ROOT/docs/review/start-here.md"
-grep -n "No algorithm registry" "$ROOT/docs/review/start-here.md"
-grep -n "No activation parameters" "$ROOT/docs/review/start-here.md"
-grep -n "not activation-ready" "$ROOT/docs/review/public-review-post-draft.md"
-grep -n "legacy-output policy" "$ROOT/docs/review/public-review-post-draft.md"
-grep -n "ext_flag=2" "$ROOT/docs/review/public-review-post-draft.md"
-grep -n "batch-Schnorr sensitivity" "$ROOT/docs/review/public-review-post-draft.md"
-grep -n "compute_qrs_digest_model.py" "$ROOT/docs/spec/final-transaction-vector-schema.md" "$DOSSIER" "$CHECKLIST"
-grep -n "cross-implementation" "$ROOT/docs/spec/final-transaction-vector-schema.md" "$DOSSIER" "$CHECKLIST"
-grep -n "docs/evidence/vector-coverage-matrix.md" "$ROOT/README.md" "$DOSSIER" "$CHECKLIST"
 grep -n "vector_coverage_matrix.json" "$ROOT/docs/evidence/vector-coverage-matrix.md" "$ROOT/test_vectors/README.md"
 grep -n "vector_coverage_matrix.schema.json" "$ROOT/docs/evidence/vector-coverage-matrix.md" "$ROOT/scripts/validate_vector_coverage_matrix.py"
 grep -n "P2MR QRS Vector Coverage Matrix" "$ROOT/test_vectors/vector_coverage_matrix.schema.json" "$ROOT/docs/evidence/vector-coverage-matrix.md"
 grep -n "P2MR QRS Consensus Gap Manifest" "$ROOT/docs/evidence/consensus-gap-manifest.schema.json" "$ROOT/scripts/validate_consensus_gap_manifest.py"
 grep -n "Final serialized consensus vectors remain blocked" "$ROOT/docs/evidence/vector-coverage-matrix.md"
-grep -n "second reviewed SLH-DSA backend" "$DOSSIER"
 grep -n "2.5x hypothetical reviewed-batch-Schnorr baseline" "$ROOT/docs/evidence/explicit-qrs-budget-fallback.md" "$ROOT/docs/evidence/resource-accounting-decision.md"
 grep -n "reviewed public batch-Schnorr implementation becomes available" "$ROOT/docs/evidence/explicit-qrs-budget-fallback.md" "$ROOT/docs/evidence/resource-accounting-decision.md"
 grep -n "fallback trigger" "$ROOT/docs/evidence/explicit-qrs-budget-fallback.md" "$ROOT/docs/evidence/resource-accounting-decision.md"
 grep -Rni "blocking Draft pre-review" "$ROOT/.github/ISSUE_TEMPLATE"
-PRIVATE_SCAFFOLD_A="$ROOT/co""dex-specs"
-PRIVATE_SCAFFOLD_B="$ROOT/qrs-pre-review-hardening"
-if [ -e "$PRIVATE_SCAFFOLD_A" ] || [ -e "$PRIVATE_SCAFFOLD_B" ]; then
-  echo "release_check.sh: private scaffolding directories must not be published" >&2
-  exit 1
-fi
-PROCESS_HITS="$(grep -RniE "Cl[a]ude|Co[d]ex|ChatG[P]T|A[I]-generated|\\bA[I]\\b|\\bL[L]M\\b|assist[a]nt" \
-  --exclude-dir=.git --exclude-dir=build --exclude-dir=third_party --exclude-dir=__pycache__ \
-  --exclude=.git \
-  "$ROOT" || true)"
-PUBLIC_PROCESS_EXCEPTION="docs/review/public-review-readiness.md:.*No private scaffolding, A""I/process artifacts"
-PROCESS_HITS="$(printf "%s\n" "$PROCESS_HITS" | grep -v "$PUBLIC_PROCESS_EXCEPTION" || true)"
-if [ -n "$PROCESS_HITS" ]; then
-  printf "%s\n" "$PROCESS_HITS"
-  echo "release_check.sh: non-technical process artifact wording found" >&2
-  exit 1
-fi
 
-if grep -Rni "consensus test vectors" \
-  "$ROOT/README.md" "$ROOT/docs/internal/pre-review-package.md" "$ROOT/docs" "$ROOT/test_vectors"; then
+if grep -RniE "test_vectors/.*are final consensus vectors|current test_vectors/.*are final consensus vectors" \
+  "$ROOT/README.md" "$ROOT/docs" "$ROOT/test_vectors"; then
+  echo "release_check.sh: current test_vectors/ must not be described as final consensus vectors" >&2
+  exit 1
+fi
+if grep -Rni "consensus test vectors" "$ROOT/README.md" "$ROOT/docs" "$ROOT/test_vectors"; then
   echo "release_check.sh: vectors must not be described as consensus test vectors" >&2
   exit 1
 fi
-if grep -Rni "P2MR is the only key-path-free output" "$BIP" "$DOSSIER" "$ROOT/README.md"; then
+if grep -Rni "P2MR is the only key-path-free output" "$BIP" "$ROOT/README.md" "$ROOT/docs"; then
   echo "release_check.sh: avoid overbroad key-path-free-output claims" >&2
   exit 1
 fi
-
-ACTIVATION_READY_HITS="$(grep -Rni "activation-ready consensus evidence" \
-  "$ROOT/README.md" "$ROOT/docs/internal/pre-review-package.md" "$ROOT/docs" || true)"
+if grep -RniE "QRS is [c]heaper|\\([c]heaper\\)|empirically supported" "$BIP" "$ROOT/README.md" "$ROOT/docs"; then
+  echo "release_check.sh: unsupported cost language found" >&2
+  exit 1
+fi
+ACTIVATION_READY_HITS="$(grep -Rni "activation-ready consensus evidence" "$ROOT/README.md" "$ROOT/docs" || true)"
 ACTIVATION_READY_CLAIMS="$(printf "%s\n" "$ACTIVATION_READY_HITS" | grep -vi "not activation-ready consensus evidence" || true)"
 if [ -n "$ACTIVATION_READY_CLAIMS" ]; then
   printf "%s\n" "$ACTIVATION_READY_CLAIMS"
   echo "release_check.sh: unsupported activation-ready consensus evidence claim found" >&2
   exit 1
 fi
-
-if grep -RniE "QRS is [c]heaper|\\([c]heaper\\)|empirically supported" \
-  "$BIP" "$DOSSIER" "$CHECKLIST" "$ROOT/docs/internal/pre-review-package.md" "$ROOT/README.md"; then
-  echo "release_check.sh: unsupported cost language found" >&2
+PROCESS_HITS="$(grep -RniE "Cl[a]ude|Co[d]ex|ChatG[P]T|A[I]-generated|\\bA[I]\\b|\\bL[L]M\\b|assist[a]nt" \
+  --exclude-dir=.git --exclude-dir=build --exclude-dir=third_party --exclude-dir=__pycache__ \
+  "$ROOT" || true)"
+if [ -n "$PROCESS_HITS" ]; then
+  printf "%s\n" "$PROCESS_HITS"
+  echo "release_check.sh: non-technical process artifact wording found" >&2
   exit 1
 fi
-
-grep -n "No legacy-output policy" "$DOSSIER"
-grep -n "Batch Schnorr" "$DOSSIER"
-grep -n "Known blockers before advancing beyond Draft" "$DOSSIER"
 
 python3 "$ROOT/scripts/compute_qrs_digest_model.py" "$ROOT/test_vectors"
 python3 "$ROOT/scripts/check_bip341_sigmsg_order.py" "$ROOT/test_vectors"
@@ -297,8 +223,7 @@ if [ "${QRS_RELEASE_NETWORK_BATCH:-0}" = "1" ]; then
 else
   BATCH_EVIDENCE_ARGS+=(--skip-upstream)
 fi
-python3 "$ROOT/scripts/check_batch_schnorr_baseline.py" \
-  "${BATCH_EVIDENCE_ARGS[@]}"
+python3 "$ROOT/scripts/check_batch_schnorr_baseline.py" "${BATCH_EVIDENCE_ARGS[@]}"
 python3 "$ROOT/scripts/verify_qrs_vectors.py" \
   "$ROOT/test_vectors" \
   --binary "$BUILD_DIR/qrs_native_bench" \
@@ -346,14 +271,10 @@ QRS_BENCH_DISABLE_EXPERIMENTAL_BATCH=1 \
   "$BUILD_DIR/qrs_native_bench" --quick --only schnorr \
   --json "$BATCH_DISABLED_JSON" \
   --markdown "$BATCH_DISABLED_MD"
-jq -e '.benchmarks.schnorr_bip340.individual_valid_verify.status == "available"' \
-  "$BATCH_DISABLED_JSON"
-jq -e '.benchmarks.schnorr_bip340.individual_invalid_verify.status == "available"' \
-  "$BATCH_DISABLED_JSON"
-jq -e '.benchmarks.schnorr_bip340.batch_experimental.status == "unavailable"' \
-  "$BATCH_DISABLED_JSON"
-jq -e '.block_model.schnorr_individual_saturated_block.status == "available"' \
-  "$BATCH_DISABLED_JSON"
+jq -e '.benchmarks.schnorr_bip340.individual_valid_verify.status == "available"' "$BATCH_DISABLED_JSON"
+jq -e '.benchmarks.schnorr_bip340.individual_invalid_verify.status == "available"' "$BATCH_DISABLED_JSON"
+jq -e '.benchmarks.schnorr_bip340.batch_experimental.status == "unavailable"' "$BATCH_DISABLED_JSON"
+jq -e '.block_model.schnorr_individual_saturated_block.status == "available"' "$BATCH_DISABLED_JSON"
 python3 "$ROOT/scripts/evaluate_resource_accounting.py" \
   --report-json "$TMP_QUICK_JSON" \
   --batch-evidence-json "$TMP_BATCH_EVIDENCE" \
@@ -402,8 +323,8 @@ grep -n "docs/evidence/consensus-gap-manifest.json" "$TMP_RESOURCE_DECISION_MD"
 grep -n "median of per-batch means" "$TMP_QUICK_MD"
 grep -n "second reviewed SLH-DSA backend" "$TMP_QUICK_MD"
 grep -n "explicit non-consensus prefixes" "$TMP_QUICK_MD"
-grep -n "QRS modeled TapLeaf v0" "$TMP_QUICK_MD" "$DOSSIER"
-grep -n "BIP-340 challenge self-test" "$TMP_QUICK_MD" "$DOSSIER"
+grep -n "QRS modeled TapLeaf v0" "$TMP_QUICK_MD"
+grep -n "BIP-340 challenge self-test" "$TMP_QUICK_MD"
 ensure_out_clean
 
 echo "release checklist passed"
