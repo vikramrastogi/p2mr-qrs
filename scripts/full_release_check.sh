@@ -84,8 +84,21 @@ python3 "$ROOT/scripts/evaluate_resource_accounting.py" \
   --json "$TMP_RESOURCE_DECISION_JSON" \
   --markdown "$TMP_RESOURCE_DECISION_MD"
 
-jq -e '.activation_ready == false' "$TMP_RESOURCE_DECISION_JSON"
-jq -e '.explicit_qrs_budget_required == false' "$TMP_RESOURCE_DECISION_JSON"
+ACTIVATION_READY="$(jq -r '.activation_ready' "$TMP_RESOURCE_DECISION_JSON")"
+if [ "$ACTIVATION_READY" != "false" ]; then
+  echo "full_release_check.sh: expected activation_ready=false, got $ACTIVATION_READY" >&2
+  exit 1
+fi
+EXPLICIT_QRS_BUDGET_REQUIRED="$(jq -r '.explicit_qrs_budget_required' "$TMP_RESOURCE_DECISION_JSON")"
+if [ "$EXPLICIT_QRS_BUDGET_REQUIRED" != "false" ]; then
+  echo "full_release_check.sh: current evidence requires an explicit QRS validation budget" >&2
+  exit 1
+fi
+DRAFT_RULE_STATUS="$(jq -r '.draft_rule_status' "$TMP_RESOURCE_DECISION_JSON")"
+if [ "$DRAFT_RULE_STATUS" != "supports_no_additional_budget_for_draft_review" ]; then
+  echo "full_release_check.sh: current resource-accounting decision is $DRAFT_RULE_STATUS, not supports_no_additional_budget_for_draft_review" >&2
+  exit 1
+fi
 
 cp "$TMP_STANDARD_JSON" "$STANDARD_JSON"
 cp "$TMP_STANDARD_MD" "$STANDARD_MD"

@@ -89,7 +89,8 @@ A passing quick benchmark alone is not release evidence.
 
 For stricter publication evidence, run `bash scripts/full_release_check.sh`.
 This omits advisory mode and fails if the current benchmark evidence requires
-an explicit QRS validation budget.
+an explicit QRS validation budget or leaves the resource-accounting decision
+unresolved.
 
 `scripts/check_batch_schnorr_baseline.py` can refresh the batch-Schnorr evidence
 report. Local release checks use `--skip-upstream` by default; set
