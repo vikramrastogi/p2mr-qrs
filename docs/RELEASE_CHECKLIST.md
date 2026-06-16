@@ -18,8 +18,10 @@ Checklist enforced by the script:
 - Batch Schnorr status is explicit.
 - Reports include machine/library/compiler metadata.
 - Timing stats are labeled as per-batch means.
-- Invalid fixed-length signatures are measured.
-- Test vectors exist or are marked pending.
+- Invalid fixed-length signatures are measured across multiple fixed-length
+  mutations.
+- Structured fixture vectors are model-verified and explicitly marked
+  provisional.
 - BIP-360 final dependency is documented.
 - README states package is Draft-stage pre-review.
 

@@ -207,74 +207,6 @@ SchnorrResult run_schnorr_benchmarks(bool quick) {
 #else
   try {
     auto ctx = create_context();
-    std::array<unsigned char, 32> seckey {};
-    std::array<unsigned char, 32> msg {};
-    std::array<unsigned char, 32> aux {};
-    fill32(seckey, 0x11);
-    fill32(msg, 0x42);
-    fill32(aux, 0x80);
-
-    if (secp256k1_ec_seckey_verify(ctx.get(), seckey.data()) != 1) {
-      throw std::runtime_error("deterministic test seckey failed secp256k1 validation");
-    }
-
-    secp256k1_keypair keypair;
-    if (secp256k1_keypair_create(ctx.get(), &keypair, seckey.data()) != 1) {
-      throw std::runtime_error("secp256k1_keypair_create failed");
-    }
-
-    secp256k1_xonly_pubkey pubkey;
-    int pk_parity = 0;
-    if (secp256k1_keypair_xonly_pub(ctx.get(), &pubkey, &pk_parity, &keypair) != 1) {
-      throw std::runtime_error("secp256k1_keypair_xonly_pub failed");
-    }
-    std::array<unsigned char, 32> serialized_pubkey {};
-    if (secp256k1_xonly_pubkey_serialize(ctx.get(), serialized_pubkey.data(), &pubkey) != 1) {
-      throw std::runtime_error("secp256k1_xonly_pubkey_serialize failed");
-    }
-    secp256k1_xonly_pubkey parsed_pubkey;
-    if (secp256k1_xonly_pubkey_parse(ctx.get(), &parsed_pubkey, serialized_pubkey.data()) != 1) {
-      throw std::runtime_error("secp256k1_xonly_pubkey_parse failed");
-    }
-
-    std::array<unsigned char, 64> sig {};
-    if (secp256k1_schnorrsig_sign32(
-            ctx.get(), sig.data(), msg.data(), &keypair, aux.data()) != 1) {
-      throw std::runtime_error("secp256k1_schnorrsig_sign32 failed");
-    }
-    if (secp256k1_schnorrsig_verify(
-            ctx.get(), sig.data(), msg.data(), msg.size(), &parsed_pubkey) != 1) {
-      throw std::runtime_error("valid Schnorr signature failed before timing");
-    }
-
-    std::array<unsigned char, 64> bad_sig = sig;
-    bad_sig[0] ^= 0x01;
-    if (secp256k1_schnorrsig_verify(
-            ctx.get(), bad_sig.data(), msg.data(), msg.size(), &parsed_pubkey) != 0) {
-      throw std::runtime_error("invalid fixed-length Schnorr signature verified before timing");
-    }
-
-    const std::size_t batches = quick ? 11 : 51;
-    const std::size_t iters = quick ? 2000 : 20000;
-    const std::size_t warmup = quick ? 200 : 1000;
-
-    r.individual_valid_verify = summarize(time_batches(
-        "schnorr_bip340_individual_valid_verify",
-        [&]() {
-          return secp256k1_schnorrsig_verify(
-                     ctx.get(), sig.data(), msg.data(), msg.size(), &parsed_pubkey) == 1;
-        },
-        batches, iters, warmup));
-    r.individual_invalid_verify = summarize(time_batches(
-        "schnorr_bip340_individual_invalid_verify",
-        [&]() {
-          return secp256k1_schnorrsig_verify(
-                     ctx.get(), bad_sig.data(), msg.data(), msg.size(), &parsed_pubkey) == 1;
-        },
-        batches, iters, warmup));
-
-    r.status = "available";
-    r.reason = "";
     r.libsecp256k1_commit = QRS_BENCH_SECP256K1_COMMIT;
     r.compile_flags =
         "bundled libsecp256k1 CMake target, schnorrsig/extrakeys enabled, tests/benchmarks disabled";
@@ -287,15 +219,105 @@ SchnorrResult run_schnorr_benchmarks(bool quick) {
         "found no upstream heads matching batch/schnorr/bip340 for a reviewed "
         "experimental baseline. No fake batch baseline is synthesized.";
     r.batch_reviewed_public_per_signature_verify.status = "unavailable";
-    r.batch_experimental_valid = run_experimental_batch_benchmarks(ctx.get(), false, quick);
-    r.batch_experimental_invalid = run_experimental_batch_benchmarks(ctx.get(), true, quick);
-    if (r.batch_experimental_valid.empty()) {
-      throw std::runtime_error("experimental batch benchmark produced no results");
+
+    std::array<unsigned char, 32> seckey {};
+    std::array<unsigned char, 32> msg {};
+    std::array<unsigned char, 32> aux {};
+    secp256k1_xonly_pubkey pubkey;
+    secp256k1_xonly_pubkey parsed_pubkey;
+    std::array<unsigned char, 64> sig {};
+    std::array<unsigned char, 64> bad_sig = sig;
+
+    try {
+      fill32(seckey, 0x11);
+      fill32(msg, 0x42);
+      fill32(aux, 0x80);
+
+      if (secp256k1_ec_seckey_verify(ctx.get(), seckey.data()) != 1) {
+        throw std::runtime_error("deterministic test seckey failed secp256k1 validation");
+      }
+
+      secp256k1_keypair keypair;
+      if (secp256k1_keypair_create(ctx.get(), &keypair, seckey.data()) != 1) {
+        throw std::runtime_error("secp256k1_keypair_create failed");
+      }
+
+      int pk_parity = 0;
+      if (secp256k1_keypair_xonly_pub(ctx.get(), &pubkey, &pk_parity, &keypair) != 1) {
+        throw std::runtime_error("secp256k1_keypair_xonly_pub failed");
+      }
+      std::array<unsigned char, 32> serialized_pubkey {};
+      if (secp256k1_xonly_pubkey_serialize(ctx.get(), serialized_pubkey.data(), &pubkey) != 1) {
+        throw std::runtime_error("secp256k1_xonly_pubkey_serialize failed");
+      }
+      if (secp256k1_xonly_pubkey_parse(ctx.get(), &parsed_pubkey, serialized_pubkey.data()) != 1) {
+        throw std::runtime_error("secp256k1_xonly_pubkey_parse failed");
+      }
+
+      if (secp256k1_schnorrsig_sign32(
+              ctx.get(), sig.data(), msg.data(), &keypair, aux.data()) != 1) {
+        throw std::runtime_error("secp256k1_schnorrsig_sign32 failed");
+      }
+      if (secp256k1_schnorrsig_verify(
+              ctx.get(), sig.data(), msg.data(), msg.size(), &parsed_pubkey) != 1) {
+        throw std::runtime_error("valid Schnorr signature failed before timing");
+      }
+
+      bad_sig = sig;
+      bad_sig[0] ^= 0x01;
+      if (secp256k1_schnorrsig_verify(
+              ctx.get(), bad_sig.data(), msg.data(), msg.size(), &parsed_pubkey) != 0) {
+        throw std::runtime_error("invalid fixed-length Schnorr signature verified before timing");
+      }
+
+      const std::size_t batches = quick ? 11 : 51;
+      const std::size_t iters = quick ? 2000 : 20000;
+      const std::size_t warmup = quick ? 200 : 1000;
+
+      r.individual_valid_verify = summarize(time_batches(
+          "schnorr_bip340_individual_valid_verify",
+          [&]() {
+            return secp256k1_schnorrsig_verify(
+                       ctx.get(), sig.data(), msg.data(), msg.size(), &parsed_pubkey) == 1;
+          },
+          batches, iters, warmup));
+      r.individual_invalid_verify = summarize(time_batches(
+          "schnorr_bip340_individual_invalid_verify",
+          [&]() {
+            return secp256k1_schnorrsig_verify(
+                       ctx.get(), bad_sig.data(), msg.data(), msg.size(), &parsed_pubkey) == 1;
+          },
+          batches, iters, warmup));
+
+      r.status = "available";
+      r.reason = "";
+    } catch (const std::exception& e) {
+      r.status = "unavailable";
+      r.reason = e.what();
+      r.individual_valid_verify.status = "unavailable";
+      r.individual_invalid_verify.status = "unavailable";
+      r.batch_experimental_status = "unavailable";
+      r.batch_experimental_reason = "not run because individual Schnorr setup failed: " +
+                                    std::string(e.what());
+      r.batch_experimental_primary_per_signature_verify.status = "unavailable";
+      return r;
     }
-    r.batch_experimental_primary_per_signature_verify =
-        r.batch_experimental_valid.back().per_signature_verify;
-    r.batch_experimental_status = "available";
-    r.batch_experimental_reason = "";
+
+    try {
+      r.batch_experimental_valid = run_experimental_batch_benchmarks(ctx.get(), false, quick);
+      r.batch_experimental_invalid = run_experimental_batch_benchmarks(ctx.get(), true, quick);
+      if (r.batch_experimental_valid.empty()) {
+        throw std::runtime_error("experimental batch benchmark produced no results");
+      }
+      r.batch_experimental_primary_per_signature_verify =
+          r.batch_experimental_valid.back().per_signature_verify;
+      r.batch_experimental_status = "available";
+      r.batch_experimental_reason = "";
+    } catch (const std::exception& e) {
+      r.batch_experimental_status = "unavailable";
+      r.batch_experimental_reason = e.what();
+      r.batch_experimental_primary_per_signature_verify.status = "unavailable";
+    }
     return r;
   } catch (const std::exception& e) {
     r.status = "unavailable";

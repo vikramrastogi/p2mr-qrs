@@ -39,7 +39,7 @@ validation budget before activation.
 - `docs/RELEASE_CHECKLIST.md` - posting and release checks.
 - `src/` and `include/` - native benchmark harness.
 - `scripts/` - validation, report, and batch-Schnorr evidence scripts.
-- `test_vectors/` - provisional structured QRS consensus fixtures.
+- `test_vectors/` - provisional structured QRS fixture vectors.
 - `fuzz/` and `tests/` - malformed witness corpus and negative cases.
 - `out/sample-native-report.md` - sample native benchmark report.
 - `out/batch-evidence.md` - reviewed-public batch Schnorr status evidence.
@@ -54,6 +54,7 @@ cmake --build build -j
 ./build/qrs_native_bench --quick --json out/quick.json --markdown out/quick.md
 python3 scripts/assert_quick_report.py out/quick.json out/quick.md
 python3 scripts/validate_test_vectors.py test_vectors/
+python3 scripts/verify_qrs_fixtures.py test_vectors/
 python3 scripts/run_qrs_negative_tests.py
 bash scripts/release_check.sh
 ```
@@ -73,6 +74,8 @@ network-checked upstream evidence.
   unavailable in this package.
 - The QRS validation-path section is a model, not Bitcoin Core consensus
   integration.
+- The fixture vectors are executable structured fixtures, not final consensus
+  vectors or final SLH-DSA signature vectors.
 
 Known blockers before advancing beyond Draft are listed in
 `docs/REVIEWER_DOSSIER.md`.

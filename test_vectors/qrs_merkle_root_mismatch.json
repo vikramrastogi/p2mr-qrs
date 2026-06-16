@@ -3,14 +3,44 @@
   "version": "0.9.0-provisional",
   "provisional_leaf_version": "c2",
   "finalization_blocker": "BIP-360 final hashing and sighash definitions are not final.",
-  "transaction": {"version": 2, "lock_time": 0, "inputs": [{"prevout": "00:8", "sequence": 4294967295}], "outputs": [{"value_sat": 1000, "script_pubkey": "51205656565656565656565656565656565656565656565656565656565656565656"}]},
+  "transaction": {
+    "version": 2,
+    "lock_time": 0,
+    "inputs": [
+      {
+        "prevout": "00:8",
+        "sequence": 4294967295
+      }
+    ],
+    "outputs": [
+      {
+        "value_sat": 1000,
+        "script_pubkey": "51205656565656565656565656565656565656565656565656565656565656565656"
+      }
+    ]
+  },
   "spent_output_scriptPubKey": "51205656565656565656565656565656565656565656565656565656565656565656",
-  "witness_stack": ["qrs_signature", "qrs_public_key", "control_block"],
-  "qrs_public_key": {"encoding": "repeat_byte", "byte": "0a", "bytes": 32},
-  "qrs_signature": {"encoding": "repeat_byte", "byte": "11", "bytes": 7856},
-  "control_block": {"hex": "c3aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "depth": 1},
-  "expected_leaf_hash": "0101010101010101010101010101010101010101010101010101010101010101",
-  "expected_qrs_msg": "0202020202020202020202020202020202020202020202020202020202020202",
+  "witness_stack": [
+    "qrs_signature",
+    "qrs_public_key",
+    "control_block"
+  ],
+  "qrs_public_key": {
+    "encoding": "repeat_byte",
+    "byte": "0a",
+    "bytes": 32
+  },
+  "qrs_signature": {
+    "encoding": "repeat_byte",
+    "byte": "11",
+    "bytes": 7856
+  },
+  "control_block": {
+    "hex": "c3aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "depth": 1
+  },
+  "expected_leaf_hash": "0586926e45041f6e02799b7b9bc0285295e7bcb8e9d736fa0caf973824e3b46f",
+  "expected_qrs_msg": "7bf549c380b1d0e4ff71809aab7c15df370517bc4834f40bbbb51fd9d7803983",
   "expected_result": false,
   "failure_stage": "merkle_root_mismatch",
   "reaches_slh_dsa_verifier": false

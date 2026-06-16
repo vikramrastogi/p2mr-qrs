@@ -68,9 +68,12 @@ vectors are marked provisional for the same reason.
 
 ## Test-vector status
 
-Structured provisional vectors exist in `test_vectors/` and are checked by
-`scripts/validate_test_vectors.py`. They distinguish structural rejects from
-the invalid fixed-length signature case that reaches SLH-DSA verification.
+Structured provisional fixture vectors exist in `test_vectors/` and are checked
+by `scripts/validate_test_vectors.py` and
+`scripts/verify_qrs_fixtures.py`. They recompute the modeled fixture hashes and
+distinguish structural rejects from the invalid fixed-length signature case
+that reaches the modeled SLH-DSA verifier boundary. They are not final
+consensus vectors and do not contain final SLH-DSA signature vectors.
 
 ## Benchmark status
 
@@ -96,5 +99,6 @@ is a model, not Bitcoin Core integration.
 - Final QRS leaf-version and `ext_flag` conflict review.
 - Native benchmark replication across hardware, OS, compilers, and verifier libraries.
 - Bitcoin Core validation-path integration, not just the current model.
-- Consensus test vectors computed from final BIP-360/QRS definitions.
+- Consensus test vectors with real signatures computed from final
+  BIP-360/QRS definitions.
 - Independent SLH-DSA verifier review and cross-implementation vector checks.

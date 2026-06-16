@@ -60,7 +60,7 @@ Current implementation status:
 - The current BIP draft is included at `docs/bip-p2mr-quantum-rescue-leaf-consolidated.mediawiki`.
 - The hardened v0.9.0 BIP draft is included at `docs/bip-p2mr-quantum-rescue-leaf-v0.9.0.mediawiki`.
 - The harness writes JSON and Markdown reports and includes the requested saturated-block model fields.
-- Provisional structured consensus vectors live in `test_vectors/`; malformed witness and negative cases live in `fuzz/` and `tests/`.
+- Provisional structured QRS fixture vectors live in `test_vectors/`; malformed witness and negative cases live in `fuzz/` and `tests/`.
 - `docs/REVIEWER_DOSSIER.md` maps predictable objections to evidence, caveats, blockers, or non-goals.
 - `docs/RELEASE_CHECKLIST.md` lists the posting checks enforced by `scripts/release_check.sh`.
 - `THIRD_PARTY_NOTICES.md` identifies vendored third-party code and license locations.
@@ -91,6 +91,7 @@ python3 scripts/assert_quick_report.py --json out/quick.json --markdown out/quic
 python3 scripts/assert_quick_report.py out/quick.json out/quick.md
 python3 scripts/check_batch_schnorr_baseline.py --skip-upstream --markdown out/batch-evidence.md --json out/batch-evidence.json
 python3 scripts/validate_test_vectors.py test_vectors/
+python3 scripts/verify_qrs_fixtures.py test_vectors/
 python3 scripts/run_qrs_negative_tests.py
 bash scripts/release_check.sh
 grep -n "Version: 0.9.0" docs/bip-p2mr-quantum-rescue-leaf-v0.9.0.mediawiki

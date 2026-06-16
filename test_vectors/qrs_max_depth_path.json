@@ -3,14 +3,47 @@
   "version": "0.9.0-provisional",
   "provisional_leaf_version": "c2",
   "finalization_blocker": "BIP-360 final hashing and sighash definitions are not final.",
-  "transaction": {"version": 2, "lock_time": 0, "inputs": [{"prevout": "00:9", "sequence": 4294967295}], "outputs": [{"value_sat": 1000, "script_pubkey": "51207878787878787878787878787878787878787878787878787878787878787878"}]},
-  "spent_output_scriptPubKey": "51207878787878787878787878787878787878787878787878787878787878787878",
-  "witness_stack": ["qrs_signature", "qrs_public_key", "control_block"],
-  "qrs_public_key": {"encoding": "repeat_byte", "byte": "0b", "bytes": 32},
-  "qrs_signature": {"encoding": "repeat_byte", "byte": "11", "bytes": 7856},
-  "control_block": {"encoding": "repeat_sibling_path", "control_byte": "c3", "sibling_hash_byte": "aa", "depth": 128, "bytes": 4097},
-  "expected_leaf_hash": "0303030303030303030303030303030303030303030303030303030303030303",
-  "expected_qrs_msg": "0404040404040404040404040404040404040404040404040404040404040404",
+  "transaction": {
+    "version": 2,
+    "lock_time": 0,
+    "inputs": [
+      {
+        "prevout": "00:9",
+        "sequence": 4294967295
+      }
+    ],
+    "outputs": [
+      {
+        "value_sat": 1000,
+        "script_pubkey": "51206d869d651710a6ac34bd94496a9f4d9caa64668904a56e349f0d7677f3a93d15"
+      }
+    ]
+  },
+  "spent_output_scriptPubKey": "51206d869d651710a6ac34bd94496a9f4d9caa64668904a56e349f0d7677f3a93d15",
+  "witness_stack": [
+    "qrs_signature",
+    "qrs_public_key",
+    "control_block"
+  ],
+  "qrs_public_key": {
+    "encoding": "repeat_byte",
+    "byte": "0b",
+    "bytes": 32
+  },
+  "qrs_signature": {
+    "encoding": "repeat_byte",
+    "byte": "11",
+    "bytes": 7856
+  },
+  "control_block": {
+    "encoding": "repeat_sibling_path",
+    "control_byte": "c3",
+    "sibling_hash_byte": "aa",
+    "depth": 128,
+    "bytes": 4097
+  },
+  "expected_leaf_hash": "cf998bbbd43cfba43f3c71eb25f8b3bf9f4073472a7089927b1d2ce4f43b26e3",
+  "expected_qrs_msg": "1699df393e9c2995a5813f8115b711715705b9e7defae4f74d54f87b9f9828b0",
   "expected_result": true,
   "failure_stage": "none",
   "reaches_slh_dsa_verifier": true

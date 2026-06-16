@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate QRS structured consensus-vector fixtures."""
+"""Validate QRS provisional structured-fixture metadata."""
 
 from __future__ import annotations
 
@@ -139,7 +139,7 @@ def main() -> int:
     missing = required - names
     if missing:
         raise AssertionError(f"missing required vector names: {sorted(missing)}")
-    print(f"validated {len(vectors)} QRS test vectors")
+    print(f"validated {len(vectors)} QRS structured fixture vectors")
     return 0
 
 

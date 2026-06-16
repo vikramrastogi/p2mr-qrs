@@ -3,10 +3,12 @@
 #include "qrs_bench/bench_timer.h"
 
 #include <array>
+#include <algorithm>
 #include <cstring>
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
 
 #if defined(QRS_BENCH_HAVE_OPENSSL)
@@ -150,6 +152,65 @@ bool verify_message(EVP_PKEY* key,
   }
   return rc == 1;
 }
+
+struct InvalidSignatureCase {
+  std::string name;
+  std::vector<unsigned char> sig;
+};
+
+std::vector<InvalidSignatureCase> make_invalid_fixed_length_cases(
+    const std::vector<unsigned char>& sig) {
+  std::vector<InvalidSignatureCase> cases;
+
+  auto byte0 = sig;
+  byte0[0] ^= 0x01;
+  cases.push_back({"byte0_bitflip", std::move(byte0)});
+
+  auto middle = sig;
+  middle[middle.size() / 2] ^= 0x02;
+  cases.push_back({"middle_bitflip", std::move(middle)});
+
+  auto last = sig;
+  last.back() ^= 0x04;
+  cases.push_back({"last_bitflip", std::move(last)});
+
+  auto spread = sig;
+  for (std::size_t i = 0; i < 32; ++i) {
+    const std::size_t pos = (17 + i * 251) % spread.size();
+    spread[pos] ^= static_cast<unsigned char>(1U << (i % 8));
+  }
+  cases.push_back({"spread_32_bitflips", std::move(spread)});
+
+  cases.push_back({"all_zero", std::vector<unsigned char>(sig.size(), 0x00)});
+  cases.push_back({"all_ff", std::vector<unsigned char>(sig.size(), 0xff)});
+
+  std::vector<unsigned char> deterministic_garbage(sig.size());
+  for (std::size_t i = 0; i < deterministic_garbage.size(); ++i) {
+    deterministic_garbage[i] = static_cast<unsigned char>((7 + i * 131) & 0xffU);
+  }
+  cases.push_back({"deterministic_garbage", std::move(deterministic_garbage)});
+
+  return cases;
+}
+
+void select_invalid_summary_stats(SlhDsaResult& r) {
+  std::vector<NamedStats> available;
+  for (const auto& c : r.invalid_fixed_length_cases) {
+    if (c.stats.available) {
+      available.push_back(c);
+    }
+  }
+  if (available.empty()) {
+    return;
+  }
+  std::sort(available.begin(), available.end(), [](const NamedStats& a, const NamedStats& b) {
+    return a.stats.p99_ns < b.stats.p99_ns;
+  });
+  r.invalid_fixed_length_best_observed = available.front().stats;
+  r.invalid_fixed_length_median_observed = available[available.size() / 2].stats;
+  r.invalid_fixed_length_worst_observed = available.back().stats;
+  r.invalid_fixed_length_verify = r.invalid_fixed_length_worst_observed;
+}
 #endif
 
 }  // namespace
@@ -162,6 +223,9 @@ SlhDsaResult run_slh_dsa_benchmarks(bool quick) {
   r.reason = "built without OpenSSL";
   r.valid_verify.status = "unavailable";
   r.invalid_fixed_length_verify.status = "unavailable";
+  r.invalid_fixed_length_best_observed.status = "unavailable";
+  r.invalid_fixed_length_median_observed.status = "unavailable";
+  r.invalid_fixed_length_worst_observed.status = "unavailable";
   return r;
 #else
   r.openssl_version = OpenSSL_version(OPENSSL_VERSION);
@@ -189,10 +253,16 @@ SlhDsaResult run_slh_dsa_benchmarks(bool quick) {
     if (!verify_message(public_key.get(), msg, sig)) {
       throw std::runtime_error("valid SLH-DSA signature failed before timing");
     }
-    std::vector<unsigned char> bad_sig = sig;
-    bad_sig[0] ^= 0x01;
-    if (verify_message(public_key.get(), msg, bad_sig)) {
-      throw std::runtime_error("invalid fixed-length SLH-DSA signature verified before timing");
+    std::vector<InvalidSignatureCase> invalid_cases = make_invalid_fixed_length_cases(sig);
+    for (const auto& c : invalid_cases) {
+      if (c.sig.size() != sig.size()) {
+        throw std::runtime_error("invalid SLH-DSA case " + c.name +
+                                 " changed signature length");
+      }
+      if (verify_message(public_key.get(), msg, c.sig)) {
+        throw std::runtime_error("invalid fixed-length SLH-DSA signature case " + c.name +
+                                 " verified before timing");
+      }
     }
 
     const std::size_t batches = quick ? 7 : 31;
@@ -202,9 +272,16 @@ SlhDsaResult run_slh_dsa_benchmarks(bool quick) {
     r.valid_verify = summarize(time_batches(
         "slh_dsa_sha2_128s_valid_verify",
         [&]() { return verify_message(public_key.get(), msg, sig); }, batches, iters, warmup));
-    r.invalid_fixed_length_verify = summarize(time_batches(
-        "slh_dsa_sha2_128s_invalid_fixed_length_verify",
-        [&]() { return verify_message(public_key.get(), msg, bad_sig); }, batches, iters, warmup));
+    for (const auto& c : invalid_cases) {
+      NamedStats timed;
+      timed.name = c.name;
+      timed.stats = summarize(time_batches(
+          "slh_dsa_sha2_128s_invalid_fixed_length_" + c.name + "_verify",
+          [&]() { return verify_message(public_key.get(), msg, c.sig); }, batches, iters,
+          warmup));
+      r.invalid_fixed_length_cases.push_back(std::move(timed));
+    }
+    select_invalid_summary_stats(r);
 
     r.status = "available";
     r.reason = "";
@@ -214,6 +291,9 @@ SlhDsaResult run_slh_dsa_benchmarks(bool quick) {
     r.reason = e.what();
     r.valid_verify.status = "unavailable";
     r.invalid_fixed_length_verify.status = "unavailable";
+    r.invalid_fixed_length_best_observed.status = "unavailable";
+    r.invalid_fixed_length_median_observed.status = "unavailable";
+    r.invalid_fixed_length_worst_observed.status = "unavailable";
     return r;
   }
 #endif

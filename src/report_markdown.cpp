@@ -106,6 +106,20 @@ std::string render_markdown(const Environment& env,
   stats_row(o, "BIP-340 Schnorr experimental batch primary per-signature verify",
             schnorr.batch_experimental_primary_per_signature_verify);
 
+  o << "\n## SLH-DSA Invalid Fixed-Length Suite\n\n";
+  o << "Each case keeps the signature length at 7,856 bytes and is checked to fail "
+       "before timing. The compatibility `invalid_fixed_length_verify` value in "
+       "JSON is the worst observed p99 case from this suite.\n\n";
+  o << "| Case | Status | Median batch-mean ns | p95 batch-mean ns | "
+       "p99 batch-mean ns | Max batch-mean ns | Ops/sec |\n";
+  o << "|---|---:|---:|---:|---:|---:|---:|\n";
+  for (const auto& c : slh.invalid_fixed_length_cases) {
+    stats_row(o, c.name, c.stats);
+  }
+  stats_row(o, "best observed invalid fixed-length", slh.invalid_fixed_length_best_observed);
+  stats_row(o, "median observed invalid fixed-length", slh.invalid_fixed_length_median_observed);
+  stats_row(o, "worst observed invalid fixed-length", slh.invalid_fixed_length_worst_observed);
+
   o << "\n## QRS Validation Path Model\n\n";
   o << "- `status`: " << qrs_path.status << "\n";
   o << "- `scope`: " << qrs_path.scope << "\n";

@@ -1,0 +1,220 @@
+#!/usr/bin/env python3
+"""Execute the provisional QRS structured-fixture model.
+
+These fixtures are not final consensus vectors: the BIP-360/P2MR leaf hashing
+and QRS sighash rules are still draft material, and the fixture signatures are
+descriptor bytes rather than real SLH-DSA signatures. This verifier makes the
+current fixture model executable by recomputing modeled hashes and failure-stage
+classification, without pretending to provide final consensus-vector coverage.
+"""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import re
+import sys
+from pathlib import Path
+
+
+QRS_LEAF_VERSION = 0xC2
+P2MR_SCRIPT_PREFIX = "5120"
+STRUCTURAL_FAILURES = {
+    "signature_length",
+    "public_key_length",
+    "control_block_length",
+    "control_low_bit",
+    "leaf_version",
+    "merkle_root_mismatch",
+    "malformed_witness",
+}
+
+
+class FixtureError(AssertionError):
+    pass
+
+
+def fail(path: Path, message: str) -> None:
+    raise FixtureError(f"{path}: {message}")
+
+
+def tagged_hash(tag: str, payload: bytes) -> bytes:
+    tag_hash = hashlib.sha256(tag.encode("ascii")).digest()
+    return hashlib.sha256(tag_hash + tag_hash + payload).digest()
+
+
+def canonical_json(value: object) -> bytes:
+    return json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
+
+
+def hex_bytes(value: str, path: Path, field: str) -> bytes:
+    if not isinstance(value, str) or re.fullmatch(r"[0-9a-f]*", value) is None or len(value) % 2:
+        fail(path, f"{field} must be even-length lowercase hex")
+    return bytes.fromhex(value)
+
+
+def expand_descriptor(value: object, path: Path, field: str) -> bytes:
+    if isinstance(value, str):
+        return hex_bytes(value, path, field)
+    if not isinstance(value, dict):
+        fail(path, f"{field} must be hex or a descriptor object")
+
+    if "hex" in value:
+        out = hex_bytes(value["hex"], path, f"{field}.hex")
+        if "bytes" in value and int(value["bytes"]) != len(out):
+            fail(path, f"{field}.bytes does not match {field}.hex")
+        return out
+
+    encoding = value.get("encoding")
+    if encoding == "repeat_byte":
+        byte = hex_bytes(value.get("byte"), path, f"{field}.byte")
+        if len(byte) != 1:
+            fail(path, f"{field}.byte must be exactly one byte")
+        return byte * int(value["bytes"])
+
+    if encoding == "repeat_sibling_path":
+        control = hex_bytes(value.get("control_byte"), path, f"{field}.control_byte")
+        sibling = hex_bytes(value.get("sibling_hash_byte"), path, f"{field}.sibling_hash_byte")
+        if len(control) != 1 or len(sibling) != 1:
+            fail(path, f"{field} repeat_sibling_path requires one-byte control and sibling bytes")
+        depth = int(value["depth"])
+        out = control + sibling * (32 * depth)
+        if int(value.get("bytes", len(out))) != len(out):
+            fail(path, f"{field}.bytes does not match repeat_sibling_path depth")
+        return out
+
+    fail(path, f"{field} has unsupported descriptor encoding {encoding!r}")
+    return b""
+
+
+def modeled_leaf_hash(pubkey: bytes) -> bytes:
+    return tagged_hash("QRSFixtureLeaf/v0.9.0", bytes([QRS_LEAF_VERSION]) + pubkey)
+
+
+def merkle_root(leaf_hash: bytes, control_block: bytes) -> bytes:
+    root = leaf_hash
+    for offset in range(1, len(control_block), 32):
+        sibling = control_block[offset : offset + 32]
+        left, right = sorted([root, sibling])
+        root = tagged_hash("QRSFixtureBranch/v0.9.0", left + right)
+    return root
+
+
+def modeled_qrs_msg(data: dict, pubkey: bytes, leaf_hash: bytes, annex: bytes) -> bytes:
+    payload = {
+        "transaction": data["transaction"],
+        "spent_output_scriptPubKey": data["spent_output_scriptPubKey"],
+        "qrs_public_key": pubkey.hex(),
+        "leaf_hash": leaf_hash.hex(),
+        "annex": annex.hex(),
+    }
+    return tagged_hash("QRSFixtureMsg/v0.9.0", canonical_json(payload))
+
+
+def p2mr_root(script_pubkey: str, path: Path) -> bytes:
+    if not isinstance(script_pubkey, str):
+        fail(path, "spent_output_scriptPubKey must be lowercase hex")
+    if not script_pubkey.startswith(P2MR_SCRIPT_PREFIX) or len(script_pubkey) != 68:
+        fail(path, "spent_output_scriptPubKey must be OP_1 PUSH32 plus a 32-byte root")
+    return hex_bytes(script_pubkey[len(P2MR_SCRIPT_PREFIX) :], path, "spent_output_scriptPubKey root")
+
+
+def classify(data: dict, sig: bytes, pubkey: bytes, control_block: bytes, leaf_hash: bytes, path: Path) -> str:
+    witness_stack = data.get("witness_stack")
+    if not isinstance(witness_stack, list) or witness_stack[:3] != [
+        "qrs_signature",
+        "qrs_public_key",
+        "control_block",
+    ]:
+        return "malformed_witness"
+
+    if len(sig) != 7856:
+        return "signature_length"
+    if len(pubkey) != 32:
+        return "public_key_length"
+    if len(control_block) < 1 or (len(control_block) - 1) % 32 != 0 or len(control_block) > 4097:
+        return "control_block_length"
+    if (control_block[0] & 0x01) == 0:
+        return "control_low_bit"
+    if (control_block[0] & 0xFE) != QRS_LEAF_VERSION:
+        return "leaf_version"
+    if merkle_root(leaf_hash, control_block) != p2mr_root(data["spent_output_scriptPubKey"], path):
+        return "merkle_root_mismatch"
+    return "none" if data["expected_result"] else "slh_dsa_verify"
+
+
+def update_spend_root(data: dict, root: bytes) -> None:
+    script = P2MR_SCRIPT_PREFIX + root.hex()
+    data["spent_output_scriptPubKey"] = script
+    outputs = data.get("transaction", {}).get("outputs", [])
+    if outputs and isinstance(outputs[0], dict):
+        outputs[0]["script_pubkey"] = script
+
+
+def verify_one(path: Path, update: bool) -> dict:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    sig = expand_descriptor(data["qrs_signature"], path, "qrs_signature")
+    pubkey = expand_descriptor(data["qrs_public_key"], path, "qrs_public_key")
+    control_block = expand_descriptor(data["control_block"], path, "control_block")
+    annex = hex_bytes(data.get("annex", ""), path, "annex")
+
+    leaf_hash = modeled_leaf_hash(pubkey)
+    qrs_msg = modeled_qrs_msg(data, pubkey, leaf_hash, annex)
+
+    if update:
+        data["expected_leaf_hash"] = leaf_hash.hex()
+        data["expected_qrs_msg"] = qrs_msg.hex()
+        if data["failure_stage"] in {"none", "slh_dsa_verify"}:
+            update_spend_root(data, merkle_root(leaf_hash, control_block))
+            qrs_msg = modeled_qrs_msg(data, pubkey, leaf_hash, annex)
+            data["expected_qrs_msg"] = qrs_msg.hex()
+        path.write_text(json.dumps(data, indent=2, sort_keys=False) + "\n", encoding="utf-8")
+
+    if data.get("expected_leaf_hash") != leaf_hash.hex():
+        fail(path, "expected_leaf_hash does not match executable fixture model")
+    if data.get("expected_qrs_msg") != qrs_msg.hex():
+        fail(path, "expected_qrs_msg does not match executable fixture model")
+
+    stage = classify(data, sig, pubkey, control_block, leaf_hash, path)
+    if stage != data.get("failure_stage"):
+        fail(path, f"classified failure_stage {stage!r}, expected {data.get('failure_stage')!r}")
+    reaches = stage in {"none", "slh_dsa_verify"}
+    if bool(data.get("reaches_slh_dsa_verifier")) != reaches:
+        fail(path, f"reaches_slh_dsa_verifier should be {reaches}")
+    if stage == "none" and not data.get("expected_result"):
+        fail(path, "stage none requires expected_result true")
+    if stage != "none" and data.get("expected_result"):
+        fail(path, "invalid stage requires expected_result false")
+    if stage == "slh_dsa_verify" and len(sig) != 7856:
+        fail(path, "SLH-DSA verifier-reaching fixture must keep a fixed 7,856-byte signature")
+    if stage in STRUCTURAL_FAILURES and data.get("reaches_slh_dsa_verifier"):
+        fail(path, "structural failure must not reach SLH-DSA verifier")
+    return data
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("vectors", type=Path)
+    parser.add_argument("--update", action="store_true")
+    args = parser.parse_args()
+
+    paths = sorted(args.vectors.glob("qrs_*.json"))
+    if not paths:
+        raise FixtureError(f"no qrs_*.json fixtures found under {args.vectors}")
+    verified = [verify_one(path, args.update) for path in paths]
+    crypto_reaching = [v["name"] for v in verified if v["failure_stage"] in {"none", "slh_dsa_verify"}]
+    print(
+        f"verified {len(verified)} provisional QRS structured fixtures "
+        f"({len(crypto_reaching)} reach the modeled SLH-DSA verifier boundary; "
+        "cryptographic fixture signatures are not final consensus vectors)"
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except (FixtureError, AssertionError) as exc:
+        print(f"verify_qrs_fixtures.py: {exc}", file=sys.stderr)
+        sys.exit(1)

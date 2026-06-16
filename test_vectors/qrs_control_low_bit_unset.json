@@ -3,14 +3,44 @@
   "version": "0.9.0-provisional",
   "provisional_leaf_version": "c2",
   "finalization_blocker": "BIP-360 final hashing and sighash definitions are not final.",
-  "transaction": {"version": 2, "lock_time": 0, "inputs": [{"prevout": "00:6", "sequence": 4294967295}], "outputs": [{"value_sat": 1000, "script_pubkey": "51201212121212121212121212121212121212121212121212121212121212121212"}]},
+  "transaction": {
+    "version": 2,
+    "lock_time": 0,
+    "inputs": [
+      {
+        "prevout": "00:6",
+        "sequence": 4294967295
+      }
+    ],
+    "outputs": [
+      {
+        "value_sat": 1000,
+        "script_pubkey": "51201212121212121212121212121212121212121212121212121212121212121212"
+      }
+    ]
+  },
   "spent_output_scriptPubKey": "51201212121212121212121212121212121212121212121212121212121212121212",
-  "witness_stack": ["qrs_signature", "qrs_public_key", "control_block"],
-  "qrs_public_key": {"encoding": "repeat_byte", "byte": "08", "bytes": 32},
-  "qrs_signature": {"encoding": "repeat_byte", "byte": "11", "bytes": 7856},
-  "control_block": {"hex": "c2", "depth": 0},
-  "expected_leaf_hash": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
-  "expected_qrs_msg": "dcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdc",
+  "witness_stack": [
+    "qrs_signature",
+    "qrs_public_key",
+    "control_block"
+  ],
+  "qrs_public_key": {
+    "encoding": "repeat_byte",
+    "byte": "08",
+    "bytes": 32
+  },
+  "qrs_signature": {
+    "encoding": "repeat_byte",
+    "byte": "11",
+    "bytes": 7856
+  },
+  "control_block": {
+    "hex": "c2",
+    "depth": 0
+  },
+  "expected_leaf_hash": "2ee147efa3c12f821d2aa690775264e6e578b6fbdb20cb0c04de2a7cc218689a",
+  "expected_qrs_msg": "81d9f17aef33a5d2bba80012b3a3e54b84ae8a60b333119319db725109750930",
   "expected_result": false,
   "failure_stage": "control_low_bit",
   "reaches_slh_dsa_verifier": false

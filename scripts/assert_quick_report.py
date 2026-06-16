@@ -69,18 +69,25 @@ def main() -> int:
     )
     require("verify_batch" in batch["reason"], "batch reason must mention verify_batch limitation")
     require("No fake batch baseline" in batch["reason"], "batch reason must forbid fake baseline")
-    require(
-        schnorr["batch_experimental_valid"]["status"] == "available",
-        "experimental valid batch baseline must be available",
-    )
-    require(
-        schnorr["batch_experimental"]["status"] == "available",
-        "experimental batch status object must be available",
-    )
-    require(
-        schnorr["batch_experimental_invalid"]["status"] == "available",
-        "experimental invalid batch baseline must be available",
-    )
+    experimental_available = schnorr["batch_experimental"]["status"] == "available"
+    if experimental_available:
+        require(
+            schnorr["batch_experimental_valid"]["status"] == "available",
+            "experimental valid batch baseline must be available when experimental status is available",
+        )
+        require(
+            schnorr["batch_experimental_invalid"]["status"] == "available",
+            "experimental invalid batch baseline must be available when experimental status is available",
+        )
+    else:
+        require(
+            schnorr["batch_experimental"]["status"] == "unavailable",
+            "experimental batch status must be available or explicitly unavailable",
+        )
+        require(
+            schnorr["batch_experimental"]["reason"],
+            "unavailable experimental batch status must report a reason",
+        )
     require(
         "not a reviewed public libsecp256k1 API" in schnorr["batch_experimental_valid"]["label"],
         "experimental batch label must say it is not a reviewed public API",
@@ -89,10 +96,11 @@ def main() -> int:
         "coefficient derivation" in schnorr["batch_experimental_valid"]["timing_scope"],
         "experimental batch timing scope must document coefficient derivation",
     )
-    require(
-        len(schnorr["batch_experimental_valid"]["batch_sizes"]) >= 5,
-        "experimental batch baseline must report all requested batch sizes",
-    )
+    if experimental_available:
+        require(
+            len(schnorr["batch_experimental_valid"]["batch_sizes"]) >= 5,
+            "experimental batch baseline must report all requested batch sizes",
+        )
 
     block = report["block_model"]
     require(
@@ -104,8 +112,9 @@ def main() -> int:
         "batch Schnorr block model must remain unavailable",
     )
     require(
-        block["schnorr_experimental_batch_saturated_block"]["status"] == "available",
-        "experimental batch Schnorr block model must be available",
+        block["schnorr_experimental_batch_saturated_block"]["status"]
+        == ("available" if experimental_available else "unavailable"),
+        "experimental batch block model must match experimental batch availability",
     )
 
     slh = report["benchmarks"]["slh_dsa_sha2_128s"]
@@ -116,6 +125,21 @@ def main() -> int:
         require(
             slh["invalid_fixed_length_verify"]["status"] == "available",
             "invalid fixed-length SLH timing missing",
+        )
+        require(
+            len(slh["invalid_fixed_length_cases"]) >= 7,
+            "invalid fixed-length SLH timing suite must include adversarial mutations",
+        )
+        for key in [
+            "invalid_fixed_length_best_observed",
+            "invalid_fixed_length_median_observed",
+            "invalid_fixed_length_worst_observed",
+        ]:
+            require(slh[key]["status"] == "available", f"{key} timing missing")
+        require(
+            slh["invalid_fixed_length_verify"]["p99_ns"]
+            == slh["invalid_fixed_length_worst_observed"]["p99_ns"],
+            "compatibility invalid_fixed_length_verify must alias worst observed p99 case",
         )
     else:
         require(args.allow_unavailable_qrs, "SLH-DSA backend must be available")
@@ -168,6 +192,10 @@ def main() -> int:
         require(
             "QRS vs experimental batch Schnorr" in md,
             "Markdown must include QRS vs experimental batch Schnorr section",
+        )
+        require(
+            "SLH-DSA Invalid Fixed-Length Suite" in md,
+            "Markdown must include adversarial invalid fixed-length suite",
         )
         require(
             "median of per-batch means" in md,

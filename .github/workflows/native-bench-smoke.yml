@@ -42,6 +42,12 @@ jobs:
       - name: Build
         run: cmake --build build -j
 
+      - name: Verify structured fixtures
+        run: |
+          python3 scripts/validate_test_vectors.py test_vectors/
+          python3 scripts/verify_qrs_fixtures.py test_vectors/
+          python3 scripts/run_qrs_negative_tests.py
+
       - name: Check batch Schnorr evidence
         run: |
           python3 scripts/check_batch_schnorr_baseline.py \

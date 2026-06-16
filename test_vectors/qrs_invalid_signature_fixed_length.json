@@ -3,14 +3,45 @@
   "version": "0.9.0-provisional",
   "provisional_leaf_version": "c2",
   "finalization_blocker": "BIP-360 final hashing and sighash definitions are not final.",
-  "transaction": {"version": 2, "lock_time": 0, "inputs": [{"prevout": "00:2", "sequence": 4294967295}], "outputs": [{"value_sat": 1000, "script_pubkey": "5120cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"}]},
-  "spent_output_scriptPubKey": "5120cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
-  "witness_stack": ["qrs_signature", "qrs_public_key", "control_block"],
-  "qrs_public_key": {"encoding": "repeat_byte", "byte": "04", "bytes": 32},
-  "qrs_signature": {"encoding": "repeat_byte", "byte": "ff", "bytes": 7856, "mutation": "one valid-length byte flipped"},
-  "control_block": {"hex": "c3", "depth": 0},
-  "expected_leaf_hash": "5555555555555555555555555555555555555555555555555555555555555555",
-  "expected_qrs_msg": "6666666666666666666666666666666666666666666666666666666666666666",
+  "transaction": {
+    "version": 2,
+    "lock_time": 0,
+    "inputs": [
+      {
+        "prevout": "00:2",
+        "sequence": 4294967295
+      }
+    ],
+    "outputs": [
+      {
+        "value_sat": 1000,
+        "script_pubkey": "51206daafafc8a23a1f8e3fc35ef32e8e0d403536f0f26fc7c8eea517a9cc1b2e7a8"
+      }
+    ]
+  },
+  "spent_output_scriptPubKey": "51206daafafc8a23a1f8e3fc35ef32e8e0d403536f0f26fc7c8eea517a9cc1b2e7a8",
+  "witness_stack": [
+    "qrs_signature",
+    "qrs_public_key",
+    "control_block"
+  ],
+  "qrs_public_key": {
+    "encoding": "repeat_byte",
+    "byte": "04",
+    "bytes": 32
+  },
+  "qrs_signature": {
+    "encoding": "repeat_byte",
+    "byte": "ff",
+    "bytes": 7856,
+    "mutation": "one valid-length byte flipped"
+  },
+  "control_block": {
+    "hex": "c3",
+    "depth": 0
+  },
+  "expected_leaf_hash": "6daafafc8a23a1f8e3fc35ef32e8e0d403536f0f26fc7c8eea517a9cc1b2e7a8",
+  "expected_qrs_msg": "8d28ea24f5949c2913e9e8f55a0554a48e374e1f799aa4e3295b336a55c9a5c0",
   "expected_result": false,
   "failure_stage": "slh_dsa_verify",
   "reaches_slh_dsa_verifier": true

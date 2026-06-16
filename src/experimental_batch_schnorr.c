@@ -39,13 +39,10 @@ static void qrs_bip340_challenge(const secp256k1_hash_ctx* hash_ctx,
                                  const unsigned char* r32,
                                  const unsigned char* msg32,
                                  const unsigned char* pubkey32) {
-    static const uint32_t midstate[8] = {
-        0x9cecba11ul, 0x23925381ul, 0x11679112ul, 0xd1627e0ful,
-        0x97c87550ul, 0x003cc765ul, 0x90f61164ul, 0x33e9b66aul
-    };
+    static const unsigned char tag[] = "BIP0340/challenge";
     unsigned char buf[32];
     secp256k1_sha256 sha;
-    secp256k1_sha256_initialize_midstate(&sha, 64, midstate);
+    secp256k1_sha256_initialize_tagged(hash_ctx, &sha, tag, sizeof(tag) - 1);
     secp256k1_sha256_write(hash_ctx, &sha, r32, 32);
     secp256k1_sha256_write(hash_ctx, &sha, pubkey32, 32);
     secp256k1_sha256_write(hash_ctx, &sha, msg32, 32);
