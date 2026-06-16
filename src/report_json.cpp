@@ -78,14 +78,14 @@ void json_estimate_vector(std::ostringstream& o,
                           const std::vector<BlockEstimate>& estimates,
                           int indent) {
   const std::string pad(indent, ' ');
-  o << "{\n";
+  o << "[\n";
   for (std::size_t i = 0; i < estimates.size(); ++i) {
     const auto& e = estimates[i];
-    o << pad << "  \"depth_" << e.qrs_merkle_depth << "\": ";
+    o << pad << "  ";
     json_estimate(o, e, indent + 2);
     o << (i + 1 == estimates.size() ? "\n" : ",\n");
   }
-  o << pad << "}";
+  o << pad << "]";
 }
 
 void json_batch_benchmarks(std::ostringstream& o,

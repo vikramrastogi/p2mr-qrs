@@ -1,7 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/vikramrastogi/p2mr-qrs/test_vectors/qrs_transaction_vector.schema.json",
-  "title": "P2MR QRS final serialized transaction vector",
+  "title": "Schema for future P2MR QRS serialized transaction vectors",
+  "description": "Schema-only placeholder for future final serialized transaction vectors; not evidence that final consensus vectors already exist.",
   "type": "object",
   "additionalProperties": false,
   "required": [

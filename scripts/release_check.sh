@@ -23,6 +23,8 @@ TMP_RESOURCE_DECISION_MD="$TMP_DIR/resource-accounting-decision.md"
 BATCH_DISABLED_JSON="$TMP_DIR/schnorr-batch-disabled.json"
 BATCH_DISABLED_MD="$TMP_DIR/schnorr-batch-disabled.md"
 SECP_COMMIT_FILE="$ROOT/third_party/secp256k1.COMMIT"
+CONSENSUS_GAP_MANIFEST="$ROOT/docs/consensus-gap-manifest.json"
+CONSENSUS_GAP_MANIFEST_MD="$ROOT/docs/CONSENSUS_GAP_MANIFEST.md"
 CONSOLIDATED_BIP="$ROOT/docs/bip-p2mr-slh-dsa-leaf-""consolidated.mediawiki"
 
 ensure_out_clean() {
@@ -85,6 +87,9 @@ if grep -nE "$STALE_BIP_WORDING_PATTERN" "$BIP"; then
 fi
 grep -n "hypothesis to test" "$BIP"
 grep -n "BIP-360 is still draft" "$BIP"
+grep -n "P2MR/QRS transaction digest derived from the BIP-341" "$BIP"
+grep -n "pending final BIP-360 definitions" "$BIP" "$DOSSIER" "$ROOT/docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md"
+grep -n "proposed script-tree output that removes the Taproot key-path spend" "$BIP"
 grep -n "Fixed-length encoding and witness malleability" "$BIP"
 grep -n "RESOURCE_ACCOUNTING_DECISION.md" "$BIP"
 grep -n "EXPLICIT_QRS_BUDGET_FALLBACK.md" "$BIP"
@@ -97,10 +102,19 @@ grep -n "OpenSSL 3.5 or newer" "$ROOT/README.md" "$ROOT/docs/REPRODUCIBILITY.md"
 grep -n "EXPLICIT_QRS_BUDGET_FALLBACK.md" "$ROOT/docs/RESOURCE_ACCOUNTING_DECISION.md"
 grep -n "Bitcoin Core validation-path integration not implemented" "$ROOT/docs/BITCOIN_CORE_INTEGRATION_REQUIREMENTS.md"
 grep -n "qrs_transaction_vector.schema.json" "$ROOT/docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md"
+grep -n "schema-only placeholder" "$ROOT/docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md"
+grep -n "Schema for future P2MR QRS serialized transaction vectors" "$ROOT/test_vectors/qrs_transaction_vector.schema.json"
 grep -n "docs/REPRODUCIBILITY.md" "$ROOT/.github/ISSUE_TEMPLATE/benchmark-reproduction.yml"
 grep -n "BIP360_DEPENDENCY_MATRIX.md" "$ROOT/README.md" "$BIP" "$DOSSIER" "$ROOT/docs/PUBLIC_REVIEW_READINESS.md"
+grep -n "CONSENSUS_GAP_MANIFEST.md" "$ROOT/README.md" "$DOSSIER" "$ROOT/docs/PUBLIC_REVIEW_READINESS.md" "$CHECKLIST"
+grep -n "consensus-gap-manifest.json" "$CONSENSUS_GAP_MANIFEST_MD" "$ROOT/docs/RESOURCE_ACCOUNTING_DECISION.md"
 grep -n "future leaf version behavior" "$ROOT/docs/BIP360_DEPENDENCY_MATRIX.md"
 grep -n "SigMsg extension behavior" "$ROOT/docs/BIP360_DEPENDENCY_MATRIX.md"
+grep -n "bip360_final_leaf_hashing" "$CONSENSUS_GAP_MANIFEST" "$CONSENSUS_GAP_MANIFEST_MD"
+grep -n "qrs_ext_flag_assignment" "$CONSENSUS_GAP_MANIFEST" "$CONSENSUS_GAP_MANIFEST_MD"
+grep -n "bitcoin_core_validation_path_integration" "$CONSENSUS_GAP_MANIFEST" "$CONSENSUS_GAP_MANIFEST_MD"
+grep -n "reviewed_public_batch_schnorr_baseline" "$CONSENSUS_GAP_MANIFEST" "$CONSENSUS_GAP_MANIFEST_MD"
+grep -n "final_serialized_consensus_vectors" "$CONSENSUS_GAP_MANIFEST" "$CONSENSUS_GAP_MANIFEST_MD"
 grep -n "REPRODUCTION_MATRIX.md" "$ROOT/README.md" "$ROOT/docs/RELEASE_CHECKLIST.md" "$ROOT/docs/REPRODUCIBILITY.md"
 grep -n "Apple Silicon macOS" "$ROOT/docs/REPRODUCTION_MATRIX.md"
 grep -n "Linux x86_64" "$ROOT/docs/REPRODUCTION_MATRIX.md"
@@ -148,6 +162,10 @@ if grep -Rni "consensus test vectors" \
   echo "release_check.sh: vectors must not be described as consensus test vectors" >&2
   exit 1
 fi
+if grep -Rni "P2MR is the only key-path-free output" "$BIP" "$DOSSIER" "$ROOT/README.md"; then
+  echo "release_check.sh: avoid overbroad key-path-free-output claims" >&2
+  exit 1
+fi
 
 ACTIVATION_READY_HITS="$(grep -Rni "activation-ready consensus evidence" \
   "$ROOT/README.md" "$ROOT/00_README.md" "$ROOT/docs" || true)"
@@ -170,6 +188,7 @@ grep -n "Known blockers before advancing beyond Draft" "$DOSSIER"
 
 python3 "$ROOT/scripts/compute_qrs_digest_model.py" "$ROOT/test_vectors"
 python3 "$ROOT/scripts/validate_vector_coverage_matrix.py"
+python3 "$ROOT/scripts/validate_consensus_gap_manifest.py"
 python3 "$ROOT/scripts/validate_test_vectors.py" "$ROOT/test_vectors"
 python3 "$ROOT/scripts/verify_qrs_fixtures.py" "$ROOT/test_vectors"
 python3 "$ROOT/scripts/run_qrs_negative_tests.py"
@@ -275,14 +294,25 @@ jq '.draft_rule_status' "$TMP_RESOURCE_DECISION_JSON"
 jq '.activation_ready' "$TMP_RESOURCE_DECISION_JSON"
 jq '.explicit_qrs_budget_required' "$TMP_RESOURCE_DECISION_JSON"
 jq '.batch_sensitivity.status' "$TMP_RESOURCE_DECISION_JSON"
+jq '.depth_sensitivity.qrs_depth0_p99_ms' "$TMP_RESOURCE_DECISION_JSON"
+jq '.depth_sensitivity.qrs_depth128_p99_ms' "$TMP_RESOURCE_DECISION_JSON"
+jq '.depth_sensitivity.qrs_depth_binding_case' "$TMP_RESOURCE_DECISION_JSON"
+jq '.activation_blocker_manifest' "$TMP_RESOURCE_DECISION_JSON"
+jq -e '.activation_blocker_ids | index("bitcoin_core_validation_path_integration")' "$TMP_RESOURCE_DECISION_JSON"
+jq -e '.activation_blocker_ids | index("final_serialized_consensus_vectors")' "$TMP_RESOURCE_DECISION_JSON"
 grep -n "Pass/Fail Conclusion" "$TMP_RESOURCE_DECISION_MD"
+grep -n "QRS Depth Sensitivity" "$TMP_RESOURCE_DECISION_MD"
 grep -n "Batch-Speedup Sensitivity" "$TMP_RESOURCE_DECISION_MD"
 grep -n "Fallback Trigger Checks" "$TMP_RESOURCE_DECISION_MD"
 grep -n "fallback trigger" "$TMP_RESOURCE_DECISION_MD"
 grep -n "Hypothetical batch speedups are sensitivity analysis only" "$TMP_RESOURCE_DECISION_MD"
 grep -n "does not establish activation readiness" "$TMP_RESOURCE_DECISION_MD"
+grep -n "bitcoin_core_validation_path_integration" "$TMP_RESOURCE_DECISION_MD"
+grep -n "docs/consensus-gap-manifest.json" "$TMP_RESOURCE_DECISION_MD"
 grep -n "median of per-batch means" "$TMP_QUICK_MD"
 grep -n "second reviewed SLH-DSA backend" "$TMP_QUICK_MD"
+grep -n "explicit non-consensus prefixes" "$TMP_QUICK_MD"
+grep -n "QRS modeled TapLeaf v0" "$TMP_QUICK_MD" "$DOSSIER"
 grep -n "BIP-340 challenge self-test" "$TMP_QUICK_MD" "$DOSSIER"
 ensure_out_clean
 
