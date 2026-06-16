@@ -20,7 +20,7 @@ body:
     id: affected_section
     attributes:
       label: Affected file or section
-      placeholder: docs/BIP360_DEPENDENCY_MATRIX.md, BIP Dependencies, test_vectors/...
+      placeholder: docs/spec/bip360-dependency-matrix.md, BIP Dependencies, test_vectors/...
     validations:
       required: true
   - type: textarea

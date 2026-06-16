@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/vikramrastogi/p2mr-qrs/docs/consensus-gap-manifest.schema.json",
+  "$id": "https://github.com/vikramrastogi/p2mr-qrs/docs/evidence/consensus-gap-manifest.schema.json",
   "title": "P2MR QRS Consensus Gap Manifest",
   "type": "object",
   "additionalProperties": false,

@@ -31,6 +31,8 @@ ensure_out_clean() {
 
 ensure_out_clean
 
+python3 "$ROOT/scripts/check_doc_paths.py"
+
 cmake -S "$ROOT" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release
 cmake --build "$BUILD_DIR" -j
 if ! "$BUILD_DIR/qrs_native_bench" --slh-probe; then
@@ -123,7 +125,7 @@ if [ "$DRAFT_RULE_STATUS" != "supports_no_additional_budget_for_draft_review" ];
   echo "full_release_check.sh: current resource-accounting decision is $DRAFT_RULE_STATUS, not supports_no_additional_budget_for_draft_review" >&2
   exit 1
 fi
-jq -e '.activation_blocker_manifest == "docs/consensus-gap-manifest.json"' "$TMP_RESOURCE_DECISION_JSON"
+jq -e '.activation_blocker_manifest == "docs/evidence/consensus-gap-manifest.json"' "$TMP_RESOURCE_DECISION_JSON"
 jq -e '.activation_blocker_ids | index("bitcoin_core_validation_path_integration")' "$TMP_RESOURCE_DECISION_JSON"
 jq -e '.activation_blocker_ids | index("final_serialized_consensus_vectors")' "$TMP_RESOURCE_DECISION_JSON"
 

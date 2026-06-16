@@ -33,11 +33,11 @@ structured transaction fields, spent output scriptPubKey, witness stack,
 
 The final serialized transaction-vector schema is defined in
 `qrs_transaction_vector.schema.json` and documented in
-`../docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md`. It is not populated yet because
+`docs/spec/final-transaction-vector-schema.md`. It is not populated yet because
 the final BIP-360/QRS sighash and hashing definitions do not exist yet.
 
 The provisional coverage matrix is `vector_coverage_matrix.json` and is
-documented in `../docs/VECTOR_COVERAGE_MATRIX.md`. It maps expected reviewer
+documented in `docs/evidence/vector-coverage-matrix.md`. It maps expected reviewer
 coverage to structured fixtures, executable negative cases, the structured
 malformed-witness corpus, digest mutation self-tests, and invalid-verifier
 benchmark cases. The `fuzz/` entries are corpus seeds for the current

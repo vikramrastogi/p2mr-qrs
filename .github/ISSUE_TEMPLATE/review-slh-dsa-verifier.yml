@@ -20,7 +20,7 @@ body:
     id: affected_section
     attributes:
       label: Affected file or section
-      placeholder: src/slh_dsa_openssl.cpp, include/qrs_bench/slh_dsa_backend.h, docs/SLH_DSA_VERIFY_COST_ANALYSIS.md
+      placeholder: src/slh_dsa_openssl.cpp, include/qrs_bench/slh_dsa_backend.h, docs/evidence/slh-dsa-verify-cost-analysis.md
     validations:
       required: true
   - type: textarea

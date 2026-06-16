@@ -5,7 +5,7 @@ use it to check that a published report contains the required evidence.
 
 ## Conclusion
 
-Use one of the conclusion strings from `06_report_generation.md`; do not infer
+Use one of the conclusion strings from `docs/internal/implementation-notes/report-generation.md`; do not infer
 consensus readiness from a single machine.
 
 ## Environment

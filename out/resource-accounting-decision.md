@@ -78,7 +78,7 @@ Fallback trigger checks identify when the inactive explicit QRS budget must be r
 
 ## Activation Blockers
 
-- Manifest: `docs/consensus-gap-manifest.json`
+- Manifest: `docs/evidence/consensus-gap-manifest.json`
 - `bip360_final_leaf_hashing`
 - `bip360_final_branch_hashing`
 - `bip360_final_future_leaf_behavior`

@@ -13,7 +13,7 @@
     "activation_parameters",
     "final_serialized_consensus_vectors"
   ],
-  "activation_blocker_manifest": "docs/consensus-gap-manifest.json",
+  "activation_blocker_manifest": "docs/evidence/consensus-gap-manifest.json",
   "activation_blockers": [
     "Reviewed public batch Schnorr baseline unavailable.",
     "Bitcoin Core validation-path integration not implemented.",

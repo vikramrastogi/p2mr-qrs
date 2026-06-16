@@ -6,7 +6,7 @@ Exact goal:
 Files created:
 - `src/report_json.cpp`
 - `src/report_markdown.cpp`
-- `docs/native-benchmark-report-template.md`
+- `docs/reproducibility/native-benchmark-report-template.md`
 - `scripts/assert_quick_report.py`
 
 Required behavior:

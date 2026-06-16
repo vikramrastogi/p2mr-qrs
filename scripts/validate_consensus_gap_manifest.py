@@ -10,9 +10,9 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
-MANIFEST = ROOT / "docs" / "consensus-gap-manifest.json"
-SCHEMA = ROOT / "docs" / "consensus-gap-manifest.schema.json"
-MARKDOWN = ROOT / "docs" / "CONSENSUS_GAP_MANIFEST.md"
+MANIFEST = ROOT / "docs" / "evidence" / "consensus-gap-manifest.json"
+SCHEMA = ROOT / "docs" / "evidence" / "consensus-gap-manifest.schema.json"
+MARKDOWN = ROOT / "docs" / "evidence" / "consensus-gap-manifest.md"
 
 REQUIRED_IDS = {
     "bip360_final_leaf_hashing",
