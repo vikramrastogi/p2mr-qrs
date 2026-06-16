@@ -78,17 +78,17 @@ Current sample run metadata from `out/full.json`:
 - libsecp256k1 commit:
   `aea86bc3509f3ceb5c047fe6567bf8910f72a728`
 - Benchmark commit recorded by the sample report:
-  `3821510b6bcc223e0d716dc65021f249afca3e68`
+  `12d98c69248da475cfcf54409c01eee9418cdc69`
 - Working tree dirty status recorded by the sample report: `false`
 
 Current full-report p99 saturated-block estimates:
 
 | Estimate | p99 ms | Status |
 | --- | ---: | --- |
-| QRS valid saturated block | 90.887 | available |
-| QRS worst-observed invalid fixed-length saturated block | 95.910 | available |
-| Individual BIP-340 Schnorr saturated block | 345.599 | available |
-| Experimental batch BIP-340 Schnorr saturated block | 240.083 | available, sensitivity analysis only |
+| QRS valid saturated block | 93.957 | available |
+| QRS worst-observed invalid fixed-length saturated block | 107.736 | available |
+| Individual BIP-340 Schnorr saturated block | 434.150 | available |
+| Experimental batch BIP-340 Schnorr saturated block | 304.741 | available, sensitivity analysis only |
 | Reviewed public batch BIP-340 Schnorr saturated block | unavailable | no reviewed public API wired |
 
 The generated decision also includes a `batch_sensitivity` object. It reports
@@ -117,7 +117,7 @@ accounting cannot become activation evidence while IDs such as
 `final_serialized_consensus_vectors` remain unresolved.
 
 The worst observed invalid fixed-length SLH-DSA case in the sample run is
-`wrong_message`. The invalid-fixed-length bucket is a crypto bucket: every case keeps
+`wrong_public_key`. The invalid-fixed-length bucket is a crypto bucket: every case keeps
 the 7,856-byte signature length and is asserted to fail through the SLH-DSA
 verifier before timing, including wrong-message and wrong-public-key cases.
 Verifier-cost review still requires algorithmic worst-case analysis; see

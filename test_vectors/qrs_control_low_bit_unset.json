@@ -40,7 +40,7 @@
     "depth": 0
   },
   "expected_leaf_hash": "4d8b91ba0d65ac6fed7b89b0ba0ba77da5493c2ca6df54063492d22587799a5d",
-  "expected_qrs_msg": "7fec07de69d13730671df4e1fbbb471b219deec4170ff42f1ec05fa05b7315c5",
+  "expected_qrs_msg": "c32ba8f25606f4d9c07b2b4d2110ff4650c08a93f97814d243deabb76b171814",
   "expected_result": false,
   "failure_stage": "control_low_bit",
   "reaches_slh_dsa_verifier": false
