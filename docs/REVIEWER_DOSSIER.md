@@ -22,6 +22,19 @@ P2MR is key-path-free. An SLH-DSA leaf inside an output with an
 exposed key path would not remove the discrete-log exposure. See the BIP
 Rationale section and `../docs/bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki`.
 
+## Why this is not just BIP-360
+
+BIP-360 is the generic P2MR container and future-leaf mechanism. This package
+is one concrete post-quantum validation rule for that container: one
+SLH-DSA-SHA2-128s public-key payload, one fixed-size signature, one QRS
+signature message, executable vectors, and resource-accounting evidence.
+
+The intended relationship is complementary, not competitive. If BIP-360 absorbs
+this leaf directly, this package can serve as the leaf specification. If
+BIP-360 remains algorithm-neutral, this package can remain a dependent BIP.
+Keeping the boundary explicit avoids turning BIP-360 into an algorithm-selection
+document while still giving reviewers a concrete SLH-DSA leaf to evaluate.
+
 ## Why a leaf version instead of opcode
 
 SLH-DSA-SHA2-128s signatures are 7,856 bytes, exceeding BIP-342's retained
@@ -199,6 +212,7 @@ Markdown artifacts. The platform target table is `REPRODUCTION_MATRIX.md`.
 
 | Objection | Answer | Evidence |
 | --- | --- | --- |
+| Why not just BIP-360? | BIP-360 defines the P2MR container; this package defines one concrete SLH-DSA future-leaf validation rule for that container. | BIP Motivation and Rationale; `BIP360_DEPENDENCY_MATRIX.md`. |
 | Why not solve old coins? | Legacy-output policy is out of scope. | BIP Abstract and Backward compatibility; this dossier's non-goals. |
 | Why not ML-DSA? | This draft tests one conservative hash-based primitive first. | BIP Motivation and Rationale. |
 | Why not a tapscript opcode? | The 7,856-byte signature exceeds the retained 520-byte tapscript stack-element limit. | BIP Rationale; `../test_vectors/`. |

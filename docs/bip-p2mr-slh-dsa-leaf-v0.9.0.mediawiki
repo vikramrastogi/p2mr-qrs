@@ -31,6 +31,8 @@ BIP-360 defines P2MR, a script-tree output that removes Taproot's key-path spend
 
 This BIP fills exactly that gap, and only that gap: a concrete, opt-in, post-quantum spend condition that can be committed inside a P2MR tree and revealed only if needed. A holder who wants a conservative fail-safe creates a P2MR output with an ordinary efficient spend leaf (today's classical signature) and an SLH-DSA leaf alongside it. While classical signatures remain safe, the efficient leaf is used and the SLH-DSA public key stays hidden. If the classical algorithm later becomes unsafe, the holder spends through the SLH-DSA leaf to migrate the coins.
 
+This proposal is intended to sit in BIP-360's orbit, not compete with it. BIP-360 specifies the key-path-free P2MR container and future-leaf mechanism; this BIP specifies one concrete future leaf validation rule for that container. Keeping the SLH-DSA rule separate lets BIP-360 remain the generic P2MR output proposal while this document carries the algorithm-specific consensus details, exact witness shape, signature-message binding, vectors, and resource-accounting evidence.
+
 More precisely, the P2MR SLH-DSA leaf is a spend path: it lets an owner move funds out of a P2MR output without ever exposing an elliptic-curve public key, migrating them to a fresh output. In the special case of a P2MR output committing only to this leaf (no classical sibling), the output has no classical signature spend path. Its spendability depends on the SLH-DSA key rather than an elliptic-curve key.
 
 The design deliberately makes no decision about legacy-output policy. Whether already-exposed coins should be frozen, burned, throttled, rescued, or left untouched is a separate social-consensus question (the subject of BIP-361 and related proposals), and bundling it with an optional signing primitive is precisely what has prevented a minimal post-quantum signing change from converging.
@@ -176,6 +178,12 @@ Wallets SHOULD generate a fresh QRS key per output, SHOULD NOT derive QRS keys b
 ===Why a P2MR leaf rather than a new witness version?===
 
 A leaf reuses the BIP-360 output type and lets a wallet combine the QRS condition with other leaves in one Merkle tree. A dedicated witness version for one post-quantum key type would create another address family and would not naturally support script trees.
+
+===Why a separate BIP rather than part of BIP-360?===
+
+BIP-360 is the generic P2MR container. This BIP is one concrete post-quantum validation rule that can live inside that container. The separation is intentional: it keeps BIP-360 from becoming an algorithm-selection document, while giving reviewers an exact SLH-DSA leaf specification to evaluate on its own merits. The boundary is simple: BIP-360 decides the P2MR output, Merkle commitment, control block, and future-leaf semantics; this BIP decides only the SLH-DSA leaf payload, witness shape, signature message, verification rule, test vectors, and resource-accounting evidence.
+
+If BIP-360 later adopts this leaf directly, this document can serve as the leaf's specification. If BIP-360 remains algorithm-neutral, this document can remain a dependent BIP. In either case, this proposal should be reviewed as a concrete P2MR SLH-DSA leaf specification, not as a replacement for BIP-360.
 
 ===Why a leaf version rather than a tapscript opcode (in v1)?===
 
