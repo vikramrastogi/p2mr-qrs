@@ -26,7 +26,10 @@ from compute_qrs_digest_model import compute_vector_digest  # type: ignore
 QRS_LEAF_VERSION = 0xC2
 QRS_HASH_TYPE = 0x00
 QRS_EXT_FLAG = 0x02
-P2MR_SCRIPT_PREFIX = "5120"
+# Provisional root-carrier encoding for executable fixtures only. BIP-360 final
+# P2MR output encoding is still an external blocker; do not treat this as a
+# final consensus scriptPubKey prefix.
+PROVISIONAL_ROOT_SCRIPT_PREFIX = "5120"
 STRUCTURAL_FAILURES = {
     "signature_length",
     "public_key_length",
@@ -130,12 +133,20 @@ def modeled_qrs_msg(data: dict, leaf_hash: bytes, annex: bytes, path: Path) -> b
     return bytes.fromhex(compute_vector_digest(data, path)["qrs_msg"])
 
 
-def p2mr_root(script_pubkey: str, path: Path) -> bytes:
+def provisional_root_from_script_pubkey(script_pubkey: str, path: Path) -> bytes:
     if not isinstance(script_pubkey, str):
         fail(path, "spent_output_scriptPubKey must be lowercase hex")
-    if not script_pubkey.startswith(P2MR_SCRIPT_PREFIX) or len(script_pubkey) != 68:
-        fail(path, "spent_output_scriptPubKey must be OP_1 PUSH32 plus a 32-byte root")
-    return hex_bytes(script_pubkey[len(P2MR_SCRIPT_PREFIX) :], path, "spent_output_scriptPubKey root")
+    if not script_pubkey.startswith(PROVISIONAL_ROOT_SCRIPT_PREFIX) or len(script_pubkey) != 68:
+        fail(
+            path,
+            "spent_output_scriptPubKey must use the provisional OP_1 PUSH32 "
+            "root-carrier plus a 32-byte root",
+        )
+    return hex_bytes(
+        script_pubkey[len(PROVISIONAL_ROOT_SCRIPT_PREFIX) :],
+        path,
+        "spent_output_scriptPubKey root",
+    )
 
 
 def witness_stack_after_annex_removal(data: dict) -> list[str] | None:
@@ -175,13 +186,15 @@ def classify(data: dict, sig: bytes, pubkey: bytes, control_block: bytes, leaf_h
         return "control_low_bit"
     if (control_block[0] & 0xFE) != QRS_LEAF_VERSION:
         return "leaf_version"
-    if merkle_root(leaf_hash, control_block) != p2mr_root(data["spent_output_scriptPubKey"], path):
+    if merkle_root(leaf_hash, control_block) != provisional_root_from_script_pubkey(
+        data["spent_output_scriptPubKey"], path
+    ):
         return "merkle_root_mismatch"
     return "none" if data["expected_result"] else "slh_dsa_verify"
 
 
 def update_spend_root(data: dict, root: bytes) -> None:
-    script = P2MR_SCRIPT_PREFIX + root.hex()
+    script = PROVISIONAL_ROOT_SCRIPT_PREFIX + root.hex()
     data["spent_output_scriptPubKey"] = script
     outputs = data.get("transaction", {}).get("outputs", [])
     if outputs and isinstance(outputs[0], dict):

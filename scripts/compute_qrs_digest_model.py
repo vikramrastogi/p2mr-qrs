@@ -23,7 +23,9 @@ from typing import Any
 QRS_LEAF_VERSION = 0xC2
 QRS_HASH_TYPE = 0x00
 QRS_EXT_FLAG = 0x02
-P2MR_SCRIPT_PREFIX = "5120"
+# Provisional root-carrier encoding for executable fixtures only. BIP-360 final
+# P2MR output encoding is still an external blocker.
+PROVISIONAL_ROOT_SCRIPT_PREFIX = "5120"
 
 
 class DigestModelError(AssertionError):
@@ -270,7 +272,10 @@ def run_mutation_self_tests(vectors: list[tuple[Path, dict[str, Any]]]) -> None:
         no_annex_path,
         no_annex,
         "changed fallback spent_output_scriptPubKey",
-        lambda d: d.__setitem__("spent_output_scriptPubKey", "5120" + "22" * 32),
+        lambda d: d.__setitem__(
+            "spent_output_scriptPubKey",
+            PROVISIONAL_ROOT_SCRIPT_PREFIX + "22" * 32,
+        ),
     )
 
 

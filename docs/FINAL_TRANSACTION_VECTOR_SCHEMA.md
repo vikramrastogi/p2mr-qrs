@@ -15,6 +15,11 @@ ext_flag=2 SigMsg payload followed by `leaf_hash`. What remains provisional is
 the serialized transaction digest itself, because final BIP-360/QRS sighash
 definitions are not yet fixed.
 
+Current `spent_output_scriptPubKey` values use a provisional OP_1/PUSH32
+root-carrier encoding (`5120 || root`) so the executable fixtures can bind a
+32-byte Merkle root. That encoding is fixture scaffolding, not final BIP-360
+P2MR output encoding.
+
 `scripts/compute_qrs_digest_model.py` is the Python byte-level model for these
 provisional vectors. The native benchmark binary exposes the same model through
 `--qrs-digest-vector`, and `scripts/check_qrs_digest_agreement.py` verifies
