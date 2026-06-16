@@ -47,8 +47,10 @@ fi
 python3 "$ROOT/scripts/check_batch_schnorr_baseline.py" \
   "${BATCH_EVIDENCE_ARGS[@]}"
 
+python3 "$ROOT/scripts/validate_consensus_gap_manifest.py"
 python3 "$ROOT/scripts/validate_test_vectors.py" "$ROOT/test_vectors"
 python3 "$ROOT/scripts/compute_qrs_digest_model.py" "$ROOT/test_vectors"
+python3 "$ROOT/scripts/validate_vector_coverage_matrix.py"
 python3 "$ROOT/scripts/verify_qrs_fixtures.py" "$ROOT/test_vectors"
 python3 "$ROOT/scripts/run_qrs_negative_tests.py"
 python3 "$ROOT/scripts/verify_qrs_vectors.py" \
@@ -116,6 +118,9 @@ if [ "$DRAFT_RULE_STATUS" != "supports_no_additional_budget_for_draft_review" ];
   echo "full_release_check.sh: current resource-accounting decision is $DRAFT_RULE_STATUS, not supports_no_additional_budget_for_draft_review" >&2
   exit 1
 fi
+jq -e '.activation_blocker_manifest == "docs/consensus-gap-manifest.json"' "$TMP_RESOURCE_DECISION_JSON"
+jq -e '.activation_blocker_ids | index("bitcoin_core_validation_path_integration")' "$TMP_RESOURCE_DECISION_JSON"
+jq -e '.activation_blocker_ids | index("final_serialized_consensus_vectors")' "$TMP_RESOURCE_DECISION_JSON"
 
 if [ "${QRS_RELEASE_UPDATE_ARTIFACTS:-0}" = "1" ]; then
   cp "$TMP_STANDARD_JSON" "$STANDARD_JSON"

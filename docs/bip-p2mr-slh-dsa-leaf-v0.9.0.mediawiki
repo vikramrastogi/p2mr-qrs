@@ -15,7 +15,7 @@
 
 ===Abstract===
 
-This document specifies a single new Pay-to-Merkle-Root (P2MR) leaf version that verifies one SLH-DSA-SHA2-128s signature. The leaf is valid only inside BIP-360 P2MR outputs and commits to exactly one 32-byte SLH-DSA-SHA2-128s public key. Spending it reveals the public key, a BIP-360 control block, and one 7,856-byte SLH-DSA-SHA2-128s signature over a BIP-341-style transaction digest.
+This document specifies a single new Pay-to-Merkle-Root (P2MR) leaf version that verifies one SLH-DSA-SHA2-128s signature. The leaf is valid only inside BIP-360 P2MR outputs and commits to exactly one 32-byte SLH-DSA-SHA2-128s public key. Spending it reveals the public key, a BIP-360 control block, and one 7,856-byte SLH-DSA-SHA2-128s signature over a P2MR/QRS transaction digest derived from the BIP-341 <code>SigMsg</code> structure, pending final BIP-360 definitions.
 
 This BIP is purely additive. It does not restrict, freeze, burn, throttle, sunset, or otherwise encumber any existing output type, and it does not modify the validation of ECDSA, Schnorr, P2PK, P2PKH, P2SH, P2WPKH, P2WSH, or P2TR. It defines exactly one new, opt-in, post-quantum spending condition for new P2MR outputs, and nothing else.
 
@@ -183,7 +183,7 @@ SLH-DSA-SHA2-128s signatures (7,856 bytes) far exceed the 520-byte tapscript sta
 
 ===Why restrict to P2MR outputs?===
 
-P2MR is the only key-path-free output. Permitting an SLH-DSA leaf inside an output that still carries an exposed key path (e.g. P2TR) would offer false comfort, since the output would remain quantum-vulnerable through that key path. Confining this leaf to P2MR ensures the capability appears only where it actually delivers protection, and the leaf version enforces this naturally.
+Within the Taproot-successor design space considered here, P2MR is the proposed script-tree output that removes the Taproot key-path spend. Permitting an SLH-DSA leaf inside an output that still carries an exposed key path (e.g. P2TR) would offer false comfort, since the output would remain quantum-vulnerable through that key path. Confining this leaf to P2MR ensures the capability appears only where it actually delivers protection, and the leaf version enforces this naturally.
 
 ===Why SLH-DSA-SHA2-128s, and only one algorithm?===
 

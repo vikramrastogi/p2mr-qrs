@@ -11,6 +11,21 @@ from typing import Any
 
 
 HYPOTHETICAL_BATCH_SPEEDUPS = (1.5, 2.0, 2.5, 3.0, 4.0, 5.0)
+CONSENSUS_GAP_MANIFEST = "docs/consensus-gap-manifest.json"
+ACTIVATION_BLOCKER_IDS = [
+    "bip360_final_leaf_hashing",
+    "bip360_final_branch_hashing",
+    "bip360_final_future_leaf_behavior",
+    "qrs_ext_flag_assignment",
+    "final_sigmsg_definition",
+    "bitcoin_core_validation_path_integration",
+    "second_reviewed_slh_dsa_backend",
+    "cross_hardware_reproduction",
+    "reviewed_public_batch_schnorr_baseline",
+    "wallet_descriptor_psbt_hardware_standards",
+    "activation_parameters",
+    "final_serialized_consensus_vectors",
+]
 
 
 class DecisionError(AssertionError):
@@ -37,6 +52,15 @@ def p99_ms(data: dict[str, Any], path: str) -> float:
     value = nested(data, path).get("p99_ms")
     require(value is not None, f"{path}.p99_ms is unavailable")
     return float(value)
+
+
+def depth_row(data: dict[str, Any], path: str, depth: int) -> dict[str, Any]:
+    rows = nested(data, path)
+    require(isinstance(rows, list), f"{path} must be an array")
+    for row in rows:
+        if int(row.get("qrs_merkle_depth", -1)) == depth:
+            return row
+    raise DecisionError(f"{path} missing depth {depth}")
 
 
 def add_check(checks: list[dict[str, Any]], name: str, passed: bool, detail: str) -> None:
@@ -194,6 +218,23 @@ def render_markdown(decision: dict[str, Any]) -> str:
         lines.append(
             f"| {item['name']} | {'pass' if item['passed'] else 'fail'} | {item['detail']} |"
         )
+    depth = decision.get("depth_sensitivity", {})
+    lines.extend(
+        [
+            "",
+            "## QRS Depth Sensitivity",
+            "",
+            "| Field | Value |",
+            "| --- | ---: |",
+            f"| qrs_depth0_p99_ms | {depth.get('qrs_depth0_p99_ms', 'unavailable')} |",
+            f"| qrs_depth128_p99_ms | {depth.get('qrs_depth128_p99_ms', 'unavailable')} |",
+            f"| qrs_depth_binding_case | {depth.get('qrs_depth_binding_case', 'unavailable')} |",
+            "",
+            "Depth-sensitive rows count Merkle path witness weight and TapBranch hash counts. "
+            "They do not benchmark Bitcoin Core branch-hash implementation overhead.",
+            "",
+        ]
+    )
     sensitivity = decision.get("batch_sensitivity", {})
     lines.extend(
         [
@@ -271,6 +312,10 @@ def render_markdown(decision: dict[str, Any]) -> str:
             f"{item['detail']} |"
         )
     lines.extend(["", "## Activation Blockers", ""])
+    lines.append(f"- Manifest: `{decision['activation_blocker_manifest']}`")
+    for blocker_id in decision.get("activation_blocker_ids", []):
+        lines.append(f"- `{blocker_id}`")
+    lines.append("")
     for blocker in decision["activation_blockers"]:
         lines.append(f"- {blocker}")
     lines.extend(
@@ -380,14 +425,31 @@ def evaluate(report: dict[str, Any], batch_evidence: dict[str, Any], allow_unava
                 "experimental_batch_schnorr_saturated_block": None,
                 "reviewed_public_batch_schnorr_saturated_block": None,
             },
+            "depth_sensitivity": {
+                "qrs_depth0_p99_ms": None,
+                "qrs_depth128_p99_ms": None,
+                "qrs_depth_binding_case": "unavailable",
+            },
             "batch_sensitivity": build_batch_sensitivity(None, None, None, None),
             "fallback_triggers": build_fallback_triggers(None, None, None, None),
             "checks": checks,
+            "activation_blocker_manifest": CONSENSUS_GAP_MANIFEST,
+            "activation_blocker_ids": ACTIVATION_BLOCKER_IDS,
             "activation_blockers": blockers,
         }
 
     qrs_valid = p99_ms(report, "block_model.qrs_saturated_block_valid")
     qrs_invalid = p99_ms(report, "block_model.qrs_saturated_block_invalid_fixed_length")
+    qrs_depth0 = depth_row(report, "block_model.qrs_saturated_block_valid_by_depth", 0)
+    qrs_depth128 = depth_row(report, "block_model.qrs_saturated_block_valid_by_depth", 128)
+    qrs_depth0_p99 = float(qrs_depth0["p99_ms"])
+    qrs_depth128_p99 = float(qrs_depth128["p99_ms"])
+    if qrs_depth128_p99 < qrs_depth0_p99:
+        depth_binding_case = "depth128_lower_block_time_due_to_fewer_weight_limited_inputs"
+    elif qrs_depth128_p99 == qrs_depth0_p99:
+        depth_binding_case = "depth128_equal_to_depth0"
+    else:
+        depth_binding_case = "depth128_higher_block_time"
     schnorr_individual = p99_ms(report, "block_model.schnorr_individual_saturated_block")
     experimental_batch = None
     reviewed_batch = None
@@ -488,6 +550,15 @@ def evaluate(report: dict[str, Any], batch_evidence: dict[str, Any], allow_unava
             "experimental_batch_schnorr_saturated_block": experimental_batch,
             "reviewed_public_batch_schnorr_saturated_block": reviewed_batch,
         },
+        "depth_sensitivity": {
+            "qrs_depth0_p99_ms": qrs_depth0_p99,
+            "qrs_depth128_p99_ms": qrs_depth128_p99,
+            "qrs_depth_binding_case": depth_binding_case,
+            "note": (
+                "If depth 128 has lower total saturated-block validation time, "
+                "that is due to fewer weight-limited QRS inputs, not lower per-input cost."
+            ),
+        },
         "batch_sensitivity": build_batch_sensitivity(
             qrs_valid, qrs_invalid, schnorr_individual, experimental_batch
         ),
@@ -495,6 +566,8 @@ def evaluate(report: dict[str, Any], batch_evidence: dict[str, Any], allow_unava
             qrs_valid, qrs_invalid, schnorr_individual, reviewed_batch
         ),
         "checks": checks,
+        "activation_blocker_manifest": CONSENSUS_GAP_MANIFEST,
+        "activation_blocker_ids": ACTIVATION_BLOCKER_IDS,
         "activation_blockers": blockers,
     }
 

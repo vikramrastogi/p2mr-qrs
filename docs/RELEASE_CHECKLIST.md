@@ -41,7 +41,8 @@ unresolved.
 Failure of `full_release_check.sh` means the current machine's standard-run evidence is not strong enough for the stricter gate; it does not change the Draft-stage status of the BIP.
 
 See `PUBLIC_REVIEW_READINESS.md` for the public pre-review readiness checklist
-and `PUBLIC_REVIEW_POST_DRAFT.md` for the short public-posting draft.
+`REVIEW_THIS_FIRST.md` for the reviewer entrypoint, and
+`PUBLIC_REVIEW_POST_DRAFT.md` for the short public-posting draft.
 
 Checklist enforced by the script:
 
@@ -96,9 +97,15 @@ Checklist enforced by the script:
 - `docs/BITCOIN_CORE_INTEGRATION_REQUIREMENTS.md` states the exact Core
   validation-path artifact required before activation.
 - `docs/BIP360_DEPENDENCY_MATRIX.md` tracks final BIP-360/P2MR dependencies.
+- `docs/CONSENSUS_GAP_MANIFEST.md` and
+  `docs/consensus-gap-manifest.json` track machine-checked activation and
+  final-vector blockers.
 - `docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md` and
   `test_vectors/qrs_transaction_vector.schema.json` define the final serialized
   vector shape once BIP-360/QRS definitions are final.
+- `docs/VECTOR_COVERAGE_MATRIX.md` and
+  `test_vectors/vector_coverage_matrix.json` make provisional fixture,
+  negative/fuzz, digest-mutation, and invalid-verifier coverage explicit.
 - `docs/REPRODUCIBILITY.md` and the benchmark reproduction issue template
   define the independent rerun protocol.
 - `docs/REPRODUCTION_MATRIX.md` tracks Apple Silicon macOS, Linux x86_64, and

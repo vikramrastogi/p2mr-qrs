@@ -241,6 +241,7 @@ def run_mutation_self_tests(vectors: list[tuple[Path, dict[str, Any]]]) -> None:
     by_name = {data["name"]: (path, data) for path, data in vectors}
     no_annex_path, no_annex = by_name["qrs_valid_no_annex"]
     with_annex_path, with_annex = by_name["qrs_valid_with_annex"]
+    multi_input_path, multi_input = by_name["qrs_multi_input_explicit_spent_outputs"]
     assert_mutation_changes(
         no_annex_path,
         no_annex,
@@ -251,11 +252,23 @@ def run_mutation_self_tests(vectors: list[tuple[Path, dict[str, Any]]]) -> None:
     two_input["transaction"]["inputs"].append({"prevout": "11:9", "sequence": 1})
     assert_mutation_changes(no_annex_path, two_input, "changed input index", lambda d: d.__setitem__("input_index", 1))
     assert_mutation_changes(with_annex_path, with_annex, "changed annex", lambda d: d.__setitem__("annex", "50ab"))
-    assert_mutation_changes(no_annex_path, no_annex, "changed leaf hash", lambda d: d.__setitem__("qrs_public_key", "02" * 32))
+    assert_mutation_changes(no_annex_path, no_annex, "changed leaf pubkey", lambda d: d.__setitem__("qrs_public_key", "02" * 32))
+    assert_mutation_changes(
+        multi_input_path,
+        multi_input,
+        "changed spent output amount",
+        lambda d: d["spent_outputs"][0].__setitem__("amount_sats", d["spent_outputs"][0]["amount_sats"] + 1),
+    )
+    assert_mutation_changes(
+        multi_input_path,
+        multi_input,
+        "changed spent output scriptPubKey",
+        lambda d: d["spent_outputs"][0].__setitem__("script_pubkey", "0014" + "44" * 20),
+    )
     assert_mutation_changes(
         no_annex_path,
         no_annex,
-        "changed scriptPubKey",
+        "changed fallback spent_output_scriptPubKey",
         lambda d: d.__setitem__("spent_output_scriptPubKey", "5120" + "22" * 32),
     )
 
