@@ -143,6 +143,9 @@ std::string render_markdown(const Environment& env,
   o << "- `reviewed_public_api_reason`: " << schnorr.batch_reviewed_public_api_reason << "\n";
   o << "- `experimental_status`: " << schnorr.batch_experimental_status << "\n";
   o << "- `experimental_label`: " << schnorr.batch_experimental_label << "\n";
+  o << "- BIP-340 challenge self-test: `"
+    << schnorr.batch_experimental_challenge_self_test_status << "` - "
+    << schnorr.batch_experimental_challenge_self_test_reason << "\n";
   o << "- `coefficient_policy`: " << schnorr.batch_experimental_coefficient_policy << "\n";
   o << "- `invalid_batch_policy`: " << schnorr.batch_experimental_invalid_policy << "\n";
   o << "- `timing_scope`: " << schnorr.batch_experimental_timing_scope << "\n";

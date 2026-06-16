@@ -1,5 +1,6 @@
 #pragma once
 
+#include "qrs_bench/benchmark_mode.h"
 #include "qrs_bench/stats.h"
 
 #include <string>
@@ -21,6 +22,6 @@ struct QrsValidationPathResult {
   Stats invalid_fixed_length;
 };
 
-QrsValidationPathResult run_qrs_validation_path_model(bool quick);
+QrsValidationPathResult run_qrs_validation_path_model(BenchmarkMode mode);
 
 }  // namespace qrs

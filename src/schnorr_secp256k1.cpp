@@ -129,7 +129,9 @@ Stats divide_stats(const Stats& total, double divisor) {
   return per;
 }
 
-BatchBenchmark run_experimental_batch_case(const BatchInputs& inputs, bool invalid, bool quick) {
+BatchBenchmark run_experimental_batch_case(const BatchInputs& inputs,
+                                           bool invalid,
+                                           BenchmarkMode mode) {
   BatchContextPtr batch_ctx(
       qrs_exp_bip340_batch_context_create(inputs.size),
       qrs_exp_bip340_batch_context_destroy);
@@ -144,11 +146,15 @@ BatchBenchmark run_experimental_batch_case(const BatchInputs& inputs, bool inval
                                      : "experimental valid batch failed before timing");
   }
 
-  const std::size_t samples = quick ? 5 : 21;
+  const std::size_t samples =
+      mode == BenchmarkMode::Quick ? 5 : (mode == BenchmarkMode::Standard ? 11 : 21);
   const std::size_t iters =
-      quick ? (inputs.size <= 512 ? 3 : 1)
-            : (inputs.size <= 512 ? 12 : (inputs.size <= 2048 ? 5 : 2));
-  const std::size_t warmup = quick ? 1 : 2;
+      mode == BenchmarkMode::Quick
+          ? (inputs.size <= 512 ? 3 : 1)
+          : (mode == BenchmarkMode::Standard
+                 ? (inputs.size <= 512 ? 6 : (inputs.size <= 2048 ? 3 : 1))
+                 : (inputs.size <= 512 ? 12 : (inputs.size <= 2048 ? 5 : 2)));
+  const std::size_t warmup = mode == BenchmarkMode::Full ? 2 : 1;
   BatchBenchmark out;
   out.batch_size = inputs.size;
   out.total_verify = summarize(time_batches(
@@ -173,11 +179,11 @@ std::vector<std::size_t> experimental_batch_sizes() {
 
 std::vector<BatchBenchmark> run_experimental_batch_benchmarks(secp256k1_context* ctx,
                                                               bool invalid,
-                                                              bool quick) {
+                                                              BenchmarkMode mode) {
   std::vector<BatchBenchmark> results;
   for (const std::size_t size : experimental_batch_sizes()) {
     BatchInputs inputs = make_batch_inputs(ctx, size);
-    results.push_back(run_experimental_batch_case(inputs, invalid, quick));
+    results.push_back(run_experimental_batch_case(inputs, invalid, mode));
   }
   return results;
 }
@@ -185,7 +191,7 @@ std::vector<BatchBenchmark> run_experimental_batch_benchmarks(secp256k1_context*
 
 }  // namespace
 
-SchnorrResult run_schnorr_benchmarks(bool quick) {
+SchnorrResult run_schnorr_benchmarks(BenchmarkMode mode) {
   SchnorrResult r;
 
 #if !defined(QRS_BENCH_HAVE_SECP256K1)
@@ -270,9 +276,12 @@ SchnorrResult run_schnorr_benchmarks(bool quick) {
         throw std::runtime_error("invalid fixed-length Schnorr signature verified before timing");
       }
 
-      const std::size_t batches = quick ? 11 : 51;
-      const std::size_t iters = quick ? 2000 : 20000;
-      const std::size_t warmup = quick ? 200 : 1000;
+      const std::size_t batches =
+          mode == BenchmarkMode::Quick ? 11 : (mode == BenchmarkMode::Standard ? 25 : 51);
+      const std::size_t iters =
+          mode == BenchmarkMode::Quick ? 2000 : (mode == BenchmarkMode::Standard ? 8000 : 20000);
+      const std::size_t warmup =
+          mode == BenchmarkMode::Quick ? 200 : (mode == BenchmarkMode::Standard ? 500 : 1000);
 
       r.individual_valid_verify = summarize(time_batches(
           "schnorr_bip340_individual_valid_verify",
@@ -304,8 +313,14 @@ SchnorrResult run_schnorr_benchmarks(bool quick) {
     }
 
     try {
-      r.batch_experimental_valid = run_experimental_batch_benchmarks(ctx.get(), false, quick);
-      r.batch_experimental_invalid = run_experimental_batch_benchmarks(ctx.get(), true, quick);
+      if (qrs_exp_bip340_challenge_self_test() != 1) {
+        throw std::runtime_error("BIP-340 challenge self-test failed");
+      }
+      r.batch_experimental_challenge_self_test_status = "available";
+      r.batch_experimental_challenge_self_test_reason =
+          "BIP-340 challenge self-test passed: libsecp256k1 tagged SHA helper matched an independent tagged_hash construction over deterministic inputs.";
+      r.batch_experimental_valid = run_experimental_batch_benchmarks(ctx.get(), false, mode);
+      r.batch_experimental_invalid = run_experimental_batch_benchmarks(ctx.get(), true, mode);
       if (r.batch_experimental_valid.empty()) {
         throw std::runtime_error("experimental batch benchmark produced no results");
       }
@@ -316,6 +331,10 @@ SchnorrResult run_schnorr_benchmarks(bool quick) {
     } catch (const std::exception& e) {
       r.batch_experimental_status = "unavailable";
       r.batch_experimental_reason = e.what();
+      if (r.batch_experimental_challenge_self_test_status != "available") {
+        r.batch_experimental_challenge_self_test_status = "unavailable";
+        r.batch_experimental_challenge_self_test_reason = e.what();
+      }
       r.batch_experimental_primary_per_signature_verify.status = "unavailable";
     }
     return r;

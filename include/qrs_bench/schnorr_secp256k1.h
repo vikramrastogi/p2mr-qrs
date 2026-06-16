@@ -1,5 +1,6 @@
 #pragma once
 
+#include "qrs_bench/benchmark_mode.h"
 #include "qrs_bench/stats.h"
 
 #include <cstddef>
@@ -34,11 +35,14 @@ struct SchnorrResult {
       "Invalid batch rejects as a batch; no fallback to individual verification is timed.";
   std::string batch_experimental_timing_scope =
       "Timed verification includes signature/public-key parsing, BIP-340 challenge computation, coefficient derivation, and the multiscalar batch equation check.";
+  std::string batch_experimental_challenge_self_test_status = "unavailable";
+  std::string batch_experimental_challenge_self_test_reason =
+      "experimental batch benchmark did not run";
   std::vector<BatchBenchmark> batch_experimental_valid;
   std::vector<BatchBenchmark> batch_experimental_invalid;
   Stats batch_experimental_primary_per_signature_verify;
 };
 
-SchnorrResult run_schnorr_benchmarks(bool quick);
+SchnorrResult run_schnorr_benchmarks(BenchmarkMode mode);
 
 }  // namespace qrs

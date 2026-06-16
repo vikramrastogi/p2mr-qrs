@@ -34,20 +34,82 @@ static void qrs_u64_write_le(unsigned char out[8], uint64_t v) {
     }
 }
 
-static void qrs_bip340_challenge(const secp256k1_hash_ctx* hash_ctx,
-                                 secp256k1_scalar* e,
-                                 const unsigned char* r32,
-                                 const unsigned char* msg32,
-                                 const unsigned char* pubkey32) {
+static void qrs_bip340_challenge_hash_tagged(const secp256k1_hash_ctx* hash_ctx,
+                                             unsigned char out32[32],
+                                             const unsigned char* r32,
+                                             const unsigned char* msg32,
+                                             const unsigned char* pubkey32) {
     static const unsigned char tag[] = "BIP0340/challenge";
-    unsigned char buf[32];
     secp256k1_sha256 sha;
     secp256k1_sha256_initialize_tagged(hash_ctx, &sha, tag, sizeof(tag) - 1);
     secp256k1_sha256_write(hash_ctx, &sha, r32, 32);
     secp256k1_sha256_write(hash_ctx, &sha, pubkey32, 32);
     secp256k1_sha256_write(hash_ctx, &sha, msg32, 32);
-    secp256k1_sha256_finalize(hash_ctx, &sha, buf);
+    secp256k1_sha256_finalize(hash_ctx, &sha, out32);
+}
+
+static void qrs_bip340_challenge_hash_independent(const secp256k1_hash_ctx* hash_ctx,
+                                                  unsigned char out32[32],
+                                                  const unsigned char* r32,
+                                                  const unsigned char* msg32,
+                                                  const unsigned char* pubkey32) {
+    static const unsigned char tag[] = "BIP0340/challenge";
+    unsigned char tag_hash[32];
+    secp256k1_sha256 sha;
+    secp256k1_sha256_initialize(&sha);
+    secp256k1_sha256_write(hash_ctx, &sha, tag, sizeof(tag) - 1);
+    secp256k1_sha256_finalize(hash_ctx, &sha, tag_hash);
+
+    secp256k1_sha256_initialize(&sha);
+    secp256k1_sha256_write(hash_ctx, &sha, tag_hash, 32);
+    secp256k1_sha256_write(hash_ctx, &sha, tag_hash, 32);
+    secp256k1_sha256_write(hash_ctx, &sha, r32, 32);
+    secp256k1_sha256_write(hash_ctx, &sha, pubkey32, 32);
+    secp256k1_sha256_write(hash_ctx, &sha, msg32, 32);
+    secp256k1_sha256_finalize(hash_ctx, &sha, out32);
+}
+
+static void qrs_bip340_challenge(const secp256k1_hash_ctx* hash_ctx,
+                                 secp256k1_scalar* e,
+                                 const unsigned char* r32,
+                                 const unsigned char* msg32,
+                                 const unsigned char* pubkey32) {
+    unsigned char buf[32];
+    qrs_bip340_challenge_hash_tagged(hash_ctx, buf, r32, msg32, pubkey32);
     secp256k1_scalar_set_b32(e, buf, NULL);
+}
+
+int qrs_exp_bip340_challenge_self_test(void) {
+    secp256k1_hash_ctx hash_ctx;
+    unsigned char r32[32];
+    unsigned char msg32[32];
+    unsigned char pubkey32[32];
+    unsigned char tagged[32];
+    unsigned char independent[32];
+    unsigned char scalar_tagged[32];
+    unsigned char scalar_independent[32];
+    secp256k1_scalar e_tagged;
+    secp256k1_scalar e_independent;
+    size_t i;
+
+    secp256k1_hash_ctx_init(&hash_ctx);
+    for (i = 0; i < 32; ++i) {
+        r32[i] = (unsigned char)(0x11U + 3U * i);
+        msg32[i] = (unsigned char)(0x42U ^ (7U * i));
+        pubkey32[i] = (unsigned char)(0x80U + 5U * i);
+    }
+
+    qrs_bip340_challenge_hash_tagged(&hash_ctx, tagged, r32, msg32, pubkey32);
+    qrs_bip340_challenge_hash_independent(&hash_ctx, independent, r32, msg32, pubkey32);
+    if (memcmp(tagged, independent, 32) != 0) {
+        return 0;
+    }
+
+    qrs_bip340_challenge(&hash_ctx, &e_tagged, r32, msg32, pubkey32);
+    secp256k1_scalar_set_b32(&e_independent, independent, NULL);
+    secp256k1_scalar_get_b32(scalar_tagged, &e_tagged);
+    secp256k1_scalar_get_b32(scalar_independent, &e_independent);
+    return memcmp(scalar_tagged, scalar_independent, 32) == 0;
 }
 
 static void qrs_batch_seed(const secp256k1_hash_ctx* hash_ctx,

@@ -16,9 +16,14 @@ Checklist enforced by the script:
 - Native QRS benchmark runs.
 - Native individual Schnorr benchmark runs.
 - Batch Schnorr status is explicit.
+- Release checks configure, build, regenerate `out/quick.json` and
+  `out/quick.md`, and then validate those freshly generated artifacts.
 - Reports include machine/library/compiler metadata.
 - Reports include git commit, working-tree dirty status, and benchmark binary
   build mode.
+- Release checks fail if a freshly generated report does not match current
+  `HEAD`, is generated from a dirty source tree, or reports a libsecp256k1
+  commit different from `third_party/secp256k1.COMMIT`.
 - Timing stats are labeled as per-batch means.
 - Invalid fixed-length signatures are measured across multiple fixed-length
   mutations.
@@ -26,6 +31,9 @@ Checklist enforced by the script:
   `scripts/verify_qrs_fixtures.py`, and verifier-reaching vectors are
   cryptographically checked by `scripts/verify_qrs_vectors.py`.
 - `scripts/check_batch_schnorr_baseline.py` regenerates batch-baseline evidence.
+- The experimental batch benchmark reports a BIP-340 challenge self-test that
+  compares the libsecp256k1 tagged-SHA helper against an independent
+  `tagged_hash("BIP0340/challenge", R || P || m)` construction.
 - `scripts/evaluate_resource_accounting.py` regenerates the pass/fail
   resource-accounting decision from the benchmark report.
 - `docs/RESOURCE_ACCOUNTING_DECISION.md` maps the benchmark evidence to the

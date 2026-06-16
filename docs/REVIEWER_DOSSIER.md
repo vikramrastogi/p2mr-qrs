@@ -60,6 +60,11 @@ commit. Experimental native BIP-340 batch baseline: available as sensitivity
 analysis only, not reviewed consensus code. See `04_batch_schnorr_baseline.md`
 and `../scripts/check_batch_schnorr_baseline.py`.
 
+The experimental batch path includes a BIP-340 challenge self-test. The test
+compares libsecp256k1's tagged-SHA helper against an independent
+`tagged_hash("BIP0340/challenge", R || P || m)` construction before timing
+experimental batch verification.
+
 ## BIP-360 dependency status
 
 The BIP requires BIP-360 and remains blocked on final BIP-360 definitions for

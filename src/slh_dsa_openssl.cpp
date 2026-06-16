@@ -250,7 +250,7 @@ void select_invalid_summary_stats(SlhDsaResult& r) {
 
 }  // namespace
 
-SlhDsaResult run_slh_dsa_benchmarks(bool quick) {
+SlhDsaResult run_slh_dsa_benchmarks(BenchmarkMode mode) {
   SlhDsaResult r;
 
 #if !defined(QRS_BENCH_HAVE_OPENSSL)
@@ -303,9 +303,12 @@ SlhDsaResult run_slh_dsa_benchmarks(bool quick) {
       }
     }
 
-    const std::size_t batches = quick ? 7 : 31;
-    const std::size_t iters = quick ? 8 : 100;
-    const std::size_t warmup = quick ? 4 : 32;
+    const std::size_t batches =
+        mode == BenchmarkMode::Quick ? 7 : (mode == BenchmarkMode::Standard ? 15 : 31);
+    const std::size_t iters =
+        mode == BenchmarkMode::Quick ? 8 : (mode == BenchmarkMode::Standard ? 32 : 100);
+    const std::size_t warmup =
+        mode == BenchmarkMode::Quick ? 4 : (mode == BenchmarkMode::Standard ? 8 : 32);
 
     r.valid_verify = summarize(time_batches(
         "slh_dsa_sha2_128s_valid_verify",

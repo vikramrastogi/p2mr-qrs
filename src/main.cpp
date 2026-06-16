@@ -13,7 +13,7 @@
 namespace {
 
 struct Args {
-  bool quick = true;
+  qrs::BenchmarkMode mode = qrs::BenchmarkMode::Quick;
   std::string only = "all";
   std::string json_path = "out/quick.json";
   std::string markdown_path = "out/quick.md";
@@ -21,7 +21,8 @@ struct Args {
 
 void usage(const char* argv0) {
   std::cerr << "Usage: " << argv0
-            << " [--quick|--full] [--only slh-dsa|schnorr|schnorr-batch|qrs-path|all]"
+            << " [--quick|--standard|--full]"
+            << " [--only slh-dsa|schnorr|schnorr-batch|qrs-path|all]"
             << " --json out/result.json --markdown out/result.md\n";
 }
 
@@ -30,9 +31,15 @@ Args parse_args(int argc, char** argv) {
   for (int i = 1; i < argc; ++i) {
     const std::string a = argv[i];
     if (a == "--quick") {
-      args.quick = true;
+      args.mode = qrs::BenchmarkMode::Quick;
+      args.json_path = "out/quick.json";
+      args.markdown_path = "out/quick.md";
+    } else if (a == "--standard") {
+      args.mode = qrs::BenchmarkMode::Standard;
+      args.json_path = "out/standard.json";
+      args.markdown_path = "out/standard.md";
     } else if (a == "--full") {
-      args.quick = false;
+      args.mode = qrs::BenchmarkMode::Full;
       args.json_path = "out/full.json";
       args.markdown_path = "out/full.md";
     } else if (a == "--json" && i + 1 < argc) {
@@ -69,13 +76,13 @@ int main(int argc, char** argv) {
     qrs::SchnorrResult schnorr;
     qrs::QrsValidationPathResult qrs_path;
     if (run_slh) {
-      slh = qrs::run_slh_dsa_benchmarks(args.quick);
+      slh = qrs::run_slh_dsa_benchmarks(args.mode);
     }
     if (run_schnorr) {
-      schnorr = qrs::run_schnorr_benchmarks(args.quick);
+      schnorr = qrs::run_schnorr_benchmarks(args.mode);
     }
     if (run_qrs_path) {
-      qrs_path = qrs::run_qrs_validation_path_model(args.quick);
+      qrs_path = qrs::run_qrs_validation_path_model(args.mode);
     }
 
     const qrs::Stats* qrs_valid = slh.valid_verify.available ? &slh.valid_verify : nullptr;
@@ -96,7 +103,7 @@ int main(int argc, char** argv) {
     const auto model =
         qrs::build_block_model(qrs_valid, qrs_invalid, schnorr_individual,
                                schnorr_experimental_batch, schnorr_batch);
-    const std::string mode = args.quick ? "quick" : "full";
+    const std::string mode = qrs::benchmark_mode_name(args.mode);
 
     qrs::write_text_file(args.json_path,
                          qrs::render_json(env, slh, schnorr, qrs_path, model, mode));

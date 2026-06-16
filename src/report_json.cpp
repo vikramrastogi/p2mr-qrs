@@ -177,10 +177,20 @@ std::string render_json(const Environment& env,
   o << "        \"reason\": \"" << esc(schnorr.batch_experimental_reason) << "\",\n";
   o << "        \"label\": \"" << esc(schnorr.batch_experimental_label) << "\"\n";
   o << "      }";
+  o << ",\n      \"batch_experimental_challenge_self_test\": {\n";
+  o << "        \"status\": \""
+    << esc(schnorr.batch_experimental_challenge_self_test_status) << "\",\n";
+  o << "        \"reason\": \""
+    << esc(schnorr.batch_experimental_challenge_self_test_reason) << "\"\n";
+  o << "      }";
   o << ",\n      \"batch_experimental_valid\": {\n";
   o << "        \"status\": \"" << esc(schnorr.batch_experimental_status) << "\",\n";
   o << "        \"reason\": \"" << esc(schnorr.batch_experimental_reason) << "\",\n";
   o << "        \"label\": \"" << esc(schnorr.batch_experimental_label) << "\",\n";
+  o << "        \"challenge_self_test_status\": \""
+    << esc(schnorr.batch_experimental_challenge_self_test_status) << "\",\n";
+  o << "        \"challenge_self_test_reason\": \""
+    << esc(schnorr.batch_experimental_challenge_self_test_reason) << "\",\n";
   o << "        \"coefficient_policy\": \""
     << esc(schnorr.batch_experimental_coefficient_policy) << "\",\n";
   o << "        \"timing_scope\": \""
@@ -194,6 +204,10 @@ std::string render_json(const Environment& env,
   o << "        \"status\": \"" << esc(schnorr.batch_experimental_status) << "\",\n";
   o << "        \"reason\": \"" << esc(schnorr.batch_experimental_reason) << "\",\n";
   o << "        \"label\": \"" << esc(schnorr.batch_experimental_label) << "\",\n";
+  o << "        \"challenge_self_test_status\": \""
+    << esc(schnorr.batch_experimental_challenge_self_test_status) << "\",\n";
+  o << "        \"challenge_self_test_reason\": \""
+    << esc(schnorr.batch_experimental_challenge_self_test_reason) << "\",\n";
   o << "        \"invalid_batch_policy\": \""
     << esc(schnorr.batch_experimental_invalid_policy) << "\",\n";
   o << "        \"timing_scope\": \""
