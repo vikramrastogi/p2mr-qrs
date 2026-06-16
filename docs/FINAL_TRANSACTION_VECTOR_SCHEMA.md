@@ -24,6 +24,9 @@ P2MR output encoding.
 provisional vectors. The native benchmark binary exposes the same model through
 `--qrs-digest-vector`, and `scripts/check_qrs_digest_agreement.py` verifies
 cross-implementation agreement on `leaf_hash`, `merkle_root`, and `qrs_msg`.
+For the supported `SIGHASH_DEFAULT` subset, the provisional model follows
+BIP-341 field ordering: `spend_type` appears after the transaction-wide hashes
+and before `input_index`.
 
 Final vectors must be serialized spend vectors. They must bind the exact bytes
 that a consensus implementation validates.

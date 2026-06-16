@@ -42,6 +42,17 @@ SLH-DSA-SHA2-128s signature against one fixed-size SLH-DSA-SHA2-128s public key.
 - No claim of final consensus-vector coverage.
 - No claim of consensus readiness.
 
+## Why not just BIP-360?
+
+BIP-360 defines the P2MR output construction and future-leaf framework. This
+package defines one concrete future-leaf validation rule for that framework:
+one SLH-DSA-SHA2-128s public key, one fixed-size signature, one digest shape,
+one witness shape, and one resource-accounting question. Keeping the leaf
+separate lets BIP-360 remain algorithm-neutral and not an algorithm registry.
+The dependency is intentional: this draft must be revised to match final
+BIP-360 definitions, and it can be folded into BIP-360 if BIP-360 maintainers
+prefer that path.
+
 ## What would make this proposal invalid
 
 - Final BIP-360/P2MR definitions conflict with the proposed leaf or digest
