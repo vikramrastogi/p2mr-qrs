@@ -92,6 +92,9 @@ Checklist enforced by the script:
 - `docs/BITCOIN_CORE_INTEGRATION_REQUIREMENTS.md` states the exact Core
   validation-path artifact required before activation.
 - `docs/BIP360_DEPENDENCY_MATRIX.md` tracks final BIP-360/P2MR dependencies.
+- `docs/CONSENSUS_GAP_MANIFEST.md` and
+  `docs/consensus-gap-manifest.json` track machine-checked activation and
+  final-vector blockers.
 - `docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md` and
   `test_vectors/qrs_transaction_vector.schema.json` define the final serialized
   vector shape once BIP-360/QRS definitions are final.
