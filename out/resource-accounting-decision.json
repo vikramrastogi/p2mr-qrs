@@ -23,49 +23,49 @@
   ],
   "activation_ready": false,
   "batch_sensitivity": {
-    "experimental_batch_speedup_vs_individual": 1.4705207765695276,
+    "experimental_batch_speedup_vs_individual": 1.4246524097512314,
     "experimental_batch_tightens_individual": true,
     "hypothetical_speedups": [
       {
         "qrs_valid_exceeds": false,
         "qrs_worst_invalid_exceeds": false,
-        "schnorr_p99_ms": 241.06933333333333,
+        "schnorr_p99_ms": 289.43333333333334,
         "speedup_vs_individual": 1.5
       },
       {
         "qrs_valid_exceeds": false,
         "qrs_worst_invalid_exceeds": false,
-        "schnorr_p99_ms": 180.802,
+        "schnorr_p99_ms": 217.075,
         "speedup_vs_individual": 2.0
       },
       {
         "qrs_valid_exceeds": false,
         "qrs_worst_invalid_exceeds": false,
-        "schnorr_p99_ms": 144.64159999999998,
+        "schnorr_p99_ms": 173.66,
         "speedup_vs_individual": 2.5
       },
       {
         "qrs_valid_exceeds": false,
         "qrs_worst_invalid_exceeds": false,
-        "schnorr_p99_ms": 120.53466666666667,
+        "schnorr_p99_ms": 144.71666666666667,
         "speedup_vs_individual": 3.0
       },
       {
-        "qrs_valid_exceeds": true,
-        "qrs_worst_invalid_exceeds": true,
-        "schnorr_p99_ms": 90.401,
+        "qrs_valid_exceeds": false,
+        "qrs_worst_invalid_exceeds": false,
+        "schnorr_p99_ms": 108.5375,
         "speedup_vs_individual": 4.0
       },
       {
         "qrs_valid_exceeds": true,
         "qrs_worst_invalid_exceeds": true,
-        "schnorr_p99_ms": 72.32079999999999,
+        "schnorr_p99_ms": 86.83,
         "speedup_vs_individual": 5.0
       }
     ],
     "policy": "Hypothetical batch speedups are sensitivity analysis only; they are not a measured baseline and no fake batch baseline is synthesized.",
-    "qrs_valid_exceeds_if_batch_speedup_gt": 3.642924784912655,
-    "qrs_worst_invalid_exceeds_if_batch_speedup_gt": 3.4046455573444807,
+    "qrs_valid_exceeds_if_batch_speedup_gt": 4.62073075981566,
+    "qrs_worst_invalid_exceeds_if_batch_speedup_gt": 4.02975792678399,
     "status": "available"
   },
   "checks": [
@@ -105,17 +105,17 @@
       "passed": true
     },
     {
-      "detail": "qrs_worst=106.209 ms, individual_schnorr=361.604 ms",
+      "detail": "qrs_worst=107.736 ms, individual_schnorr=434.150 ms",
       "name": "QRS worst p99 below individual Schnorr p99",
       "passed": true
     },
     {
-      "detail": "qrs_worst=106.209 ms, experimental_batch=245.902 ms",
+      "detail": "qrs_worst=107.736 ms, experimental_batch=304.741 ms",
       "name": "QRS worst p99 below experimental batch Schnorr p99",
       "passed": true
     },
     {
-      "detail": "experimental_batch=245.902 ms, individual_schnorr=361.604 ms",
+      "detail": "experimental_batch=304.741 ms, individual_schnorr=434.150 ms",
       "name": "Experimental batch tightens individual Schnorr baseline",
       "passed": true
     }
@@ -123,8 +123,8 @@
   "conclusion": "Current native evidence supports continuing with the no-additional-budget rule as Draft-stage review material.",
   "depth_sensitivity": {
     "note": "If depth 128 has lower total saturated-block validation time, that is due to fewer weight-limited QRS inputs, not lower per-input cost.",
-    "qrs_depth0_p99_ms": 99.262,
-    "qrs_depth128_p99_ms": 65.841,
+    "qrs_depth0_p99_ms": 93.957,
+    "qrs_depth128_p99_ms": 62.322,
     "qrs_depth_binding_case": "depth128_lower_block_time_due_to_fewer_weight_limited_inputs"
   },
   "draft_rule_status": "supports_no_additional_budget_for_draft_review",
@@ -137,45 +137,45 @@
       {
         "detail": "fallback trigger if QRS worst-invalid p99 exceeds individual Schnorr p99",
         "name": "qrs_worst_exceeds_individual_schnorr",
-        "qrs_worst_p99_ms": 106.209,
-        "threshold_p99_ms": 361.604,
+        "qrs_worst_p99_ms": 107.736,
+        "threshold_p99_ms": 434.15,
         "triggered": false
       },
       {
         "detail": "fallback trigger if QRS worst-invalid p99 exceeds a 2.5x hypothetical reviewed-batch-Schnorr baseline",
         "name": "qrs_worst_exceeds_2_5x_hypothetical_reviewed_batch_schnorr",
-        "qrs_worst_p99_ms": 106.209,
-        "threshold_p99_ms": 144.64159999999998,
+        "qrs_worst_p99_ms": 107.736,
+        "threshold_p99_ms": 173.66,
         "triggered": false
       },
       {
         "detail": "fallback trigger if QRS worst-invalid p99 exceeds a 3.0x hypothetical reviewed-batch-Schnorr baseline",
         "name": "qrs_worst_exceeds_3_0x_hypothetical_reviewed_batch_schnorr",
-        "qrs_worst_p99_ms": 106.209,
-        "threshold_p99_ms": 120.53466666666667,
+        "qrs_worst_p99_ms": 107.736,
+        "threshold_p99_ms": 144.71666666666667,
         "triggered": false
       },
       {
         "detail": "fallback trigger if a reviewed public batch-Schnorr implementation becomes available and QRS exceeds it",
         "name": "qrs_worst_exceeds_reviewed_public_batch_schnorr",
-        "qrs_worst_p99_ms": 106.209,
+        "qrs_worst_p99_ms": 107.736,
         "threshold_p99_ms": null,
         "triggered": null
       },
       {
         "detail": "fallback trigger requires Bitcoin Core validation-path integration evidence; current harness models that path only",
         "name": "bitcoin_core_validation_path_overhead",
-        "qrs_worst_p99_ms": 106.209,
+        "qrs_worst_p99_ms": 107.736,
         "threshold_p99_ms": null,
         "triggered": null
       }
     ]
   },
   "p99_ms": {
-    "experimental_batch_schnorr_saturated_block": 245.902,
-    "individual_schnorr_saturated_block": 361.604,
-    "qrs_valid_saturated_block": 99.262,
-    "qrs_worst_invalid_fixed_length_saturated_block": 106.209,
+    "experimental_batch_schnorr_saturated_block": 304.741,
+    "individual_schnorr_saturated_block": 434.15,
+    "qrs_valid_saturated_block": 93.957,
+    "qrs_worst_invalid_fixed_length_saturated_block": 107.736,
     "reviewed_public_batch_schnorr_saturated_block": null
   },
   "schema": "qrs-native-bench/resource-accounting-decision/v0"
