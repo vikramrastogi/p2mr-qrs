@@ -32,6 +32,11 @@ The final serialized transaction-vector schema is defined in
 `../docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md`. It is not populated yet because
 the final BIP-360/QRS sighash and hashing definitions do not exist yet.
 
+The provisional coverage matrix is `vector_coverage_matrix.json` and is
+documented in `../docs/VECTOR_COVERAGE_MATRIX.md`. It maps expected reviewer
+coverage to structured fixtures, negative/fuzz cases, digest mutation
+self-tests, and invalid-verifier benchmark cases.
+
 The important invariant in this directory is failure-stage classification:
 structural invalid cases must fail before SLH-DSA verification, while
 `qrs_invalid_signature_fixed_length.json` must reach the verifier and fail
@@ -41,6 +46,7 @@ Run:
 
 ```sh
 python3 scripts/validate_test_vectors.py test_vectors/
+python3 scripts/validate_vector_coverage_matrix.py
 python3 scripts/verify_qrs_fixtures.py test_vectors/
 python3 scripts/verify_qrs_vectors.py test_vectors/ --binary build/qrs_native_bench
 ```

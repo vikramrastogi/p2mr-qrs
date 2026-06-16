@@ -143,6 +143,11 @@ which calls the native SLH-DSA-SHA2-128s verifier for valid and invalid
 fixed-length signatures. They are still not final consensus vectors because the
 modeled hashing rules remain provisional pending final BIP-360/QRS definitions.
 
+`VECTOR_COVERAGE_MATRIX.md` and
+`test_vectors/vector_coverage_matrix.json` make the current provisional
+coverage explicit across structured fixtures, negative/fuzz witness cases,
+digest mutation self-tests, and fixed-length invalid verifier cases.
+
 ## Benchmark status
 
 Native OpenSSL SLH-DSA-SHA2-128s, native individual libsecp256k1 BIP-340, and
