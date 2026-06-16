@@ -1,14 +1,15 @@
-# QRS Native Benchmark Proof Package
+# P2MR QRS BIP Pre-Review Package
 
 Status: Draft-stage pre-review package for v0.9.0. This is not
 activation-ready consensus evidence.
 
 Repo / branch:
-- Repo: `qrs-native-bench` or this existing BIP workspace.
-- Branch: `qrs-native-benchmark-proof`.
+- Repo: `p2mr-qrs`.
+- Branch: `main`.
 
 Exact goal:
-- Build a native, reproducible benchmark package for the P2MR Quantum-Rescue Leaf BIP.
+- Publish a narrow pre-review package for the P2MR Quantum-Rescue Leaf BIP.
+- Keep the proposal scoped to one P2MR-only future leaf, one SLH-DSA-SHA2-128s signature, no legacy-output policy, no witness discount, no algorithm registry, and no tapscript opcode in v1.
 - Produce evidence for whether QRS validation can safely rely on existing SegWit weight accounting or needs an explicit per-QRS consensus validation budget.
 
 Files to inspect first:
@@ -60,7 +61,10 @@ Current implementation status:
 - The hardened v0.9.0 BIP draft is included at `docs/bip-p2mr-quantum-rescue-leaf-v0.9.0.mediawiki`.
 - The harness writes JSON and Markdown reports and includes the requested saturated-block model fields.
 - Provisional structured consensus vectors live in `test_vectors/`; malformed witness and negative cases live in `fuzz/` and `tests/`.
-- `REVIEWER_DOSSIER.md` maps predictable objections to evidence, caveats, blockers, or non-goals.
+- `docs/REVIEWER_DOSSIER.md` maps predictable objections to evidence, caveats, blockers, or non-goals.
+- `docs/RELEASE_CHECKLIST.md` lists the posting checks enforced by `scripts/release_check.sh`.
+- `THIRD_PARTY_NOTICES.md` identifies vendored third-party code and license locations.
+- `out/sample-native-report.md` is the stable sample Markdown report alias for public review.
 - `.github/workflows/native-bench-smoke.yml` builds and runs the quick smoke path on Linux and macOS and uploads the generated reports as CI artifacts.
 
 Tests:
@@ -84,9 +88,15 @@ python3 scripts/check_batch_schnorr_baseline.py --json out/batch-evidence.json -
 ./build/qrs_native_bench --quick --json out/quick.json --markdown out/quick.md
 ./build/qrs_native_bench --full --json out/full.json --markdown out/full.md
 python3 scripts/assert_quick_report.py --json out/quick.json --markdown out/quick.md --batch-evidence-json out/batch-evidence.json
+python3 scripts/assert_quick_report.py out/quick.json out/quick.md
+python3 scripts/check_batch_schnorr_baseline.py --skip-upstream --markdown out/batch-evidence.md --json out/batch-evidence.json
 python3 scripts/validate_test_vectors.py test_vectors/
 python3 scripts/run_qrs_negative_tests.py
 bash scripts/release_check.sh
+grep -n "Version: 0.9.0" docs/bip-p2mr-quantum-rescue-leaf-v0.9.0.mediawiki
+grep -n "no legacy-output" docs/REVIEWER_DOSSIER.md
+grep -n "Batch Schnorr" docs/REVIEWER_DOSSIER.md
+grep -n "Known blockers before advancing beyond Draft" docs/REVIEWER_DOSSIER.md
 jq '.environment.cpu_model' out/full.json
 jq '.benchmarks.slh_dsa_sha2_128s.valid_verify.p99_ns' out/full.json
 jq '.benchmarks.slh_dsa_sha2_128s.invalid_fixed_length_verify.p99_ns' out/full.json

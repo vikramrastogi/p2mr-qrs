@@ -2,7 +2,7 @@
 
 Artifacts:
 
-- `../RELEASE_CHECKLIST.md`
+- `../docs/RELEASE_CHECKLIST.md`
 - `../scripts/release_check.sh`
 
 Acceptance:

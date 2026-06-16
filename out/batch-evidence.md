@@ -3,7 +3,7 @@
 - `status`: unavailable
 - `reason`: Bundled upstream bitcoin-core/secp256k1 commit aea86bc3509f3ceb5c047fe6567bf8910f72a728 exposes no public BIP-340 batch verification API; local schnorrsig tests still mark verify_batch as TODO; and the upstream head search found no batch/Schnorr/BIP-340 branch to wire as a reviewed experimental baseline.
 - `bundled_commit_expected`: aea86bc3509f3ceb5c047fe6567bf8910f72a728
-- `bundled_commit_actual`: aea86bc3509f3ceb5c047fe6567bf8910f72a728
+- `bundled_commit_actual`: vendored source has no .git metadata; expected commit recorded in third_party/secp256k1.COMMIT
 - `public_batch_api_detected`: false
 - `verify_batch_todo_mentions`: 3
 - `upstream_head_search.status`: ok

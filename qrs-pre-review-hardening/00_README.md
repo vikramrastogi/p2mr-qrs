@@ -9,8 +9,8 @@ Status: Draft-stage pre-review, not activation-ready.
 Primary entry points:
 
 - BIP: `../docs/bip-p2mr-quantum-rescue-leaf-v0.9.0.mediawiki`
-- Benchmark reports: `../out/quick.md`, `../out/full.md`
+- Benchmark reports: `../out/quick.md`, `../out/full.md`, `../out/sample-native-report.md`
 - Test vectors: `../test_vectors/`
 - Fuzz/negative cases: `../fuzz/qrs_witness_corpus/`, `../tests/qrs_negative_cases.json`
-- Reviewer dossier: `../REVIEWER_DOSSIER.md`
-- Release checklist: `../RELEASE_CHECKLIST.md`
+- Reviewer dossier: `../docs/REVIEWER_DOSSIER.md`
+- Release checklist: `../docs/RELEASE_CHECKLIST.md`

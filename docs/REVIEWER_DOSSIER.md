@@ -7,7 +7,7 @@ readiness.
 
 Defines one P2MR-only future leaf version that verifies one
 SLH-DSA-SHA2-128s signature over a BIP-341-style transaction digest. See
-`docs/bip-p2mr-quantum-rescue-leaf-v0.9.0.mediawiki`.
+`bip-p2mr-quantum-rescue-leaf-v0.9.0.mediawiki`.
 
 ## What this proposal explicitly does not do
 
@@ -19,7 +19,7 @@ or a tapscript opcode.
 
 P2MR is key-path-free. A post-quantum rescue leaf inside an output with an
 exposed key path would not remove the discrete-log exposure. See the BIP
-Rationale section and `01_bip_spec_hardening.md`.
+Rationale section and `../01_bip_spec_hardening.md`.
 
 ## Why a leaf version instead of opcode
 
@@ -44,20 +44,21 @@ treats that as an explicit non-goal, not an omission.
 
 The signature, public key, control block, and annex are counted under existing
 SegWit weight rules. See Resource accounting in the v0.9.0 BIP and
-`05_block_validation_model.md`.
+`../05_block_validation_model.md`.
 
 ## Resource-accounting status
 
 No-new-budget is a hypothesis to test, not an established consensus conclusion.
 The harness emits QRS, individual Schnorr, experimental batch Schnorr, and
-reviewed-public batch status separately. See `out/full.md` and `out/full.json`.
+reviewed-public batch status separately. See `../out/full.md` and
+`../out/full.json`.
 
 ## Batch Schnorr status
 
 Reviewed public libsecp256k1 batch API: unavailable in the bundled upstream
 commit. Experimental native BIP-340 batch baseline: available as sensitivity
 analysis only, not reviewed consensus code. See `04_batch_schnorr_baseline.md`
-and `scripts/check_batch_schnorr_baseline.py`.
+and `../scripts/check_batch_schnorr_baseline.py`.
 
 ## BIP-360 dependency status
 
@@ -76,6 +77,18 @@ the invalid fixed-length signature case that reaches SLH-DSA verification.
 Native OpenSSL SLH-DSA-SHA2-128s, native individual libsecp256k1 BIP-340, and
 experimental native batch BIP-340 are measured. The QRS validation-path section
 is a model, not Bitcoin Core integration.
+
+## Objection map
+
+| Objection | Answer | Evidence |
+| --- | --- | --- |
+| Why not solve old coins? | Legacy-output policy is out of scope. | BIP Abstract and Backward compatibility; this dossier's non-goals. |
+| Why not ML-DSA? | This draft tests one conservative hash-based primitive first. | BIP Motivation and Rationale. |
+| Why not a tapscript opcode? | The 7,856-byte signature exceeds the retained 520-byte tapscript stack-element limit. | BIP Rationale; `../test_vectors/`. |
+| Why no witness discount? | The proposal does not hide a blockspace-policy change inside the crypto primitive. | BIP Resource accounting; `../out/full.md`. |
+| What about batch Schnorr? | Reviewed public batch API status is explicit; experimental batch is labeled non-consensus. | `../out/batch-evidence.md`; `../04_batch_schnorr_baseline.md`. |
+| What if BIP-360 changes? | Advancement is blocked on final BIP-360 definitions. | BIP Dependencies and Rationale; provisional vector notes. |
+| Is this activation-ready? | No. It is Draft-stage pre-review material. | `RELEASE_CHECKLIST.md`; this dossier's known blockers. |
 
 ## Known blockers before advancing beyond Draft
 

@@ -87,9 +87,15 @@ def main() -> int:
     tests = secp_dir / "src" / "modules" / "schnorrsig" / "tests_impl.h"
 
     expected_commit = commit_file.read_text(encoding="utf-8").strip() if commit_file.exists() else ""
-    rc, actual_commit, actual_commit_err = run_command(["git", "rev-parse", "HEAD"], cwd=secp_dir)
-    if rc != 0:
-        actual_commit = f"unavailable: {actual_commit_err}"
+    if (secp_dir / ".git").exists():
+        rc, actual_commit, actual_commit_err = run_command(["git", "rev-parse", "HEAD"], cwd=secp_dir)
+        if rc != 0:
+            actual_commit = f"unavailable: {actual_commit_err}"
+    else:
+        actual_commit = (
+            "vendored source has no .git metadata; expected commit recorded in "
+            "third_party/secp256k1.COMMIT"
+        )
 
     header_text = header.read_text(encoding="utf-8") if header.exists() else ""
     public_api_names = sorted(set(re.findall(r"\bsecp256k1_schnorrsig_[A-Za-z0-9_]+\b", header_text)))
@@ -118,8 +124,8 @@ def main() -> int:
         upstream["stderr"] = stderr
         upstream["matching_heads"] = [line for line in stdout.splitlines() if line.strip()]
 
-    upstream_checked = upstream["status"] == "ok"
-    upstream_has_candidate = upstream_checked and bool(upstream["matching_heads"])
+    upstream_checked = upstream["status"] in {"ok", "skipped"}
+    upstream_has_candidate = upstream["status"] == "ok" and bool(upstream["matching_heads"])
     if public_batch_api or upstream_has_candidate:
         status = "review-needed"
     elif upstream_checked:
@@ -127,12 +133,19 @@ def main() -> int:
     else:
         status = "evidence-incomplete"
 
-    if status == "unavailable":
+    if status == "unavailable" and upstream["status"] == "ok":
         reason = (
             f"Bundled upstream bitcoin-core/secp256k1 commit {expected_commit} exposes no "
             "public BIP-340 batch verification API; local schnorrsig tests still mark "
             "verify_batch as TODO; and the upstream head search found no batch/Schnorr/BIP-340 "
             "branch to wire as a reviewed experimental baseline."
+        )
+    elif status == "unavailable":
+        reason = (
+            f"Bundled upstream bitcoin-core/secp256k1 commit {expected_commit} exposes no "
+            "public BIP-340 batch verification API, and local schnorrsig tests still mark "
+            "verify_batch as TODO. The upstream head search was skipped by caller request; "
+            "run without --skip-upstream before treating this as network-checked evidence."
         )
     else:
         if status == "review-needed":

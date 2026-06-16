@@ -20,7 +20,8 @@ def require(value: bool, message: str) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--json", type=Path, required=True)
+    parser.add_argument("positional", nargs="*", type=Path)
+    parser.add_argument("--json", type=Path, default=None)
     parser.add_argument("--markdown", type=Path, default=None)
     parser.add_argument("--batch-evidence-json", type=Path, default=None)
     parser.add_argument(
@@ -29,6 +30,14 @@ def main() -> int:
         help="Allow QRS/SLH-DSA timings to be unavailable on platforms whose OpenSSL lacks SLH-DSA.",
     )
     args = parser.parse_args()
+    if args.json is None:
+        if not args.positional:
+            parser.error("either --json or positional JSON path is required")
+        args.json = args.positional[0]
+    if args.markdown is None and len(args.positional) >= 2:
+        args.markdown = args.positional[1]
+    if len(args.positional) > 2:
+        parser.error("too many positional arguments")
 
     report = json.loads(args.json.read_text(encoding="utf-8"))
     require(report.get("schema") == "qrs-native-bench/v0", "unexpected report schema")

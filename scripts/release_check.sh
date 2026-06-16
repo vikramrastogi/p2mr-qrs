@@ -3,6 +3,8 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BIP="$ROOT/docs/bip-p2mr-quantum-rescue-leaf-v0.9.0.mediawiki"
+DOSSIER="$ROOT/docs/REVIEWER_DOSSIER.md"
+CHECKLIST="$ROOT/docs/RELEASE_CHECKLIST.md"
 QUICK_JSON="$ROOT/out/quick.json"
 QUICK_MD="$ROOT/out/quick.md"
 BATCH_EVIDENCE="$ROOT/out/batch-evidence.json"
@@ -15,10 +17,14 @@ grep -n "strong unforgeability" "$BIP"
 grep -n "Draft-stage pre-review" "$ROOT/00_README.md"
 
 if grep -RniE "QRS is [c]heaper|\\([c]heaper\\)|empirically supported" \
-  "$BIP" "$ROOT/REVIEWER_DOSSIER.md" "$ROOT/RELEASE_CHECKLIST.md" "$ROOT/00_README.md"; then
+  "$BIP" "$DOSSIER" "$CHECKLIST" "$ROOT/00_README.md"; then
   echo "release_check.sh: unsupported cost language found" >&2
   exit 1
 fi
+
+grep -n "No legacy-output policy" "$DOSSIER"
+grep -n "Batch Schnorr" "$DOSSIER"
+grep -n "Known blockers before advancing beyond Draft" "$DOSSIER"
 
 python3 "$ROOT/scripts/validate_test_vectors.py" "$ROOT/test_vectors"
 python3 "$ROOT/scripts/run_qrs_negative_tests.py"
