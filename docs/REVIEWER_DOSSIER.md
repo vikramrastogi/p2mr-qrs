@@ -6,7 +6,8 @@ readiness.
 ## What this proposal does
 
 Defines one P2MR-only future leaf version that verifies one
-SLH-DSA-SHA2-128s signature over a BIP-341-style transaction digest. See
+SLH-DSA-SHA2-128s signature over a P2MR/QRS transaction digest derived from the
+BIP-341 `SigMsg` structure, pending final BIP-360 definitions. See
 `bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki`.
 
 ## What this proposal does not do
@@ -87,6 +88,14 @@ P2MR hashing, sighash tagging, annex handling, and future-leaf behavior. The
 vectors are marked provisional for the same reason. The dependency closure table
 is `BIP360_DEPENDENCY_MATRIX.md`.
 
+Known activation and final-vector gaps are also listed in
+`CONSENSUS_GAP_MANIFEST.md` and machine-checked by
+`scripts/validate_consensus_gap_manifest.py`. That manifest includes blocker
+IDs such as `bip360_final_leaf_hashing`,
+`bitcoin_core_validation_path_integration`,
+`reviewed_public_batch_schnorr_baseline`, and
+`final_serialized_consensus_vectors`.
+
 BIP-360's reference material includes exploratory P2MR/PQC examples using
 SLH-DSA in script-like leaves. This package does not claim to invent the general
 P2MR-plus-post-quantum-signature idea; its narrower contribution is a single
@@ -141,6 +150,12 @@ experimental native batch BIP-340 are measured. The QRS validation-path section
 is a model, not Bitcoin Core integration. The artifact required to close that
 caveat is specified in `BITCOIN_CORE_INTEGRATION_REQUIREMENTS.md`.
 
+The modeled validation path intentionally uses explicit non-consensus prefixes
+such as `QRS modeled TapLeaf v0`, `QRS modeled Branch v0`, and
+`QRS modeled SigMsg v0`. Those prefixes make the benchmark bucket stable for
+pre-review while preventing the report from being mistaken for final
+TapLeaf/TapBranch/TapSighash consensus code.
+
 The report now lists SLH-DSA backend status explicitly. Consensus readiness
 requires a reviewed/pinned verifier strategy and cross-backend agreement.
 OpenSSL EVP is pre-review evidence, not by itself final consensus dependency
@@ -187,6 +202,7 @@ Markdown artifacts. The platform target table is `REPRODUCTION_MATRIX.md`.
 | How does evidence map to the budget rule? | The decision criteria and current conclusion are in a separate decision record. | `RESOURCE_ACCOUNTING_DECISION.md`; `../out/quick.md`; `../out/full.md`. |
 | What if the no-budget rule fails? | Use the inactive explicit QRS budget fallback before activation. | `EXPLICIT_QRS_BUDGET_FALLBACK.md`; `../scripts/evaluate_resource_accounting.py`. |
 | What if BIP-360 changes? | Advancement is blocked on final BIP-360 definitions. | BIP Dependencies and Rationale; provisional vector notes. |
+| Where is the blocker list? | Activation and final-vector gaps are machine-readable and release-checked. | `CONSENSUS_GAP_MANIFEST.md`; `consensus-gap-manifest.json`; `../scripts/validate_consensus_gap_manifest.py`. |
 | Is this activation-ready? | No. It is Draft-stage pre-review material. | `RELEASE_CHECKLIST.md`; this dossier's known blockers. |
 
 ## Known blockers before advancing beyond Draft

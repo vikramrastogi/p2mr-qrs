@@ -78,6 +78,20 @@ Fallback trigger checks identify when the inactive explicit QRS budget must be r
 
 ## Activation Blockers
 
+- Manifest: `docs/consensus-gap-manifest.json`
+- `bip360_final_leaf_hashing`
+- `bip360_final_branch_hashing`
+- `bip360_final_future_leaf_behavior`
+- `qrs_ext_flag_assignment`
+- `final_sigmsg_definition`
+- `bitcoin_core_validation_path_integration`
+- `second_reviewed_slh_dsa_backend`
+- `cross_hardware_reproduction`
+- `reviewed_public_batch_schnorr_baseline`
+- `wallet_descriptor_psbt_hardware_standards`
+- `activation_parameters`
+- `final_serialized_consensus_vectors`
+
 - Reviewed public batch Schnorr baseline unavailable.
 - Bitcoin Core validation-path integration not implemented.
 - Final BIP-360/QRS transaction digest definitions not available.

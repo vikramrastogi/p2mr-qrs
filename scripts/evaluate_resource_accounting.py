@@ -11,6 +11,21 @@ from typing import Any
 
 
 HYPOTHETICAL_BATCH_SPEEDUPS = (1.5, 2.0, 2.5, 3.0, 4.0, 5.0)
+CONSENSUS_GAP_MANIFEST = "docs/consensus-gap-manifest.json"
+ACTIVATION_BLOCKER_IDS = [
+    "bip360_final_leaf_hashing",
+    "bip360_final_branch_hashing",
+    "bip360_final_future_leaf_behavior",
+    "qrs_ext_flag_assignment",
+    "final_sigmsg_definition",
+    "bitcoin_core_validation_path_integration",
+    "second_reviewed_slh_dsa_backend",
+    "cross_hardware_reproduction",
+    "reviewed_public_batch_schnorr_baseline",
+    "wallet_descriptor_psbt_hardware_standards",
+    "activation_parameters",
+    "final_serialized_consensus_vectors",
+]
 
 
 class DecisionError(AssertionError):
@@ -297,6 +312,10 @@ def render_markdown(decision: dict[str, Any]) -> str:
             f"{item['detail']} |"
         )
     lines.extend(["", "## Activation Blockers", ""])
+    lines.append(f"- Manifest: `{decision['activation_blocker_manifest']}`")
+    for blocker_id in decision.get("activation_blocker_ids", []):
+        lines.append(f"- `{blocker_id}`")
+    lines.append("")
     for blocker in decision["activation_blockers"]:
         lines.append(f"- {blocker}")
     lines.extend(
@@ -414,6 +433,8 @@ def evaluate(report: dict[str, Any], batch_evidence: dict[str, Any], allow_unava
             "batch_sensitivity": build_batch_sensitivity(None, None, None, None),
             "fallback_triggers": build_fallback_triggers(None, None, None, None),
             "checks": checks,
+            "activation_blocker_manifest": CONSENSUS_GAP_MANIFEST,
+            "activation_blocker_ids": ACTIVATION_BLOCKER_IDS,
             "activation_blockers": blockers,
         }
 
@@ -545,6 +566,8 @@ def evaluate(report: dict[str, Any], batch_evidence: dict[str, Any], allow_unava
             qrs_valid, qrs_invalid, schnorr_individual, reviewed_batch
         ),
         "checks": checks,
+        "activation_blocker_manifest": CONSENSUS_GAP_MANIFEST,
+        "activation_blocker_ids": ACTIVATION_BLOCKER_IDS,
         "activation_blockers": blockers,
     }
 
