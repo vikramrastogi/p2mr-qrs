@@ -2,7 +2,7 @@
   BIP: ?
   Layer: Consensus (soft fork)
   Title: P2MR SLH-DSA Leaf
-  Authors: Vikram K. Rastogi <vikramrastogi@gmail.com>, Mark H. Dodson
+  Authors: Vikram K. Rastogi <vikramrastogi@gmail.com>, Mark H. Dodson <markhdodson@gmail.com>
   Status: Draft
   Type: Specification
   Assigned: ?
