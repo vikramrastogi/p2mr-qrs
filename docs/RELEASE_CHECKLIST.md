@@ -22,7 +22,9 @@ current source tree.
 benchmark and the resource decision may be advisory. `full_release_check.sh` is
 the stricter evidence gate: it uses the standard benchmark, runs the resource
 decision without advisory mode, and fails if current evidence requires an
-explicit QRS validation budget.
+explicit QRS validation budget or leaves the resource-accounting decision
+unresolved.
+Failure of `full_release_check.sh` means the current machine's standard-run evidence is not strong enough for the stricter gate; it does not change the Draft-stage status of the BIP.
 
 See `PUBLIC_REVIEW_READINESS.md` for the public pre-review readiness checklist.
 
@@ -65,7 +67,8 @@ Checklist enforced by the script:
 - `scripts/evaluate_resource_accounting.py` regenerates the pass/fail
   resource-accounting decision from the benchmark report.
 - `scripts/full_release_check.sh` is available as the stricter non-advisory
-  evidence gate for standard benchmark runs.
+  evidence gate for standard benchmark runs, and requires
+  `draft_rule_status == "supports_no_additional_budget_for_draft_review"`.
 - `docs/RESOURCE_ACCOUNTING_DECISION.md` maps the benchmark evidence to the
   draft resource-accounting decision.
 - `docs/EXPLICIT_QRS_BUDGET_FALLBACK.md` specifies the inactive per-QRS budget
