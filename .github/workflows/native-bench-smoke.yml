@@ -53,11 +53,17 @@ jobs:
         run: ./build/qrs_native_bench --quick --json out/quick.json --markdown out/quick.md
 
       - name: Assert report contract
+        shell: bash
         run: |
+          extra_args=()
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            extra_args+=(--allow-unavailable-qrs)
+          fi
           python3 scripts/assert_quick_report.py \
             --json out/quick.json \
             --markdown out/quick.md \
-            --batch-evidence-json out/batch-evidence.json
+            --batch-evidence-json out/batch-evidence.json \
+            "${extra_args[@]}"
           jq '.benchmarks.schnorr_bip340.batch.status' out/quick.json
           jq '.benchmarks.schnorr_bip340.batch_experimental_valid.status' out/quick.json
           jq '.benchmarks.schnorr_bip340.batch_reviewed_public_api_status' out/quick.json

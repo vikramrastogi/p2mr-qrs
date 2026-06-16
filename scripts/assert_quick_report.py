@@ -23,6 +23,11 @@ def main() -> int:
     parser.add_argument("--json", type=Path, required=True)
     parser.add_argument("--markdown", type=Path, default=None)
     parser.add_argument("--batch-evidence-json", type=Path, default=None)
+    parser.add_argument(
+        "--allow-unavailable-qrs",
+        action="store_true",
+        help="Allow QRS/SLH-DSA timings to be unavailable on platforms whose OpenSSL lacks SLH-DSA.",
+    )
     args = parser.parse_args()
 
     report = json.loads(args.json.read_text(encoding="utf-8"))
@@ -103,17 +108,36 @@ def main() -> int:
             slh["invalid_fixed_length_verify"]["status"] == "available",
             "invalid fixed-length SLH timing missing",
         )
+    else:
+        require(args.allow_unavailable_qrs, "SLH-DSA backend must be available")
+        require(slh.get("reason"), "unavailable SLH-DSA backend must report a reason")
+        require(
+            "EVP_PKEY_CTX_new_from_name" in slh["reason"] or "unsupported" in slh["reason"],
+            "unavailable SLH-DSA reason must identify OpenSSL algorithm support",
+        )
 
     qrs_path = report["benchmarks"]["qrs_validation_path"]
-    require(qrs_path["total_valid"]["status"] == "available", "QRS path total valid timing missing")
-    require(
-        qrs_path["invalid_structural"]["status"] == "available",
-        "QRS path invalid structural timing missing",
-    )
-    require(
-        qrs_path["invalid_fixed_length"]["status"] == "available",
-        "QRS path invalid fixed-length timing missing",
-    )
+    if qrs_path["status"] == "available":
+        require(
+            qrs_path["total_valid"]["status"] == "available",
+            "QRS path total valid timing missing",
+        )
+        require(
+            qrs_path["invalid_structural"]["status"] == "available",
+            "QRS path invalid structural timing missing",
+        )
+        require(
+            qrs_path["invalid_fixed_length"]["status"] == "available",
+            "QRS path invalid fixed-length timing missing",
+        )
+    else:
+        require(args.allow_unavailable_qrs, "QRS path timings must be available")
+        require(qrs_path.get("reason"), "unavailable QRS path must report a reason")
+        require(
+            "EVP_PKEY_CTX_new_from_name" in qrs_path["reason"]
+            or "unsupported" in qrs_path["reason"],
+            "unavailable QRS path reason must identify OpenSSL algorithm support",
+        )
     require(
         "not Bitcoin Core consensus integration" in qrs_path["scope"],
         "QRS path scope must avoid claiming Bitcoin Core integration",
