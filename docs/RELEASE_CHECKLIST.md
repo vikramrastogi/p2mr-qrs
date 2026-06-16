@@ -26,13 +26,28 @@ Checklist enforced by the script:
   `scripts/verify_qrs_fixtures.py`, and verifier-reaching vectors are
   cryptographically checked by `scripts/verify_qrs_vectors.py`.
 - `scripts/check_batch_schnorr_baseline.py` regenerates batch-baseline evidence.
+- `scripts/evaluate_resource_accounting.py` regenerates the pass/fail
+  resource-accounting decision from the benchmark report.
 - `docs/RESOURCE_ACCOUNTING_DECISION.md` maps the benchmark evidence to the
   draft resource-accounting decision.
+- `docs/EXPLICIT_QRS_BUDGET_FALLBACK.md` specifies the inactive per-QRS budget
+  fallback if weight-only accounting fails.
+- `docs/BITCOIN_CORE_INTEGRATION_REQUIREMENTS.md` states the exact Core
+  validation-path artifact required before activation.
+- `docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md` and
+  `test_vectors/qrs_transaction_vector.schema.json` define the final serialized
+  vector shape once BIP-360/QRS definitions are final.
+- `docs/REPRODUCIBILITY.md` and the benchmark reproduction issue template
+  define the independent rerun protocol.
 - BIP-360 final dependency is documented.
 - README states package is Draft-stage pre-review.
 
 Manual release blockers:
 
+- Do not claim all caveats are nullified: Core integration, final BIP-360/QRS
+  transaction vectors, reviewed public batch Schnorr, second SLH-DSA
+  implementation, and independent reproduction are external activation
+  blockers until their artifacts exist.
 - Replace provisional structured vectors with final transaction vectors once
   BIP-360 and QRS sighash definitions are final.
 - Treat experimental batch Schnorr only as sensitivity analysis.

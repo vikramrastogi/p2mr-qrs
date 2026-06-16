@@ -39,7 +39,9 @@ Source reports:
 - `out/quick.md`
 - `out/full.md`
 - `out/batch-evidence.md`
+- `out/resource-accounting-decision.md`
 - `scripts/verify_qrs_vectors.py`
+- `scripts/evaluate_resource_accounting.py`
 - `scripts/release_check.sh`
 
 Current sample run metadata from `out/full.json`:
@@ -89,4 +91,5 @@ This conclusion is deliberately narrow:
 
 If future native benchmarks, Bitcoin Core integration, implementation-variance
 checks, or reviewed batch-Schnorr evidence fail the criteria above, the BIP must
-add an explicit per-QRS validation budget before activation.
+add an explicit per-QRS validation budget before activation. The inactive
+fallback design is specified in `docs/EXPLICIT_QRS_BUDGET_FALLBACK.md`.

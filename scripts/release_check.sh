@@ -10,6 +10,8 @@ QUICK_MD="$ROOT/out/quick.md"
 SAMPLE_MD="$ROOT/out/sample-native-report.md"
 BATCH_EVIDENCE="$ROOT/out/batch-evidence.json"
 BATCH_EVIDENCE_MD="$ROOT/out/batch-evidence.md"
+RESOURCE_DECISION_JSON="$ROOT/out/resource-accounting-decision.json"
+RESOURCE_DECISION_MD="$ROOT/out/resource-accounting-decision.md"
 BUILD_DIR="$ROOT/build"
 
 grep -n "Version: 0.9.0" "$BIP"
@@ -18,10 +20,16 @@ grep -n "hypothesis to test" "$BIP"
 grep -n "BIP-360 is still draft" "$BIP"
 grep -n "strong unforgeability" "$BIP"
 grep -n "RESOURCE_ACCOUNTING_DECISION.md" "$BIP"
+grep -n "EXPLICIT_QRS_BUDGET_FALLBACK.md" "$BIP"
 grep -n "adversarial invalid fixed-length" "$BIP"
 grep -n "Draft-stage pre-review" "$ROOT/00_README.md"
 grep -n "Draft-stage pre-review" "$ROOT/README.md"
 grep -n "verify_qrs_vectors.py" "$CHECKLIST"
+grep -n "evaluate_resource_accounting.py" "$CHECKLIST"
+grep -n "EXPLICIT_QRS_BUDGET_FALLBACK.md" "$ROOT/docs/RESOURCE_ACCOUNTING_DECISION.md"
+grep -n "Bitcoin Core validation-path integration not implemented" "$ROOT/docs/BITCOIN_CORE_INTEGRATION_REQUIREMENTS.md"
+grep -n "qrs_transaction_vector.schema.json" "$ROOT/docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md"
+grep -n "docs/REPRODUCIBILITY.md" "$ROOT/.github/ISSUE_TEMPLATE/benchmark-reproduction.yml"
 
 if grep -RniE "QRS is [c]heaper|\\([c]heaper\\)|empirically supported" \
   "$BIP" "$DOSSIER" "$CHECKLIST" "$ROOT/00_README.md" "$ROOT/README.md"; then
@@ -54,6 +62,11 @@ python3 "$ROOT/scripts/assert_quick_report.py" \
   --json "$QUICK_JSON" \
   --markdown "$QUICK_MD" \
   --batch-evidence-json "$BATCH_EVIDENCE"
+python3 "$ROOT/scripts/evaluate_resource_accounting.py" \
+  --report-json "$QUICK_JSON" \
+  --batch-evidence-json "$BATCH_EVIDENCE" \
+  --json "$RESOURCE_DECISION_JSON" \
+  --markdown "$RESOURCE_DECISION_MD"
 
 jq '.benchmarks.slh_dsa_sha2_128s.valid_verify.status' "$QUICK_JSON"
 jq '.benchmarks.schnorr_bip340.individual_valid_verify.status' "$QUICK_JSON"
@@ -63,6 +76,10 @@ jq '.benchmarks.qrs_validation_path.total_valid.status' "$QUICK_JSON"
 jq '.environment.git_commit' "$QUICK_JSON"
 jq '.environment.working_tree_dirty' "$QUICK_JSON"
 jq '.environment.benchmark_binary_build_mode' "$QUICK_JSON"
+jq '.draft_rule_status' "$RESOURCE_DECISION_JSON"
+jq '.activation_ready' "$RESOURCE_DECISION_JSON"
+jq '.explicit_qrs_budget_required' "$RESOURCE_DECISION_JSON"
+grep -n "Pass/Fail Conclusion" "$RESOURCE_DECISION_MD"
 grep -n "median of per-batch means" "$QUICK_MD"
 
 echo "release checklist passed"

@@ -46,7 +46,9 @@ def is_hex_string(value: object) -> bool:
 
 
 def load_vectors(vectors_dir: Path) -> list[tuple[Path, dict]]:
-    paths = sorted(vectors_dir.glob("qrs_*.json"))
+    paths = sorted(
+        path for path in vectors_dir.glob("qrs_*.json") if not path.name.endswith(".schema.json")
+    )
     if not paths:
         raise VectorError(f"no qrs_*.json vectors found under {vectors_dir}")
     return [(path, json.loads(path.read_text(encoding="utf-8"))) for path in paths]

@@ -16,6 +16,11 @@ structured transaction fields, spent output scriptPubKey, witness stack,
 `qrs_public_key`, `qrs_signature`, `control_block`, `expected_leaf_hash`,
 `expected_qrs_msg`, `expected_result`, and `failure_stage`.
 
+The final serialized transaction-vector schema is defined in
+`qrs_transaction_vector.schema.json` and documented in
+`../docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md`. It is not populated yet because
+the final BIP-360/QRS sighash and hashing definitions do not exist yet.
+
 The important invariant in this directory is failure-stage classification:
 structural invalid cases must fail before SLH-DSA verification, while
 `qrs_invalid_signature_fixed_length.json` must reach the verifier and fail

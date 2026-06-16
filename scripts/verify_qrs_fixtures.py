@@ -199,7 +199,9 @@ def main() -> int:
     parser.add_argument("--update", action="store_true")
     args = parser.parse_args()
 
-    paths = sorted(args.vectors.glob("qrs_*.json"))
+    paths = sorted(
+        path for path in args.vectors.glob("qrs_*.json") if not path.name.endswith(".schema.json")
+    )
     if not paths:
         raise FixtureError(f"no qrs_*.json fixtures found under {args.vectors}")
     verified = [verify_one(path, args.update) for path in paths]

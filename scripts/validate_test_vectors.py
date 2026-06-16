@@ -119,7 +119,9 @@ def main() -> int:
     parser.add_argument("vectors", type=Path)
     args = parser.parse_args()
 
-    paths = sorted(args.vectors.glob("qrs_*.json"))
+    paths = sorted(
+        path for path in args.vectors.glob("qrs_*.json") if not path.name.endswith(".schema.json")
+    )
     if len(paths) < 10:
         raise AssertionError("expected at least 10 QRS vectors")
     vectors = [validate_vector(path) for path in paths]

@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/vikramrastogi/p2mr-qrs/test_vectors/qrs_transaction_vector.schema.json",
+  "title": "P2MR QRS final serialized transaction vector",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "name",
+    "bip360_revision",
+    "qrs_bip_revision",
+    "raw_spending_transaction_hex",
+    "input_index",
+    "spent_outputs",
+    "spent_output_scriptPubKey",
+    "witness_stack",
+    "annex",
+    "qrs_leaf_version",
+    "qrs_ext_flag",
+    "qrs_hash_type",
+    "qrs_public_key",
+    "qrs_signature",
+    "control_block",
+    "leaf_hash",
+    "qrs_msg",
+    "expected_result",
+    "failure_stage",
+    "reaches_slh_dsa_verifier"
+  ],
+  "properties": {
+    "name": { "type": "string", "minLength": 1 },
+    "bip360_revision": { "type": "string", "minLength": 1 },
+    "qrs_bip_revision": { "type": "string", "minLength": 1 },
+    "raw_spending_transaction_hex": { "$ref": "#/$defs/hex" },
+    "input_index": { "type": "integer", "minimum": 0 },
+    "spent_outputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["amount_sats", "script_pubkey"],
+        "properties": {
+          "amount_sats": { "type": "integer", "minimum": 0 },
+          "script_pubkey": { "$ref": "#/$defs/hex" }
+        }
+      }
+    },
+    "spent_output_scriptPubKey": { "$ref": "#/$defs/hex" },
+    "witness_stack": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/hex" }
+    },
+    "annex": { "$ref": "#/$defs/hex" },
+    "qrs_leaf_version": { "type": "string", "pattern": "^[0-9a-f]{2}$" },
+    "qrs_ext_flag": { "type": "integer", "const": 2 },
+    "qrs_hash_type": { "type": "string", "pattern": "^[0-9a-f]{2}$" },
+    "qrs_public_key": { "$ref": "#/$defs/hex" },
+    "qrs_signature": { "$ref": "#/$defs/hex" },
+    "control_block": { "$ref": "#/$defs/hex" },
+    "leaf_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "qrs_msg": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "expected_result": { "type": "boolean" },
+    "failure_stage": {
+      "type": "string",
+      "enum": [
+        "none",
+        "signature_length",
+        "public_key_length",
+        "control_block_length",
+        "control_low_bit",
+        "leaf_version",
+        "merkle_root_mismatch",
+        "malformed_witness",
+        "slh_dsa_verify"
+      ]
+    },
+    "reaches_slh_dsa_verifier": { "type": "boolean" }
+  },
+  "$defs": {
+    "hex": {
+      "type": "string",
+      "pattern": "^(?:[0-9a-f]{2})*$"
+    }
+  }
+}

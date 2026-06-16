@@ -71,13 +71,21 @@ jobs:
             --markdown out/quick.md \
             --batch-evidence-json out/batch-evidence.json \
             "${extra_args[@]}"
+          python3 scripts/evaluate_resource_accounting.py \
+            --report-json out/quick.json \
+            --batch-evidence-json out/batch-evidence.json \
+            --json out/resource-accounting-decision.json \
+            --markdown out/resource-accounting-decision.md \
+            "${extra_args[@]}"
           jq '.benchmarks.schnorr_bip340.batch.status' out/quick.json
           jq '.benchmarks.schnorr_bip340.batch_experimental_valid.status' out/quick.json
           jq '.benchmarks.schnorr_bip340.batch_reviewed_public_api_status' out/quick.json
+          jq '.draft_rule_status' out/resource-accounting-decision.json
           grep -n "experimental native BIP-340 batch baseline" out/quick.md
           grep -n "not a reviewed public libsecp256k1 API" out/quick.md
           grep -n "QRS vs experimental batch Schnorr" out/quick.md
           grep -n "reviewed public batch" out/quick.md
+          grep -n "Pass/Fail Conclusion" out/resource-accounting-decision.md
 
       - name: Upload benchmark reports
         uses: actions/upload-artifact@v4
@@ -88,3 +96,5 @@ jobs:
             out/quick.md
             out/batch-evidence.json
             out/batch-evidence.md
+            out/resource-accounting-decision.json
+            out/resource-accounting-decision.md

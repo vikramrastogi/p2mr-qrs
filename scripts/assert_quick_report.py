@@ -138,10 +138,16 @@ def main() -> int:
             slh["invalid_fixed_length_verify"]["status"] == "available",
             "invalid fixed-length SLH timing missing",
         )
+        case_names = set(slh["invalid_fixed_length_cases"].keys())
         require(
-            len(slh["invalid_fixed_length_cases"]) >= 7,
+            len(case_names) >= 9,
             "invalid fixed-length SLH timing suite must include adversarial mutations",
         )
+        for case_name in ["wrong_message", "wrong_public_key"]:
+            require(
+                case_name in case_names,
+                f"invalid fixed-length SLH timing suite must include {case_name}",
+            )
         for key in [
             "invalid_fixed_length_min_observed",
             "invalid_fixed_length_best_observed",
