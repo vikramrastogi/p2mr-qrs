@@ -105,6 +105,11 @@ The release gate validates freshly generated reports under `build/release-check/
 checked-in `out/` files are sample artifacts unless refreshed with
 `QRS_RELEASE_UPDATE_ARTIFACTS=1` and committed.
 
+GitHub Actions structural smoke checks are not full release evidence when the
+runner lacks an OpenSSL provider exposing `SLH-DSA-SHA2-128s`. Strict release
+evidence requires the macOS release-check job or a local
+`bash scripts/release_check.sh` run with OpenSSL 3.5+ exposing that algorithm.
+
 For stricter publication evidence, run `bash scripts/full_release_check.sh`.
 This omits advisory mode and fails if the current benchmark evidence requires
 an explicit QRS validation budget or leaves the resource-accounting decision
