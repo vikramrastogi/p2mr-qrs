@@ -20,6 +20,12 @@ hardware:
   baseline. If the experimental batch path is slower than individual Schnorr,
   it is still useful implementation evidence, but it does not test the
   batch-risk objection.
+- A measured experimental batch implementation that is slower than individual
+  Schnorr is not favorable evidence for QRS. In that case, the experimental
+  batch result does not tighten the baseline and the resource-accounting
+  question remains unresolved for activation. The decision record therefore
+  separately reports hypothetical reviewed-batch speedups over individual
+  Schnorr.
 - Reviewed public batch Schnorr status is reported explicitly. If unavailable,
   the package must say so and must not synthesize a fake baseline from assumed
   speedups.
@@ -29,7 +35,7 @@ Decision language:
 - If QRS valid and worst-invalid p99 are below individual Schnorr and below an
   experimental batch Schnorr p99 that tightens the individual baseline on named
   hardware, the generated status is
-  `supports_no_additional_budget_for_draft`.
+  `supports_no_additional_budget_for_draft_review`.
 - If QRS exceeds experimental batch but not individual Schnorr, resource
   accounting remains unresolved for activation and the generated status is
   `unresolved_requires_reviewer_decision`.

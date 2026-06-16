@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any
 
 
-HYPOTHETICAL_BATCH_SPEEDUPS = (2.0, 2.5, 3.0, 4.0)
+HYPOTHETICAL_BATCH_SPEEDUPS = (1.5, 2.0, 2.5, 3.0, 4.0, 5.0)
 
 
 class DecisionError(AssertionError):
@@ -138,6 +138,10 @@ def render_markdown(decision: dict[str, Any]) -> str:
                 "Hypothetical batch speedups are sensitivity analysis only; no fake batch baseline is synthesized.",
             ),
             "",
+            "If the experimental batch baseline is slower than individual Schnorr, "
+            "it is reported as non-tightening and cannot support the "
+            "no-additional-budget rule for activation review.",
+            "",
         ]
     )
     if sensitivity.get("status") == "available":
@@ -258,7 +262,7 @@ def evaluate(report: dict[str, Any], batch_evidence: dict[str, Any], allow_unava
         if missing_metadata:
             blockers.append("Report metadata incomplete: " + ", ".join(missing_metadata) + ".")
         if allow_unavailable_qrs and (slh_status != "available" or qrs_path_status != "available"):
-            draft_status = "unresolved_requires_reviewer_decision"
+            draft_status = "not_evaluable_on_this_platform"
             fallback_status = "not_evaluable_on_this_platform"
             conclusion = "QRS evidence is incomplete on this platform."
             explicit_required = False
@@ -369,7 +373,7 @@ def evaluate(report: dict[str, Any], batch_evidence: dict[str, Any], allow_unava
                 "resource accounting remains unresolved for activation."
             )
     else:
-        draft_status = "supports_no_additional_budget_for_draft"
+        draft_status = "supports_no_additional_budget_for_draft_review"
         fallback_status = "not_required_by_current_draft_evidence"
         conclusion = (
             "Current native evidence supports continuing with the no-additional-budget "

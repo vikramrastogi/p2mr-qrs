@@ -1,7 +1,6 @@
 # P2MR SLH-DSA Leaf Pre-Review Package
 
-Status: Draft-stage pre-review package for v0.9.0. This is not
-activation-ready consensus evidence.
+Status: Draft-stage pre-review package for v0.9.0. This is not activation-ready consensus evidence.
 
 This repository contains a proposed BIP draft and native benchmark package for
 one P2MR-only SLH-DSA-SHA2-128s leaf. The package is intended to make review
