@@ -100,6 +100,73 @@ def build_batch_sensitivity(
     }
 
 
+def build_fallback_triggers(
+    qrs_valid: float | None,
+    qrs_invalid: float | None,
+    schnorr_individual: float | None,
+    reviewed_batch: float | None,
+) -> dict[str, Any]:
+    triggers: list[dict[str, Any]] = []
+    if qrs_valid is None or qrs_invalid is None or schnorr_individual is None:
+        return {
+            "status": "unavailable",
+            "policy": "fallback trigger evaluation requires QRS and individual Schnorr p99 estimates.",
+            "triggers": triggers,
+        }
+
+    qrs_worst = max(qrs_valid, qrs_invalid)
+
+    def add(name: str, threshold: float | None, detail: str) -> None:
+        triggers.append(
+            {
+                "name": name,
+                "triggered": None if threshold is None else qrs_worst > threshold,
+                "threshold_p99_ms": threshold,
+                "qrs_worst_p99_ms": qrs_worst,
+                "detail": detail,
+            }
+        )
+
+    add(
+        "qrs_worst_exceeds_individual_schnorr",
+        schnorr_individual,
+        "fallback trigger if QRS worst-invalid p99 exceeds individual Schnorr p99",
+    )
+    add(
+        "qrs_worst_exceeds_2_5x_hypothetical_reviewed_batch_schnorr",
+        schnorr_individual / 2.5,
+        "fallback trigger if QRS worst-invalid p99 exceeds a 2.5x hypothetical reviewed-batch-Schnorr baseline",
+    )
+    add(
+        "qrs_worst_exceeds_3_0x_hypothetical_reviewed_batch_schnorr",
+        schnorr_individual / 3.0,
+        "fallback trigger if QRS worst-invalid p99 exceeds a 3.0x hypothetical reviewed-batch-Schnorr baseline",
+    )
+    add(
+        "qrs_worst_exceeds_reviewed_public_batch_schnorr",
+        reviewed_batch,
+        "fallback trigger if a reviewed public batch-Schnorr implementation becomes available and QRS exceeds it",
+    )
+    triggers.append(
+        {
+            "name": "bitcoin_core_validation_path_overhead",
+            "triggered": None,
+            "threshold_p99_ms": None,
+            "qrs_worst_p99_ms": qrs_worst,
+            "detail": "fallback trigger requires Bitcoin Core validation-path integration evidence; current harness models that path only",
+        }
+    )
+
+    return {
+        "status": "available",
+        "policy": (
+            "Fallback trigger checks identify when the inactive explicit QRS budget "
+            "must be reconsidered before activation."
+        ),
+        "triggers": triggers,
+    }
+
+
 def render_markdown(decision: dict[str, Any]) -> str:
     lines = [
         "# Resource Accounting Evaluation",
@@ -177,6 +244,32 @@ def render_markdown(decision: dict[str, Any]) -> str:
             )
     else:
         lines.append(f"- unavailable: {sensitivity.get('reason', 'unknown')}")
+    fallback = decision.get("fallback_triggers", {})
+    lines.extend(
+        [
+            "",
+            "## Fallback Trigger Checks",
+            "",
+            fallback.get(
+                "policy",
+                "Fallback trigger evaluation is unavailable for this report.",
+            ),
+            "",
+            "| Fallback trigger | Triggered | Threshold p99 ms | QRS worst p99 ms | Detail |",
+            "| --- | --- | ---: | ---: | --- |",
+        ]
+    )
+    for item in fallback.get("triggers", []):
+        threshold = item.get("threshold_p99_ms")
+        qrs_worst = item.get("qrs_worst_p99_ms")
+        triggered = item.get("triggered")
+        lines.append(
+            f"| {item['name']} | "
+            f"{'unavailable' if triggered is None else str(triggered).lower()} | "
+            f"{'unavailable' if threshold is None else f'{threshold:.3f}'} | "
+            f"{'unavailable' if qrs_worst is None else f'{qrs_worst:.3f}'} | "
+            f"{item['detail']} |"
+        )
     lines.extend(["", "## Activation Blockers", ""])
     for blocker in decision["activation_blockers"]:
         lines.append(f"- {blocker}")
@@ -288,6 +381,7 @@ def evaluate(report: dict[str, Any], batch_evidence: dict[str, Any], allow_unava
                 "reviewed_public_batch_schnorr_saturated_block": None,
             },
             "batch_sensitivity": build_batch_sensitivity(None, None, None, None),
+            "fallback_triggers": build_fallback_triggers(None, None, None, None),
             "checks": checks,
             "activation_blockers": blockers,
         }
@@ -396,6 +490,9 @@ def evaluate(report: dict[str, Any], batch_evidence: dict[str, Any], allow_unava
         },
         "batch_sensitivity": build_batch_sensitivity(
             qrs_valid, qrs_invalid, schnorr_individual, experimental_batch
+        ),
+        "fallback_triggers": build_fallback_triggers(
+            qrs_valid, qrs_invalid, schnorr_individual, reviewed_batch
         ),
         "checks": checks,
         "activation_blockers": blockers,

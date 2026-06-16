@@ -252,10 +252,20 @@ void select_invalid_summary_stats(SlhDsaResult& r) {
 
 SlhDsaResult run_slh_dsa_benchmarks(BenchmarkMode mode) {
   SlhDsaResult r;
+  SlhDsaBackendInfo openssl_backend;
+  openssl_backend.name = "openssl";
+  SlhDsaBackendInfo second_backend;
+  second_backend.name = "second_reviewed_backend";
+  second_backend.status = "unavailable";
+  second_backend.reason = "second reviewed SLH-DSA backend not wired";
+  second_backend.provider = "unavailable";
+  second_backend.version = "unavailable";
 
 #if !defined(QRS_BENCH_HAVE_OPENSSL)
   r.status = "unavailable";
   r.reason = "built without OpenSSL";
+  openssl_backend.status = "unavailable";
+  openssl_backend.reason = r.reason;
   r.valid_verify.status = "unavailable";
   r.invalid_fixed_length_verify.status = "unavailable";
   r.invalid_fixed_length_min_observed.status = "unavailable";
@@ -263,14 +273,18 @@ SlhDsaResult run_slh_dsa_benchmarks(BenchmarkMode mode) {
   r.invalid_fixed_length_median_observed.status = "unavailable";
   r.invalid_fixed_length_p99_observed.status = "unavailable";
   r.invalid_fixed_length_worst_observed.status = "unavailable";
+  r.backends = {openssl_backend, second_backend};
   return r;
 #else
   r.openssl_version = OpenSSL_version(OPENSSL_VERSION);
+  openssl_backend.version = r.openssl_version;
   try {
     auto key = generate_key();
     r.provider = provider_name(key.get());
+    openssl_backend.provider = r.provider;
     const std::vector<unsigned char> raw_pub = raw_public_key(key.get());
     r.public_key_bytes = raw_pub.size();
+    openssl_backend.public_key_bytes = raw_pub.size();
     if (raw_pub.size() != 32) {
       throw std::runtime_error("SLH-DSA-SHA2-128s public key length was " +
                                std::to_string(raw_pub.size()) + ", expected 32");
@@ -286,6 +300,7 @@ SlhDsaResult run_slh_dsa_benchmarks(BenchmarkMode mode) {
                                std::to_string(sig.size()) + ", expected 7856");
     }
     r.signature_bytes = sig.size();
+    openssl_backend.signature_bytes = sig.size();
     r.mode = slh_dsa_mode();
     if (!verify_message(public_key.get(), msg, sig)) {
       throw std::runtime_error("valid SLH-DSA signature failed before timing");
@@ -326,10 +341,18 @@ SlhDsaResult run_slh_dsa_benchmarks(BenchmarkMode mode) {
 
     r.status = "available";
     r.reason = "";
+    openssl_backend.status = "available";
+    openssl_backend.reason = "";
+    r.backends = {openssl_backend, second_backend};
     return r;
   } catch (const std::exception& e) {
     r.status = "unavailable";
     r.reason = e.what();
+    openssl_backend.status = "unavailable";
+    openssl_backend.reason = r.reason;
+    openssl_backend.provider = r.provider;
+    openssl_backend.public_key_bytes = r.public_key_bytes;
+    openssl_backend.signature_bytes = r.signature_bytes;
     r.valid_verify.status = "unavailable";
     r.invalid_fixed_length_verify.status = "unavailable";
     r.invalid_fixed_length_min_observed.status = "unavailable";
@@ -337,6 +360,7 @@ SlhDsaResult run_slh_dsa_benchmarks(BenchmarkMode mode) {
     r.invalid_fixed_length_median_observed.status = "unavailable";
     r.invalid_fixed_length_p99_observed.status = "unavailable";
     r.invalid_fixed_length_worst_observed.status = "unavailable";
+    r.backends = {openssl_backend, second_backend};
     return r;
   }
 #endif

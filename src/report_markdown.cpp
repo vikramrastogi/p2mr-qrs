@@ -89,6 +89,18 @@ std::string render_markdown(const Environment& env,
   o << "- `SLH-DSA signature bytes`: " << slh.signature_bytes << "\n";
   o << "- `libsecp256k1`: " << schnorr.libsecp256k1_commit << "\n\n";
 
+  o << "## SLH-DSA Backend Status\n\n";
+  o << "| Backend | Status | Provider | Version | Public key bytes | Signature bytes | Reason |\n";
+  o << "|---|---:|---|---|---:|---:|---|\n";
+  for (const auto& backend : slh.backends) {
+    o << "| " << backend.name << " | " << backend.status << " | " << backend.provider
+      << " | " << backend.version << " | " << backend.public_key_bytes << " | "
+      << backend.signature_bytes << " | " << backend.reason << " |\n";
+  }
+  o << "\nThe second reviewed SLH-DSA backend is reported separately from the OpenSSL "
+       "backend; it remains unavailable until a reviewed/pinned verifier strategy "
+       "is wired for cross-backend agreement.\n\n";
+
   o << "## Raw Timing Table\n\n";
   o << "Timing statistics are computed as the median of per-batch means, p95 of "
        "per-batch means, p99 of per-batch means, and max of per-batch means; "

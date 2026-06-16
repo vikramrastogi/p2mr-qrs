@@ -100,6 +100,25 @@ void json_named_stats(std::ostringstream& o, const std::vector<NamedStats>& name
   o << pad << "}";
 }
 
+void json_slh_backends(std::ostringstream& o,
+                       const std::vector<SlhDsaBackendInfo>& backends,
+                       int indent) {
+  const std::string pad(indent, ' ');
+  o << "{\n";
+  for (std::size_t i = 0; i < backends.size(); ++i) {
+    const auto& b = backends[i];
+    o << pad << "  \"" << esc(b.name) << "\": {\n";
+    o << pad << "    \"status\": \"" << esc(b.status) << "\",\n";
+    o << pad << "    \"reason\": \"" << esc(b.reason) << "\",\n";
+    o << pad << "    \"provider\": \"" << esc(b.provider) << "\",\n";
+    o << pad << "    \"version\": \"" << esc(b.version) << "\",\n";
+    o << pad << "    \"public_key_bytes\": " << b.public_key_bytes << ",\n";
+    o << pad << "    \"signature_bytes\": " << b.signature_bytes << "\n";
+    o << pad << "  }" << (i + 1 == backends.size() ? "\n" : ",\n");
+  }
+  o << pad << "}";
+}
+
 }  // namespace
 
 std::string render_json(const Environment& env,
@@ -130,6 +149,9 @@ std::string render_json(const Environment& env,
   o << "      \"mode\": \"" << esc(slh.mode) << "\",\n";
   o << "      \"public_key_bytes\": " << slh.public_key_bytes << ",\n";
   o << "      \"signature_bytes\": " << slh.signature_bytes << ",\n";
+  o << "      \"backends\": ";
+  json_slh_backends(o, slh.backends, 6);
+  o << ",\n";
   o << "      \"valid_verify\": ";
   json_stats(o, slh.valid_verify, 6);
   o << ",\n      \"invalid_fixed_length_verify\": ";

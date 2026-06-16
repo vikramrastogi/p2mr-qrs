@@ -80,7 +80,8 @@ experimental batch verification.
 
 The BIP requires BIP-360 and remains blocked on final BIP-360 definitions for
 P2MR hashing, sighash tagging, annex handling, and future-leaf behavior. The
-vectors are marked provisional for the same reason.
+vectors are marked provisional for the same reason. The dependency closure table
+is `BIP360_DEPENDENCY_MATRIX.md`.
 
 BIP-360's reference material includes exploratory P2MR/PQC examples using
 SLH-DSA in script-like leaves. This package does not claim to invent the general
@@ -100,6 +101,12 @@ that reaches the modeled SLH-DSA verifier boundary. The model now uses the
 current BIP's structural preimage shape where possible: length-prefixed TapLeaf
 payloads, TapBranch paths, and a TapSighash message over a SigMsg-shaped
 ext_flag=2 fixture payload plus `leaf_hash`.
+
+`scripts/compute_qrs_digest_model.py` computes the byte-level provisional QRS
+digest model without canonical JSON. `src/qrs_digest_model.cpp` implements the
+same model in the native binary, and `scripts/check_qrs_digest_agreement.py`
+checks cross-implementation agreement on `leaf_hash`, `merkle_root`, and
+`qrs_msg`.
 
 The fixture verifier includes a regression self-test proving the executable
 leaf-hash fixture uses the BIP-form TapLeaf preimage with CompactSize length
@@ -122,6 +129,15 @@ Native OpenSSL SLH-DSA-SHA2-128s, native individual libsecp256k1 BIP-340, and
 experimental native batch BIP-340 are measured. The QRS validation-path section
 is a model, not Bitcoin Core integration. The artifact required to close that
 caveat is specified in `BITCOIN_CORE_INTEGRATION_REQUIREMENTS.md`.
+
+The report now lists SLH-DSA backend status explicitly. Consensus readiness
+requires a reviewed/pinned verifier strategy and cross-backend agreement.
+OpenSSL EVP is pre-review evidence, not by itself final consensus dependency
+selection. The second reviewed SLH-DSA backend remains unavailable in this
+package.
+
+Verifier cost review also needs algorithmic worst-case analysis, not only
+empirical timing evidence. See `SLH_DSA_VERIFY_COST_ANALYSIS.md`.
 
 ## Resource-accounting decision status
 
@@ -146,7 +162,7 @@ validation weight rather than a witness discount.
 `REPRODUCIBILITY.md` defines the independent rerun protocol and the repository
 includes a benchmark-reproduction issue template. Local sample reports are not
 independent evidence until another reviewer attaches comparable raw JSON and
-Markdown artifacts.
+Markdown artifacts. The platform target table is `REPRODUCTION_MATRIX.md`.
 
 ## Objection map
 

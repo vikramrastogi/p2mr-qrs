@@ -1,0 +1,43 @@
+name: QRS SigMsg review
+description: Review the QRS digest, SigMsg shape, and ext_flag assignment.
+title: "Review: QRS SigMsg / ext_flag=2 construction"
+labels:
+  - review
+  - sighash
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for review of the provisional byte-level QRS digest model and the final transaction-digest requirements.
+  - type: textarea
+    id: objection_or_confirmation
+    attributes:
+      label: Objection or confirmation
+      description: State whether the ext_flag=2 construction is acceptable or what must change.
+    validations:
+      required: true
+  - type: input
+    id: affected_section
+    attributes:
+      label: Affected file or section
+      placeholder: scripts/compute_qrs_digest_model.py, src/qrs_digest_model.cpp, docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md
+    validations:
+      required: true
+  - type: textarea
+    id: proposed_fix
+    attributes:
+      label: Proposed fix or evidence
+      description: Include expected digest bytes, vector changes, or implementation notes.
+    validations:
+      required: false
+  - type: dropdown
+    id: blocking_level
+    attributes:
+      label: Blocking level
+      options:
+        - blocking Draft pre-review
+        - blocking Draft completion
+        - blocking activation
+        - non-blocking
+    validations:
+      required: true

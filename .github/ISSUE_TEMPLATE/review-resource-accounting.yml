@@ -1,0 +1,43 @@
+name: Resource-accounting review
+description: Review QRS validation cost, fallback triggers, and batch-Schnorr sensitivity.
+title: "Review: Resource accounting and batch-Schnorr sensitivity"
+labels:
+  - review
+  - benchmark
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for timing evidence, batch-Schnorr sensitivity, fallback trigger, and explicit-budget feedback.
+  - type: textarea
+    id: objection_or_confirmation
+    attributes:
+      label: Objection or confirmation
+      description: State whether the current decision gate is sufficient for Draft review or what evidence is missing.
+    validations:
+      required: true
+  - type: input
+    id: affected_section
+    attributes:
+      label: Affected file or section
+      placeholder: scripts/evaluate_resource_accounting.py, docs/RESOURCE_ACCOUNTING_DECISION.md, out/*.json
+    validations:
+      required: true
+  - type: textarea
+    id: proposed_fix
+    attributes:
+      label: Proposed fix or evidence
+      description: Attach benchmark artifacts or describe a threshold/policy change.
+    validations:
+      required: false
+  - type: dropdown
+    id: blocking_level
+    attributes:
+      label: Blocking level
+      options:
+        - blocking Draft pre-review
+        - blocking Draft completion
+        - blocking activation
+        - non-blocking
+    validations:
+      required: true

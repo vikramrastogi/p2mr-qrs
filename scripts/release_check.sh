@@ -83,6 +83,30 @@ grep -n "EXPLICIT_QRS_BUDGET_FALLBACK.md" "$ROOT/docs/RESOURCE_ACCOUNTING_DECISI
 grep -n "Bitcoin Core validation-path integration not implemented" "$ROOT/docs/BITCOIN_CORE_INTEGRATION_REQUIREMENTS.md"
 grep -n "qrs_transaction_vector.schema.json" "$ROOT/docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md"
 grep -n "docs/REPRODUCIBILITY.md" "$ROOT/.github/ISSUE_TEMPLATE/benchmark-reproduction.yml"
+grep -n "BIP360_DEPENDENCY_MATRIX.md" "$ROOT/README.md" "$BIP" "$DOSSIER" "$ROOT/docs/PUBLIC_REVIEW_READINESS.md"
+grep -n "future leaf version behavior" "$ROOT/docs/BIP360_DEPENDENCY_MATRIX.md"
+grep -n "SigMsg extension behavior" "$ROOT/docs/BIP360_DEPENDENCY_MATRIX.md"
+grep -n "REPRODUCTION_MATRIX.md" "$ROOT/README.md" "$ROOT/docs/RELEASE_CHECKLIST.md" "$ROOT/docs/REPRODUCIBILITY.md"
+grep -n "Apple Silicon macOS" "$ROOT/docs/REPRODUCTION_MATRIX.md"
+grep -n "Linux x86_64" "$ROOT/docs/REPRODUCTION_MATRIX.md"
+grep -n "minimum public-pre-review target" "$ROOT/docs/REPRODUCTION_MATRIX.md"
+grep -n "pre-activation target" "$ROOT/docs/REPRODUCTION_MATRIX.md"
+grep -n "SLH_DSA_VERIFY_COST_ANALYSIS.md" "$ROOT/README.md" "$DOSSIER" "$ROOT/docs/RESOURCE_ACCOUNTING_DECISION.md" "$ROOT/docs/REPRODUCIBILITY.md"
+grep -n "empirical timing evidence" "$ROOT/docs/SLH_DSA_VERIFY_COST_ANALYSIS.md"
+grep -n "algorithmic worst-case" "$ROOT/docs/SLH_DSA_VERIFY_COST_ANALYSIS.md"
+grep -n "random bit flips are not a proof" "$ROOT/docs/SLH_DSA_VERIFY_COST_ANALYSIS.md"
+grep -n "PUBLIC_REVIEW_POST_DRAFT.md" "$ROOT/README.md" "$ROOT/docs/PUBLIC_REVIEW_READINESS.md" "$CHECKLIST"
+grep -n "not activation-ready" "$ROOT/docs/PUBLIC_REVIEW_POST_DRAFT.md"
+grep -n "legacy-output policy" "$ROOT/docs/PUBLIC_REVIEW_POST_DRAFT.md"
+grep -n "ext_flag=2" "$ROOT/docs/PUBLIC_REVIEW_POST_DRAFT.md"
+grep -n "batch-Schnorr sensitivity" "$ROOT/docs/PUBLIC_REVIEW_POST_DRAFT.md"
+grep -n "compute_qrs_digest_model.py" "$ROOT/docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md" "$DOSSIER" "$CHECKLIST"
+grep -n "cross-implementation" "$ROOT/docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md" "$DOSSIER" "$CHECKLIST"
+grep -n "second reviewed SLH-DSA backend" "$DOSSIER"
+grep -n "2.5x hypothetical reviewed-batch-Schnorr baseline" "$ROOT/docs/EXPLICIT_QRS_BUDGET_FALLBACK.md" "$ROOT/docs/RESOURCE_ACCOUNTING_DECISION.md"
+grep -n "reviewed public batch-Schnorr implementation becomes available" "$ROOT/docs/EXPLICIT_QRS_BUDGET_FALLBACK.md" "$ROOT/docs/RESOURCE_ACCOUNTING_DECISION.md"
+grep -n "fallback trigger" "$ROOT/docs/EXPLICIT_QRS_BUDGET_FALLBACK.md" "$ROOT/docs/RESOURCE_ACCOUNTING_DECISION.md"
+grep -Rni "blocking Draft pre-review" "$ROOT/.github/ISSUE_TEMPLATE"
 PRIVATE_SCAFFOLD_A="$ROOT/co""dex-specs"
 PRIVATE_SCAFFOLD_B="$ROOT/qrs-pre-review-hardening"
 if [ -e "$PRIVATE_SCAFFOLD_A" ] || [ -e "$PRIVATE_SCAFFOLD_B" ]; then
@@ -126,12 +150,16 @@ grep -n "No legacy-output policy" "$DOSSIER"
 grep -n "Batch Schnorr" "$DOSSIER"
 grep -n "Known blockers before advancing beyond Draft" "$DOSSIER"
 
+python3 "$ROOT/scripts/compute_qrs_digest_model.py" "$ROOT/test_vectors"
 python3 "$ROOT/scripts/validate_test_vectors.py" "$ROOT/test_vectors"
 python3 "$ROOT/scripts/verify_qrs_fixtures.py" "$ROOT/test_vectors"
 python3 "$ROOT/scripts/run_qrs_negative_tests.py"
 
 cmake -S "$ROOT" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release
 cmake --build "$BUILD_DIR" -j
+python3 "$ROOT/scripts/check_qrs_digest_agreement.py" \
+  "$ROOT/test_vectors" \
+  --binary "$BUILD_DIR/qrs_native_bench"
 
 mkdir -p "$TMP_DIR"
 BATCH_EVIDENCE_ARGS=(
@@ -206,6 +234,7 @@ python3 "$ROOT/scripts/evaluate_resource_accounting.py" \
   --advisory
 
 jq '.benchmarks.slh_dsa_sha2_128s.valid_verify.status' "$QUICK_JSON"
+jq '.benchmarks.slh_dsa_sha2_128s.backends.second_reviewed_backend.status' "$QUICK_JSON"
 jq '.benchmarks.schnorr_bip340.individual_valid_verify.status' "$QUICK_JSON"
 jq '.benchmarks.schnorr_bip340.batch_reviewed_public_api.status' "$QUICK_JSON"
 jq '.benchmarks.schnorr_bip340.batch_experimental.status' "$QUICK_JSON"
@@ -227,9 +256,12 @@ jq '.explicit_qrs_budget_required' "$RESOURCE_DECISION_JSON"
 jq '.batch_sensitivity.status' "$RESOURCE_DECISION_JSON"
 grep -n "Pass/Fail Conclusion" "$RESOURCE_DECISION_MD"
 grep -n "Batch-Speedup Sensitivity" "$RESOURCE_DECISION_MD"
+grep -n "Fallback Trigger Checks" "$RESOURCE_DECISION_MD"
+grep -n "fallback trigger" "$RESOURCE_DECISION_MD"
 grep -n "Hypothetical batch speedups are sensitivity analysis only" "$RESOURCE_DECISION_MD"
 grep -n "does not establish activation readiness" "$RESOURCE_DECISION_MD"
 grep -n "median of per-batch means" "$QUICK_MD"
+grep -n "second reviewed SLH-DSA backend" "$QUICK_MD"
 grep -n "BIP-340 challenge self-test" "$QUICK_MD" "$DOSSIER"
 
 echo "release checklist passed"

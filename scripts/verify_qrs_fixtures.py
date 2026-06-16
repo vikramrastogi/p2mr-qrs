@@ -20,6 +20,8 @@ import re
 import sys
 from pathlib import Path
 
+from compute_qrs_digest_model import compute_vector_digest  # type: ignore
+
 
 QRS_LEAF_VERSION = 0xC2
 QRS_HASH_TYPE = 0x00
@@ -47,10 +49,6 @@ def fail(path: Path, message: str) -> None:
 def tagged_hash(tag: str, payload: bytes) -> bytes:
     tag_hash = hashlib.sha256(tag.encode("ascii")).digest()
     return hashlib.sha256(tag_hash + tag_hash + payload).digest()
-
-
-def canonical_json(value: object) -> bytes:
-    return json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
 
 
 def compact_size(value: int) -> bytes:
@@ -127,28 +125,9 @@ def merkle_root(leaf_hash: bytes, control_block: bytes) -> bytes:
     return root
 
 
-def modeled_sigmsg(data: dict, annex: bytes, path: Path) -> bytes:
-    """Return a deterministic SigMsg-shaped fixture payload.
-
-    This is not a final BIP-341 transaction digest. It intentionally mirrors the
-    current QRS draft's structural pieces: hash_type, spend_type for ext_flag=2,
-    transaction/spent-output/annex commitments, and a separate leaf_hash
-    extension appended by modeled_qrs_msg().
-    """
-
-    annex_present = 1 if annex else 0
-    spend_type = QRS_EXT_FLAG * 2 + annex_present
-    tx_digest = tagged_hash("QRSFixtureTransaction/v0.9.0", canonical_json(data["transaction"]))
-    spent_output_digest = tagged_hash(
-        "QRSFixtureSpentOutput/v0.9.0",
-        hex_bytes(data["spent_output_scriptPubKey"], path, "spent_output_scriptPubKey"),
-    )
-    annex_digest = tagged_hash("QRSFixtureAnnex/v0.9.0", annex)
-    return bytes([QRS_HASH_TYPE, spend_type]) + tx_digest + spent_output_digest + annex_digest
-
-
 def modeled_qrs_msg(data: dict, leaf_hash: bytes, annex: bytes, path: Path) -> bytes:
-    return tagged_hash("TapSighash", b"\x00" + modeled_sigmsg(data, annex, path) + leaf_hash)
+    del leaf_hash, annex
+    return bytes.fromhex(compute_vector_digest(data, path)["qrs_msg"])
 
 
 def p2mr_root(script_pubkey: str, path: Path) -> bytes:

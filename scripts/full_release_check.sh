@@ -35,12 +35,16 @@ python3 "$ROOT/scripts/check_batch_schnorr_baseline.py" \
   "${BATCH_EVIDENCE_ARGS[@]}"
 
 python3 "$ROOT/scripts/validate_test_vectors.py" "$ROOT/test_vectors"
+python3 "$ROOT/scripts/compute_qrs_digest_model.py" "$ROOT/test_vectors"
 python3 "$ROOT/scripts/verify_qrs_fixtures.py" "$ROOT/test_vectors"
 python3 "$ROOT/scripts/run_qrs_negative_tests.py"
 python3 "$ROOT/scripts/verify_qrs_vectors.py" \
   "$ROOT/test_vectors" \
   --binary "$BUILD_DIR/qrs_native_bench" \
   --require-crypto
+python3 "$ROOT/scripts/check_qrs_digest_agreement.py" \
+  "$ROOT/test_vectors" \
+  --binary "$BUILD_DIR/qrs_native_bench"
 
 "$BUILD_DIR/qrs_native_bench" \
   --standard \

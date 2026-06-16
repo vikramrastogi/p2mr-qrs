@@ -15,9 +15,12 @@ add_executable(qrs_native_bench
   src/core_validation_model.cpp
   src/environment.cpp
   src/experimental_batch_schnorr.c
+  src/qrs_digest_model.cpp
   src/report_json.cpp
   src/report_markdown.cpp
   src/schnorr_secp256k1.cpp
+  src/slh_dsa_backend_null.cpp
+  src/slh_dsa_backend_openssl.cpp
   src/slh_dsa_cli.cpp
   src/slh_dsa_openssl.cpp
   src/stats.cpp
