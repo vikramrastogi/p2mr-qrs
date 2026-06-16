@@ -259,6 +259,15 @@ def main() -> int:
         "not Bitcoin Core consensus integration" in qrs_path["scope"],
         "QRS path scope must avoid claiming Bitcoin Core integration",
     )
+    require(
+        "explicit non-consensus prefixes" in qrs_path["qrs_msg_scope"],
+        "QRS path qrs_msg_scope must identify modeled non-consensus prefixes",
+    )
+    for prefix in ["QRS modeled TapLeaf v0", "QRS modeled Branch v0", "QRS modeled SigMsg v0"]:
+        require(
+            prefix in qrs_path["qrs_msg_scope"],
+            f"QRS path qrs_msg_scope must name modeled prefix {prefix}",
+        )
 
     if args.markdown:
         md = args.markdown.read_text(encoding="utf-8")
@@ -294,6 +303,10 @@ def main() -> int:
             "Markdown must define timing-statistic samples",
         )
         require("QRS Validation Path Model" in md, "Markdown must include QRS path model")
+        require(
+            "explicit non-consensus prefixes" in md,
+            "Markdown must identify modeled non-consensus QRS path prefixes",
+        )
         require(
             "QRS Depth-Sensitive Block Model" in md,
             "Markdown must include QRS depth-sensitive block model",
