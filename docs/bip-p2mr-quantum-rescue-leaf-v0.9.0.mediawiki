@@ -1,14 +1,14 @@
 <pre>
   BIP: ?
   Layer: Consensus (soft fork)
-  Title: P2MR Quantum-Rescue Leaf (SLH-DSA)
-  Author: TBD
+  Title: P2MR Quantum-Rescue Leaf
+  Authors: Vikram Rastogi <vikramrastogi@gmail.com>
   Status: Draft
   Type: Specification
-  Created: 2026-06-15
+  Assigned: ?
   License: BSD-3-Clause
-  Requires: 341, 342, 360
   Version: 0.9.0
+  Requires: 341, 342, 360
 </pre>
 
 ==Introduction==

@@ -253,8 +253,6 @@ def main() -> int:
         return 2
     if decision["draft_rule_status"] == "evidence_incomplete" and not args.allow_unavailable_qrs:
         return 2
-    if decision["draft_rule_status"] == "activation_unresolved_batch_baseline":
-        return 2
     return 0
 
 

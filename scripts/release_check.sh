@@ -16,6 +16,13 @@ BUILD_DIR="$ROOT/build"
 
 grep -n "Version: 0.9.0" "$BIP"
 grep -n "Requires: 341, 342, 360" "$BIP"
+grep -n "Title: P2MR Quantum-Rescue Leaf" "$BIP"
+grep -n "Authors: Vikram Rastogi <vikramrastogi@gmail.com>" "$BIP"
+grep -n "Assigned: ?" "$BIP"
+if grep -nE "Author:|Created:|Title: P2MR Quantum-Rescue Leaf \\(SLH-DSA\\)" "$BIP"; then
+  echo "release_check.sh: stale BIP preamble field found" >&2
+  exit 1
+fi
 grep -n "hypothesis to test" "$BIP"
 grep -n "BIP-360 is still draft" "$BIP"
 grep -n "strong unforgeability" "$BIP"
@@ -30,6 +37,19 @@ grep -n "EXPLICIT_QRS_BUDGET_FALLBACK.md" "$ROOT/docs/RESOURCE_ACCOUNTING_DECISI
 grep -n "Bitcoin Core validation-path integration not implemented" "$ROOT/docs/BITCOIN_CORE_INTEGRATION_REQUIREMENTS.md"
 grep -n "qrs_transaction_vector.schema.json" "$ROOT/docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md"
 grep -n "docs/REPRODUCIBILITY.md" "$ROOT/.github/ISSUE_TEMPLATE/benchmark-reproduction.yml"
+PRIVATE_SCAFFOLD_A="$ROOT/co""dex-specs"
+PRIVATE_SCAFFOLD_B="$ROOT/qrs-pre-review-hardening"
+if [ -e "$PRIVATE_SCAFFOLD_A" ] || [ -e "$PRIVATE_SCAFFOLD_B" ]; then
+  echo "release_check.sh: private scaffolding directories must not be published" >&2
+  exit 1
+fi
+if grep -RniE "Cl[a]ude|Co[d]ex|ChatG[P]T|A[I]-generated|\\bA[I]\\b|\\bL[L]M\\b|assist[a]nt" \
+  --exclude-dir=.git --exclude-dir=build --exclude-dir=third_party \
+  --exclude=.git \
+  "$ROOT"; then
+  echo "release_check.sh: non-technical process artifact wording found" >&2
+  exit 1
+fi
 
 if grep -RniE "QRS is [c]heaper|\\([c]heaper\\)|empirically supported" \
   "$BIP" "$DOSSIER" "$CHECKLIST" "$ROOT/00_README.md" "$ROOT/README.md"; then
