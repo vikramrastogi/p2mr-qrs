@@ -6,6 +6,9 @@ vectors: the BIP-360/P2MR leaf hashing and QRS sighash rules are still draft
 material. This verifier makes the current draft structure executable by
 recomputing leaf hashes, a SigMsg-shaped QRS message, and failure-stage
 classification, without pretending to provide final consensus-vector coverage.
+This fixture model tests the QRS message preimage shape: hash_type, spend_type,
+annex commitment, transaction/spent-output commitments, and qrs_ext =
+leaf_hash. It is not a final Bitcoin Core SigMsg implementation.
 """
 
 from __future__ import annotations
@@ -109,6 +112,10 @@ def modeled_leaf_hash(pubkey: bytes) -> bytes:
         "TapLeaf",
         bytes([QRS_LEAF_VERSION]) + compact_size(len(pubkey)) + pubkey,
     )
+
+
+def bip_form_tapleaf_preimage(pubkey: bytes) -> bytes:
+    return bytes([QRS_LEAF_VERSION]) + compact_size(32) + pubkey
 
 
 def merkle_root(leaf_hash: bytes, control_block: bytes) -> bytes:
@@ -225,6 +232,26 @@ def verify_one(path: Path, update: bool) -> dict:
     return data
 
 
+def verify_tapleaf_preimage_self_test(paths: list[Path]) -> None:
+    for path in paths:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        if data.get("failure_stage") not in {"none", "slh_dsa_verify"}:
+            continue
+        pubkey = expand_descriptor(data["qrs_public_key"], path, "qrs_public_key")
+        if len(pubkey) != 32:
+            continue
+        expected = hex_bytes(data["expected_leaf_hash"], path, "expected_leaf_hash")
+        correct = tagged_hash("TapLeaf", bip_form_tapleaf_preimage(pubkey))
+        wrong_no_length = tagged_hash("TapLeaf", bytes([QRS_LEAF_VERSION]) + pubkey)
+        if correct != expected:
+            fail(path, "TapLeaf preimage self-test failed: BIP-form compact_size preimage mismatch")
+        if wrong_no_length == expected:
+            fail(path, "TapLeaf preimage self-test failed: no-length-prefix preimage matched")
+        print("TapLeaf preimage self-test passed")
+        return
+    raise FixtureError("TapLeaf preimage self-test found no verifier-reaching 32-byte public-key vector")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("vectors", type=Path)
@@ -237,6 +264,7 @@ def main() -> int:
     if not paths:
         raise FixtureError(f"no qrs_*.json fixtures found under {args.vectors}")
     verified = [verify_one(path, args.update) for path in paths]
+    verify_tapleaf_preimage_self_test(paths)
     crypto_reaching = [v["name"] for v in verified if v["failure_stage"] in {"none", "slh_dsa_verify"}]
     print(
         f"verified {len(verified)} provisional executable QRS structured fixtures "

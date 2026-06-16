@@ -27,6 +27,20 @@ if [ -e "$CONSOLIDATED_BIP" ]; then
   echo "release_check.sh: use docs/bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki as the single canonical BIP draft" >&2
   exit 1
 fi
+BIP_V090_COUNT="$(find "$ROOT/docs" -maxdepth 1 -name 'bip-*v0.9.0.mediawiki' -print | wc -l | tr -d ' ')"
+if [ "$BIP_V090_COUNT" != "1" ]; then
+  echo "release_check.sh: expected exactly one non-archive v0.9.0 BIP draft, found $BIP_V090_COUNT" >&2
+  exit 1
+fi
+if [ ! -f "$BIP" ]; then
+  echo "release_check.sh: canonical BIP draft missing: $BIP" >&2
+  exit 1
+fi
+STALE_BIP_PATH="$ROOT/docs/bip-p2mr-quantum-""rescue-leaf-v0.9.0.mediawiki"
+if [ -f "$STALE_BIP_PATH" ]; then
+  echo "release_check.sh: stale duplicate BIP draft exists: $STALE_BIP_PATH" >&2
+  exit 1
+fi
 
 grep -n "Version: 0.9.0" "$BIP"
 grep -n "Requires: 341, 342, 360" "$BIP"
@@ -45,8 +59,11 @@ STALE_STRONG="strong un""forgeability"
 STALE_SUF="SUF-""CMA"
 STALE_BSD="3-clause B""SD"
 STALE_PRELIM="Non-consensus preliminary bench""mark"
-STALE_RESCUE_DRAFT="P2MR SLH-DSA Res""cue"" Leaf"
-STALE_BIP_WORDING_PATTERN="$STALE_UPPER_QR|$STALE_LOWER_QR|$STALE_QSAFE|$STALE_STRONG|$STALE_SUF|$STALE_BSD|$STALE_PRELIM|$STALE_RESCUE_DRAFT"
+STALE_RESCUE_DRAFT="P2MR SLH-DSA Rescue Leaf"
+STALE_FULL_TITLE="P2MR Quantum-Rescue Leaf"
+STALE_QR_SIGNATURE="Quantum-Rescue Signature"
+STALE_DRAFT_CIRCULATED="draft circulated as"
+STALE_BIP_WORDING_PATTERN="$STALE_UPPER_QR|$STALE_LOWER_QR|$STALE_QSAFE|$STALE_STRONG|$STALE_SUF|$STALE_BSD|$STALE_PRELIM|$STALE_RESCUE_DRAFT|$STALE_FULL_TITLE|$STALE_QR_SIGNATURE|$STALE_DRAFT_CIRCULATED"
 if grep -nE "$STALE_BIP_WORDING_PATTERN" "$BIP"; then
   echo "release_check.sh: stale BIP wording found" >&2
   exit 1
@@ -72,11 +89,30 @@ if [ -e "$PRIVATE_SCAFFOLD_A" ] || [ -e "$PRIVATE_SCAFFOLD_B" ]; then
   echo "release_check.sh: private scaffolding directories must not be published" >&2
   exit 1
 fi
-if grep -RniE "Cl[a]ude|Co[d]ex|ChatG[P]T|A[I]-generated|\\bA[I]\\b|\\bL[L]M\\b|assist[a]nt" \
+PROCESS_HITS="$(grep -RniE "Cl[a]ude|Co[d]ex|ChatG[P]T|A[I]-generated|\\bA[I]\\b|\\bL[L]M\\b|assist[a]nt" \
   --exclude-dir=.git --exclude-dir=build --exclude-dir=third_party --exclude-dir=__pycache__ \
   --exclude=.git \
-  "$ROOT"; then
+  "$ROOT" || true)"
+PUBLIC_PROCESS_EXCEPTION="PUBLIC_REVIEW_READINESS.md:.*No private scaffolding, A""I/process artifacts"
+PROCESS_HITS="$(printf "%s\n" "$PROCESS_HITS" | grep -v "$PUBLIC_PROCESS_EXCEPTION" || true)"
+if [ -n "$PROCESS_HITS" ]; then
+  printf "%s\n" "$PROCESS_HITS"
   echo "release_check.sh: non-technical process artifact wording found" >&2
+  exit 1
+fi
+
+if grep -Rni "consensus test vectors" \
+  "$ROOT/README.md" "$ROOT/00_README.md" "$ROOT/docs" "$ROOT/test_vectors"; then
+  echo "release_check.sh: vectors must not be described as consensus test vectors" >&2
+  exit 1
+fi
+
+ACTIVATION_READY_HITS="$(grep -Rni "activation-ready consensus evidence" \
+  "$ROOT/README.md" "$ROOT/00_README.md" "$ROOT/docs" || true)"
+ACTIVATION_READY_CLAIMS="$(printf "%s\n" "$ACTIVATION_READY_HITS" | grep -vi "not activation-ready consensus evidence" || true)"
+if [ -n "$ACTIVATION_READY_CLAIMS" ]; then
+  printf "%s\n" "$ACTIVATION_READY_CLAIMS"
+  echo "release_check.sh: unsupported activation-ready consensus evidence claim found" >&2
   exit 1
 fi
 

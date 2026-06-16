@@ -46,6 +46,7 @@ validation budget before activation.
   serialized consensus vectors.
 - `docs/REPRODUCIBILITY.md` - independent rerun protocol.
 - `docs/RELEASE_CHECKLIST.md` - posting and release checks.
+- `docs/PUBLIC_REVIEW_READINESS.md` - public pre-review readiness checklist.
 - `src/` and `include/` - native benchmark harness.
 - `scripts/` - validation, report, and batch-Schnorr evidence scripts.
 - `test_vectors/` - provisional executable structured fixtures and draft
@@ -82,6 +83,13 @@ python3 scripts/evaluate_resource_accounting.py \
   --advisory
 bash scripts/release_check.sh
 ```
+
+The commands above are local smoke/reproduction checks. Publication or pre-review release readiness is defined only by `bash scripts/release_check.sh`.
+A passing quick benchmark alone is not release evidence.
+
+For stricter publication evidence, run `bash scripts/full_release_check.sh`.
+This omits advisory mode and fails if the current benchmark evidence requires
+an explicit QRS validation budget.
 
 `scripts/check_batch_schnorr_baseline.py` can refresh the batch-Schnorr evidence
 report. Local release checks use `--skip-upstream` by default; set

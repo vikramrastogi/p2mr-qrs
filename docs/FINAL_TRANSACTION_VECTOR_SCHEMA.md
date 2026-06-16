@@ -17,6 +17,17 @@ definitions are not yet fixed.
 Final vectors must be serialized spend vectors. They must bind the exact bytes
 that a consensus implementation validates.
 
+## Final SigMsg blocker
+
+Current executable vectors test the QRS preimage shape but do not claim final
+Bitcoin Core `SigMsg` equivalence. Final consensus vectors require:
+
+- finalized BIP-360/P2MR hashing rules;
+- finalized QRS `ext_flag` assignment;
+- Bitcoin Core-shaped transaction serialization;
+- cross-implementation agreement on qrs_msg;
+- serialized valid and invalid transactions.
+
 ## Required Vector Fields
 
 Each final vector must include:

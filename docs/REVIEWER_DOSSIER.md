@@ -60,6 +60,10 @@ are explicitly hypothetical and must not be cited as measured batch evidence;
 their purpose is to show where reviewer concern about a faster batch baseline
 would make the no-additional-budget rule unresolved.
 
+A measured experimental batch implementation that is slower than individual
+Schnorr is not favorable evidence for QRS. It is reported as non-tightening and
+cannot support the no-additional-budget rule for activation review.
+
 ## Batch Schnorr status
 
 Reviewed public libsecp256k1 batch API: unavailable in the bundled upstream
@@ -96,6 +100,16 @@ that reaches the modeled SLH-DSA verifier boundary. The model now uses the
 current BIP's structural preimage shape where possible: length-prefixed TapLeaf
 payloads, TapBranch paths, and a TapSighash message over a SigMsg-shaped
 ext_flag=2 fixture payload plus `leaf_hash`.
+
+The fixture verifier includes a regression self-test proving the executable
+leaf-hash fixture uses the BIP-form TapLeaf preimage with CompactSize length
+prefix, and rejects the previously incorrect no-length-prefix form.
+
+Current executable vectors test the QRS preimage shape but do not claim final
+Bitcoin Core `SigMsg` equivalence. Final vectors require finalized
+BIP-360/P2MR hashing rules, finalized QRS `ext_flag` assignment,
+Bitcoin Core-shaped transaction serialization, cross-implementation agreement
+on qrs_msg, and serialized valid and invalid transactions.
 
 Draft cryptographic vectors are checked by `scripts/verify_qrs_vectors.py`,
 which calls the native SLH-DSA-SHA2-128s verifier for valid and invalid
@@ -154,6 +168,6 @@ Markdown artifacts.
 - Final SLH-DSA leaf-version and `ext_flag` conflict review.
 - Native benchmark replication across hardware, OS, compilers, and verifier libraries.
 - Bitcoin Core validation-path integration, not just the current model.
-- Consensus test vectors with real signatures computed from final
+- Final serialized vectors with real signatures computed from final
   BIP-360/QRS definitions.
 - Independent SLH-DSA verifier review and cross-implementation vector checks.
