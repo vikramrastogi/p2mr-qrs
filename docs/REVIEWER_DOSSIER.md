@@ -32,8 +32,8 @@ signature message, executable vectors, and resource-accounting evidence.
 The intended relationship is complementary, not competitive. If BIP-360 absorbs
 this leaf directly, this package can serve as the leaf specification. If
 BIP-360 remains algorithm-neutral, this package can remain a dependent BIP.
-Keeping the boundary explicit avoids turning BIP-360 into an algorithm-selection
-document while still giving reviewers a concrete SLH-DSA leaf to evaluate.
+Keeping the boundary explicit avoids turning BIP-360 into an algorithm registry
+while still giving reviewers a concrete SLH-DSA leaf to evaluate.
 
 ## Why a leaf version instead of opcode
 
@@ -129,10 +129,12 @@ payloads, TapBranch paths, and a TapSighash message over a SigMsg-shaped
 ext_flag=2 fixture payload plus `leaf_hash`.
 
 `scripts/compute_qrs_digest_model.py` computes the byte-level provisional QRS
-digest model without canonical JSON. `src/qrs_digest_model.cpp` implements the
-same model in the native binary, and `scripts/check_qrs_digest_agreement.py`
-checks cross-implementation agreement on `leaf_hash`, `merkle_root`, and
-`qrs_msg`.
+digest model without canonical JSON. For the supported `SIGHASH_DEFAULT`
+subset, the provisional model follows BIP-341 field ordering: `spend_type`
+appears after the transaction-wide hashes and before `input_index`.
+`src/qrs_digest_model.cpp` implements the same model in the native binary, and
+`scripts/check_qrs_digest_agreement.py` checks cross-implementation agreement
+on `leaf_hash`, `merkle_root`, and `qrs_msg`.
 
 The fixture verifier enforces exact QRS witness cardinality after optional
 annex-label removal. Extra witness elements remain malformed and do not reach
@@ -213,6 +215,7 @@ Markdown artifacts. The platform target table is `REPRODUCTION_MATRIX.md`.
 | Objection | Answer | Evidence |
 | --- | --- | --- |
 | Why not just BIP-360? | BIP-360 defines the P2MR container; this package defines one concrete SLH-DSA future-leaf validation rule for that container. | BIP Motivation and Rationale; `BIP360_DEPENDENCY_MATRIX.md`. |
+| Is this redundant with BIP-360? | No. This package is complementary: BIP-360 can remain algorithm-neutral and not an algorithm registry, while this draft specifies one concrete dependent SLH-DSA future leaf. | BIP Rationale; `BIP360_DEPENDENCY_MATRIX.md`; `REVIEW_THIS_FIRST.md`. |
 | Why not solve old coins? | Legacy-output policy is out of scope. | BIP Abstract and Backward compatibility; this dossier's non-goals. |
 | Why not ML-DSA? | This draft tests one conservative hash-based primitive first. | BIP Motivation and Rationale. |
 | Why not a tapscript opcode? | The 7,856-byte signature exceeds the retained 520-byte tapscript stack-element limit. | BIP Rationale; `../test_vectors/`. |

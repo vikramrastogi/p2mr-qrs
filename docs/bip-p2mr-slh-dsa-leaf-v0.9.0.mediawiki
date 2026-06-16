@@ -179,11 +179,11 @@ Wallets SHOULD generate a fresh QRS key per output, SHOULD NOT derive QRS keys b
 
 A leaf reuses the BIP-360 output type and lets a wallet combine the QRS condition with other leaves in one Merkle tree. A dedicated witness version for one post-quantum key type would create another address family and would not naturally support script trees.
 
-===Why a separate BIP rather than part of BIP-360?===
+===Why a separate BIP rather than only BIP-360 text?===
 
-BIP-360 is the generic P2MR container. This BIP is one concrete post-quantum validation rule that can live inside that container. The separation is intentional: it keeps BIP-360 from becoming an algorithm-selection document, while giving reviewers an exact SLH-DSA leaf specification to evaluate on its own merits. The boundary is simple: BIP-360 decides the P2MR output, Merkle commitment, control block, and future-leaf semantics; this BIP decides only the SLH-DSA leaf payload, witness shape, signature message, verification rule, test vectors, and resource-accounting evidence.
+BIP-360 is the generic P2MR container. This BIP is one concrete post-quantum validation rule that can live inside that container: one SLH-DSA-SHA2-128s public key, one fixed-size signature, one digest construction, one witness shape, and one resource-accounting question. The separation is intentional: it lets BIP-360 remain algorithm-neutral and not an algorithm registry, while giving reviewers an exact SLH-DSA leaf specification to evaluate on its own merits. The boundary is simple: BIP-360 decides the P2MR output, Merkle commitment, control block, and future-leaf semantics; this BIP decides only the SLH-DSA leaf payload, witness shape, signature message, verification rule, test vectors, and resource-accounting evidence.
 
-If BIP-360 later adopts this leaf directly, this document can serve as the leaf's specification. If BIP-360 remains algorithm-neutral, this document can remain a dependent BIP. In either case, this proposal should be reviewed as a concrete P2MR SLH-DSA leaf specification, not as a replacement for BIP-360.
+The dependency is intentional: this BIP MUST be revised to match final BIP-360 definitions. If BIP-360 later adopts this leaf directly, this document can serve as the leaf's specification. If BIP-360 remains algorithm-neutral, this document can remain a dependent BIP. In either case, this proposal should be reviewed as a concrete P2MR SLH-DSA leaf specification, not as a replacement for BIP-360.
 
 ===Why a leaf version rather than a tapscript opcode (in v1)?===
 
