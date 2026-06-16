@@ -7,7 +7,7 @@ readiness.
 
 Defines one P2MR-only future leaf version that verifies one
 SLH-DSA-SHA2-128s signature over a BIP-341-style transaction digest. See
-`bip-p2mr-quantum-rescue-leaf-v0.9.0.mediawiki`.
+`bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki`.
 
 ## What this proposal does not do
 
@@ -17,9 +17,9 @@ or a tapscript opcode.
 
 ## Why P2MR-only
 
-P2MR is key-path-free. A post-quantum rescue leaf inside an output with an
+P2MR is key-path-free. An SLH-DSA leaf inside an output with an
 exposed key path would not remove the discrete-log exposure. See the BIP
-Rationale section and `../docs/bip-p2mr-quantum-rescue-leaf-v0.9.0.mediawiki`.
+Rationale section and `../docs/bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki`.
 
 ## Why a leaf version instead of opcode
 
@@ -133,7 +133,7 @@ Markdown artifacts.
 ## Known blockers before advancing beyond Draft
 
 - Final BIP-360 dependency review.
-- Final QRS leaf-version and `ext_flag` conflict review.
+- Final SLH-DSA leaf-version and `ext_flag` conflict review.
 - Native benchmark replication across hardware, OS, compilers, and verifier libraries.
 - Bitcoin Core validation-path integration, not just the current model.
 - Consensus test vectors with real signatures computed from final

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-BIP="$ROOT/docs/bip-p2mr-quantum-rescue-leaf-v0.9.0.mediawiki"
+BIP="$ROOT/docs/bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki"
 DOSSIER="$ROOT/docs/REVIEWER_DOSSIER.md"
 CHECKLIST="$ROOT/docs/RELEASE_CHECKLIST.md"
 QUICK_JSON="$ROOT/out/quick.json"
@@ -32,13 +32,22 @@ if grep -nE "Author:|Created:|$STALE_TITLE_PATTERN" "$BIP"; then
   echo "release_check.sh: stale BIP preamble field found" >&2
   exit 1
 fi
-if grep -n "Quantum-""Rescue" "$BIP"; then
-  echo "release_check.sh: stale Q-R wording found" >&2
+STALE_UPPER_QR="Quantum-""Rescue"
+STALE_LOWER_QR="quantum-""rescue"
+STALE_QSAFE="quantum-""safe"
+STALE_STRONG="strong un""forgeability"
+STALE_SUF="SUF-""CMA"
+STALE_BSD="3-clause B""SD"
+STALE_PRELIM="Non-consensus preliminary bench""mark"
+STALE_RESCUE_DRAFT="P2MR SLH-DSA Rescue"" Leaf"
+STALE_BIP_WORDING_PATTERN="$STALE_UPPER_QR|$STALE_LOWER_QR|$STALE_QSAFE|$STALE_STRONG|$STALE_SUF|$STALE_BSD|$STALE_PRELIM|$STALE_RESCUE_DRAFT"
+if grep -nE "$STALE_BIP_WORDING_PATTERN" "$BIP"; then
+  echo "release_check.sh: stale BIP wording found" >&2
   exit 1
 fi
 grep -n "hypothesis to test" "$BIP"
 grep -n "BIP-360 is still draft" "$BIP"
-grep -n "strong unforgeability" "$BIP"
+grep -n "Fixed-length encoding and witness malleability" "$BIP"
 grep -n "RESOURCE_ACCOUNTING_DECISION.md" "$BIP"
 grep -n "EXPLICIT_QRS_BUDGET_FALLBACK.md" "$BIP"
 grep -n "adversarial invalid fixed-length" "$BIP"

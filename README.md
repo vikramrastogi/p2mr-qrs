@@ -33,7 +33,7 @@ validation budget before activation.
 
 ## Repository Map
 
-- `docs/bip-p2mr-quantum-rescue-leaf-v0.9.0.mediawiki` - BIP draft.
+- `docs/bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki` - BIP draft.
 - `docs/REVIEWER_DOSSIER.md` - predictable objections mapped to evidence,
   blockers, or non-goals.
 - `docs/RESOURCE_ACCOUNTING_DECISION.md` - decision criteria and current
