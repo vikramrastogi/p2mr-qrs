@@ -21,6 +21,10 @@ preimage shape where it can: leaf hashes use
 spend-type byte in the BIP-341 input-data position after the common transaction
 hashes. The modeled SigMsg is not a final BIP-341 transaction digest; it is a
 deterministic fixture payload until the final BIP-360/QRS digest rules exist.
+The `spent_output_scriptPubKey` values use a provisional OP_1/PUSH32
+root-carrier encoding (`5120 || root`) only so the fixtures have an executable
+32-byte root commitment; this is not a claim about final BIP-360 P2MR output
+encoding.
 
 Each vector includes the fields required for final consensus-vector review:
 structured transaction fields, spent output scriptPubKey, witness stack,

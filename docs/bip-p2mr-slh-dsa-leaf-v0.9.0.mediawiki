@@ -105,7 +105,7 @@ This witness maps onto the generic BIP-360 P2MR witness layout (initial stack el
 
 ===Signature message===
 
-Only <code>SIGHASH_DEFAULT</code> is defined. The transaction message uses the BIP-341 <code>SigMsg(hash_type, ext_flag)</code> function with <code>hash_type = QRS_HASH_TYPE</code> and <code>ext_flag = QRS_EXT_FLAG</code>. For this BIP, <code>ext_flag = 2</code> has exactly one extension field, <code>qrs_ext = leaf_hash</code>. The <code>spend_type</code> inside <code>SigMsg</code> is therefore <code>2 * QRS_EXT_FLAG + annex_present</code> (4 without annex, 5 with annex). No BIP-342 <code>key_version</code> or <code>codesep_pos</code> field is appended for this leaf version. The 32-byte message passed to SLH-DSA verification is:
+Only <code>SIGHASH_DEFAULT</code> is defined. The transaction message uses the BIP-341 <code>SigMsg(hash_type, ext_flag)</code> function with <code>hash_type = QRS_HASH_TYPE</code> and <code>ext_flag = QRS_EXT_FLAG</code>. For this BIP, <code>ext_flag = 2</code> has exactly one extension field, <code>qrs_ext = leaf_hash</code>. The <code>spend_type</code> inside <code>SigMsg</code> is therefore <code>2 * QRS_EXT_FLAG + annex_present</code> (4 without annex, 5 with annex), and remains in the BIP-341 input-data position after the common transaction hashes and before the input index. No BIP-342 <code>key_version</code> or <code>codesep_pos</code> field is appended for this leaf version. The 32-byte message passed to SLH-DSA verification is:
 
 <source>
 qrs_msg = tagged_hash("TapSighash", bytes([0x00]) || SigMsg(QRS_HASH_TYPE, QRS_EXT_FLAG) || leaf_hash)

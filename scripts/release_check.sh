@@ -8,6 +8,8 @@ CHECKLIST="$ROOT/docs/RELEASE_CHECKLIST.md"
 QUICK_JSON="$ROOT/out/quick.json"
 QUICK_MD="$ROOT/out/quick.md"
 SAMPLE_MD="$ROOT/out/sample-native-report.md"
+STANDARD_JSON="$ROOT/out/standard.json"
+FULL_JSON="$ROOT/out/full.json"
 BATCH_EVIDENCE="$ROOT/out/batch-evidence.json"
 BATCH_EVIDENCE_MD="$ROOT/out/batch-evidence.md"
 RESOURCE_DECISION_JSON="$ROOT/out/resource-accounting-decision.json"
@@ -39,7 +41,37 @@ ensure_out_clean() {
   fi
 }
 
+validate_committed_sample_reports() {
+  local sample_commit
+  sample_commit="$(jq -r '.environment.git_commit' "$QUICK_JSON")"
+  if [ -z "$sample_commit" ] || [ "$sample_commit" = "null" ]; then
+    echo "release_check.sh: committed quick sample report is missing environment.git_commit" >&2
+    exit 1
+  fi
+  if ! git -C "$ROOT" merge-base --is-ancestor "$sample_commit" HEAD; then
+    echo "release_check.sh: committed sample report commit $sample_commit is not reachable from HEAD" >&2
+    exit 1
+  fi
+  for report in "$QUICK_JSON" "$STANDARD_JSON" "$FULL_JSON"; do
+    jq -e --arg commit "$sample_commit" \
+      '.environment.git_commit == $commit and .environment.working_tree_dirty == "false"' \
+      "$report" >/dev/null
+  done
+  grep -n "$sample_commit" "$ROOT/docs/RESOURCE_ACCOUNTING_DECISION.md"
+  jq -e --slurpfile full "$FULL_JSON" --slurpfile decision "$RESOURCE_DECISION_JSON" '
+    ($decision[0].p99_ms.qrs_valid_saturated_block
+      == $full[0].block_model.qrs_saturated_block_valid.p99_ms) and
+    ($decision[0].p99_ms.qrs_worst_invalid_fixed_length_saturated_block
+      == $full[0].block_model.qrs_saturated_block_invalid_fixed_length.p99_ms) and
+    ($decision[0].p99_ms.individual_schnorr_saturated_block
+      == $full[0].block_model.schnorr_individual_saturated_block.p99_ms) and
+    ($decision[0].p99_ms.experimental_batch_schnorr_saturated_block
+      == $full[0].block_model.schnorr_experimental_batch_saturated_block.p99_ms)
+  ' >/dev/null
+}
+
 ensure_out_clean
+validate_committed_sample_reports
 
 if [ -e "$CONSOLIDATED_BIP" ]; then
   echo "release_check.sh: use docs/bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki as the single canonical BIP draft" >&2
@@ -104,6 +136,8 @@ grep -n "EXPLICIT_QRS_BUDGET_FALLBACK.md" "$ROOT/docs/RESOURCE_ACCOUNTING_DECISI
 grep -n "Bitcoin Core validation-path integration not implemented" "$ROOT/docs/BITCOIN_CORE_INTEGRATION_REQUIREMENTS.md"
 grep -n "qrs_transaction_vector.schema.json" "$ROOT/docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md"
 grep -n "schema-only placeholder" "$ROOT/docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md"
+grep -n "provisional OP_1/PUSH32" "$ROOT/docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md" "$ROOT/test_vectors/README.md"
+grep -n "root-carrier encoding" "$ROOT/docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md" "$ROOT/test_vectors/README.md"
 grep -n "Schema for future P2MR QRS serialized transaction vectors" "$ROOT/test_vectors/qrs_transaction_vector.schema.json"
 grep -n "schema_status" "$ROOT/test_vectors/qrs_transaction_vector.schema.json"
 grep -n "schema_only_pending_final_bip360_qrs" "$ROOT/test_vectors/qrs_transaction_vector.schema.json"
