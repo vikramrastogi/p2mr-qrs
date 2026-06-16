@@ -68,7 +68,9 @@ validation budget before activation.
 - `scripts/` - validation, report, and batch-Schnorr evidence scripts.
 - `test_vectors/` - provisional executable structured fixtures and draft
   cryptographic vectors.
-- `fuzz/` and `tests/` - malformed witness corpus and negative cases.
+- `fuzz/` and `tests/` - structured malformed-witness corpus and negative
+  cases executed by `scripts/run_qrs_negative_tests.py`; this is not a
+  libFuzzer target.
 - `out/sample-native-report.md` - sample native benchmark report.
 - `out/batch-evidence.md` - reviewed-public batch Schnorr status evidence.
 - `third_party/secp256k1/` - vendored pinned libsecp256k1 source.

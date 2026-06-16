@@ -12,7 +12,8 @@ The machine-readable matrix is
 Current coverage is split across:
 
 - provisional executable structured fixtures in `test_vectors/`;
-- negative/fuzz witness cases in `tests/` and `fuzz/`;
+- executable negative cases in `tests/` and the structured malformed-witness
+  corpus in `fuzz/`;
 - digest mutation self-tests in `scripts/compute_qrs_digest_model.py`;
 - fixed-length invalid verifier cases in the native SLH-DSA benchmark.
 
@@ -43,6 +44,9 @@ and sighash definitions.
 | `wrong_message_signature_fails` | `src/slh_dsa_openssl.cpp` | false | `slh_dsa_verify` | true |
 | `wrong_public_key_signature_fails` | `src/slh_dsa_openssl.cpp` | false | `slh_dsa_verify` | true |
 
-The validator checks that every artifact exists and that fixture/fuzz metadata
-matches the matrix. For digest and benchmark-source rows, it checks the named
-self-test labels remain present in the referenced source.
+The validator checks that every artifact exists and that fixture/corpus
+metadata matches the matrix. `scripts/run_qrs_negative_tests.py` then
+materializes each listed negative and structured-corpus case and runs it
+through the provisional failure-stage classifier. For digest and
+benchmark-source rows, the matrix validator checks the named self-test labels
+remain present in the referenced source.

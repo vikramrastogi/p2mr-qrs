@@ -203,10 +203,20 @@ def build_sigmsg(data: dict[str, Any], leaf_hash: bytes, annex: bytes, path: Pat
     return sigmsg + leaf_hash
 
 
+def effective_annex(data: dict[str, Any], path: Path) -> bytes:
+    annex = hex_bytes(data.get("annex", ""), path, "annex")
+    witness_stack = data.get("witness_stack")
+    if not annex:
+        return b""
+    if not isinstance(witness_stack, list) or not witness_stack or witness_stack[-1] != "annex":
+        return b""
+    return annex
+
+
 def compute_vector_digest(data: dict[str, Any], path: Path) -> dict[str, Any]:
     pubkey = expand_descriptor(data["qrs_public_key"], path, "qrs_public_key")
     control_block = expand_descriptor(data["control_block"], path, "control_block")
-    annex = hex_bytes(data.get("annex", ""), path, "annex")
+    annex = effective_annex(data, path)
     leaf_hash = modeled_leaf_hash(pubkey)
     root = merkle_root(leaf_hash, control_block)
     sigmsg_with_ext = build_sigmsg(data, leaf_hash, annex, path)

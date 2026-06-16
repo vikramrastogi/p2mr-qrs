@@ -105,7 +105,8 @@ Checklist enforced by the script:
   vector shape once BIP-360/QRS definitions are final.
 - `docs/VECTOR_COVERAGE_MATRIX.md` and
   `test_vectors/vector_coverage_matrix.json` make provisional fixture,
-  negative/fuzz, digest-mutation, and invalid-verifier coverage explicit.
+  executable negative/corpus, digest-mutation, and invalid-verifier coverage
+  explicit.
 - `docs/REPRODUCIBILITY.md` and the benchmark reproduction issue template
   define the independent rerun protocol.
 - `docs/REPRODUCTION_MATRIX.md` tracks Apple Silicon macOS, Linux x86_64, and

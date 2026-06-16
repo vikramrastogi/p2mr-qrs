@@ -250,7 +250,7 @@ A Complete version MUST include vectors for: valid QRS spend without annex; vali
 
 Before this BIP can advance beyond Draft, a reference implementation is expected to include: P2MR SLH-DSA leaf validation; an audited, pinned SLH-DSA-SHA2-128s verifier; transaction-digest tests; consensus tests; fuzz tests for malformed witnesses and control blocks; worst-case per-block validation benchmarks (per Resource Accounting); and a native benchmark harness comparing this validation path against individual and batch BIP-340 verification baselines, with median, p95, p99, and maximum timings.
 
-The current pre-review repository contains the native benchmark harness, provisional executable structured fixtures, draft cryptographic vectors verified through OpenSSL SLH-DSA where available, and negative/fuzz cases for witness-shape failures. These artifacts are review scaffolding for the Draft stage; final consensus vectors remain pending final BIP-360/QRS hashing and transaction-digest definitions.
+The current pre-review repository contains the native benchmark harness, provisional executable structured fixtures, draft cryptographic vectors verified through OpenSSL SLH-DSA where available, and executable structured negative/corpus cases for witness-shape failures. These artifacts are review scaffolding for the Draft stage; final consensus vectors remain pending final BIP-360/QRS hashing and transaction-digest definitions.
 
 ==Acknowledgements==
 

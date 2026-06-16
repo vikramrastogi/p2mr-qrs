@@ -96,7 +96,7 @@ def legacy_wrong_sigmsg(data: dict, leaf_hash: bytes, annex: bytes, path: Path) 
 
 def check_vector(path: Path, data: dict) -> None:
     pubkey = model.expand_descriptor(data["qrs_public_key"], path, "qrs_public_key")
-    annex = model.hex_bytes(data.get("annex", ""), path, "annex")
+    annex = model.effective_annex(data, path)
     leaf_hash = model.modeled_leaf_hash(pubkey)
     expected = model.hex_bytes(data["expected_qrs_msg"], path, "expected_qrs_msg")
     spend_type = model.QRS_EXT_FLAG * 2 + (1 if annex else 0)

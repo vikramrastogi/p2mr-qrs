@@ -38,8 +38,10 @@ the final BIP-360/QRS sighash and hashing definitions do not exist yet.
 
 The provisional coverage matrix is `vector_coverage_matrix.json` and is
 documented in `../docs/VECTOR_COVERAGE_MATRIX.md`. It maps expected reviewer
-coverage to structured fixtures, negative/fuzz cases, digest mutation
-self-tests, and invalid-verifier benchmark cases.
+coverage to structured fixtures, executable negative cases, the structured
+malformed-witness corpus, digest mutation self-tests, and invalid-verifier
+benchmark cases. The `fuzz/` entries are corpus seeds for the current
+structured classifier and future fuzzing, not a wired libFuzzer target.
 
 The important invariant in this directory is failure-stage classification:
 structural invalid cases must fail before SLH-DSA verification, while
