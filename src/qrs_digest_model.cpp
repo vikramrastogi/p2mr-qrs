@@ -255,6 +255,30 @@ std::string array_value(const std::string& json, const std::string& key) {
   throw std::runtime_error("unterminated JSON array for key: " + key);
 }
 
+bool terminal_witness_label_is_annex(const std::string& json) {
+  if (json.find("\"witness_stack\"") == std::string::npos) {
+    return false;
+  }
+  const std::string array = array_value(json, "witness_stack");
+  std::string last;
+  const std::regex re("\"([^\"]*)\"");
+  for (std::sregex_iterator it(array.begin(), array.end(), re), end; it != end; ++it) {
+    last = (*it)[1].str();
+  }
+  return last == "annex";
+}
+
+std::vector<unsigned char> effective_annex(const std::string& json) {
+  if (json.find("\"annex\"") == std::string::npos) {
+    return {};
+  }
+  const auto annex = parse_hex(string_value(json, "annex"), "annex");
+  if (annex.empty() || !terminal_witness_label_is_annex(json)) {
+    return {};
+  }
+  return annex;
+}
+
 std::vector<unsigned char> descriptor_value(const std::string& json, const std::string& key) {
   const std::size_t pos = value_pos(json, key);
   if (json[pos] == '"') {
@@ -398,9 +422,7 @@ std::vector<unsigned char> merkle_root_from_control(std::vector<unsigned char> r
 QrsDigestVectorResult compute_from_json(const std::string& json) {
   const auto pubkey = descriptor_value(json, "qrs_public_key");
   const auto control = descriptor_value(json, "control_block");
-  const std::string annex_hex =
-      json.find("\"annex\"") == std::string::npos ? "" : string_value(json, "annex");
-  const auto annex = parse_hex(annex_hex, "annex");
+  const auto annex = effective_annex(json);
   const auto inputs = parse_inputs(json);
   const auto outputs = parse_outputs(json);
   const std::uint64_t tx_version = number_value(json, "version", 0, true);

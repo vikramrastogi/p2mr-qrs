@@ -107,7 +107,7 @@ def validate_case_metadata(row: dict[str, Any], artifact: Path) -> None:
         data.get("reaches_slh_dsa_verifier") == row["reaches_slh_dsa_verifier"],
         f"{row['case_id']}: reaches_slh_dsa_verifier mismatch",
     )
-    require(row["expected_result"] is False, f"{row['case_id']}: negative/fuzz rows must expect false")
+    require(row["expected_result"] is False, f"{row['case_id']}: negative/corpus rows must expect false")
 
 
 def validate_source_label(row: dict[str, Any], artifact: Path) -> None:

@@ -1,7 +1,7 @@
 {
   "schema": "p2mr-qrs/vector-coverage-matrix/v0",
   "status": "provisional_executable_coverage_not_final_consensus_vectors",
-  "description": "Coverage matrix for provisional QRS structured fixtures, negative/fuzz cases, digest mutation self-tests, and verifier invalid-case checks.",
+  "description": "Coverage matrix for provisional QRS structured fixtures, executable negative/corpus cases, digest mutation self-tests, and verifier invalid-case checks.",
   "rows": [
     {
       "case_id": "valid_no_annex",

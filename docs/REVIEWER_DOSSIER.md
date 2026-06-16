@@ -160,8 +160,12 @@ modeled hashing rules remain provisional pending final BIP-360/QRS definitions.
 
 `VECTOR_COVERAGE_MATRIX.md` and
 `test_vectors/vector_coverage_matrix.json` make the current provisional
-coverage explicit across structured fixtures, negative/fuzz witness cases,
-digest mutation self-tests, and fixed-length invalid verifier cases.
+coverage explicit across structured fixtures, executable negative cases, the
+structured malformed-witness corpus, digest mutation self-tests, and
+fixed-length invalid verifier cases. `scripts/run_qrs_negative_tests.py`
+materializes each listed negative/corpus case and runs the provisional
+failure-stage classifier; `fuzz/` is not represented as a wired libFuzzer
+target.
 
 ## Benchmark status
 
