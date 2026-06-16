@@ -78,6 +78,13 @@ The BIP requires BIP-360 and remains blocked on final BIP-360 definitions for
 P2MR hashing, sighash tagging, annex handling, and future-leaf behavior. The
 vectors are marked provisional for the same reason.
 
+BIP-360 reference material already explores P2MR/PQC constructions, including
+SLH-DSA in script-like leaves. This package does not claim to invent the general
+P2MR-plus-post-quantum-signature idea; its narrower contribution is the
+P2MR-only future-leaf rule that treats the second-to-last witness element as one
+32-byte SLH-DSA payload and verifies one fixed-size SLH-DSA signature without
+invoking tapscript execution.
+
 ## Vector status
 
 Provisional executable structured fixtures exist in `test_vectors/` and are

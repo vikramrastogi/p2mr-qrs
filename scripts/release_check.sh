@@ -33,7 +33,7 @@ grep -n "Requires: 341, 342, 360" "$BIP"
 grep -n "Title: P2MR SLH-DSA Leaf" "$BIP"
 grep -n "Authors: Vikram Rastogi <vikramrastogi@gmail.com>" "$BIP"
 grep -n "Assigned: ?" "$BIP"
-STALE_TITLE_PATTERN="Title: P2MR Quantum-""Rescue Leaf"
+STALE_TITLE_PATTERN="Title: P2MR Quantum-""Rescue"" Leaf"
 if grep -nE "Author:|Created:|$STALE_TITLE_PATTERN" "$BIP"; then
   echo "release_check.sh: stale BIP preamble field found" >&2
   exit 1
@@ -45,7 +45,7 @@ STALE_STRONG="strong un""forgeability"
 STALE_SUF="SUF-""CMA"
 STALE_BSD="3-clause B""SD"
 STALE_PRELIM="Non-consensus preliminary bench""mark"
-STALE_RESCUE_DRAFT="P2MR SLH-DSA Rescue"" Leaf"
+STALE_RESCUE_DRAFT="P2MR SLH-DSA Res""cue"" Leaf"
 STALE_BIP_WORDING_PATTERN="$STALE_UPPER_QR|$STALE_LOWER_QR|$STALE_QSAFE|$STALE_STRONG|$STALE_SUF|$STALE_BSD|$STALE_PRELIM|$STALE_RESCUE_DRAFT"
 if grep -nE "$STALE_BIP_WORDING_PATTERN" "$BIP"; then
   echo "release_check.sh: stale BIP wording found" >&2
