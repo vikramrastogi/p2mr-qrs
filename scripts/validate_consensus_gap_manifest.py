@@ -47,6 +47,16 @@ ALLOWED_OWNER_TYPES = {
     "future_batch_schnorr_review",
 }
 
+CRITICAL_GAP_SCHEMA_KEYS = {
+    "id",
+    "status",
+    "blocks",
+    "owner_type",
+    "description",
+    "evidence_required",
+    "current_repo_artifact",
+}
+
 
 def fail(message: str) -> None:
     print(f"validate_consensus_gap_manifest.py: {message}", file=sys.stderr)
@@ -75,12 +85,30 @@ def validate_artifact(path_text: str, gap_id: str) -> None:
         fail(f"{gap_id}: current_repo_artifact does not exist: {path_text}")
 
 
+def validate_schema_contract(schema: dict[str, Any]) -> None:
+    if schema.get("title") != "P2MR QRS Consensus Gap Manifest":
+        fail("schema title mismatch")
+
+    gap_schema = schema.get("properties", {}).get("gaps", {}).get("items", {})
+    required_keys = set(gap_schema.get("required", []))
+    missing = sorted(CRITICAL_GAP_SCHEMA_KEYS - required_keys)
+    if missing:
+        fail("schema gap required keys missing: " + ", ".join(missing))
+
+    schema_const = schema.get("properties", {}).get("schema", {}).get("const")
+    if schema_const != "p2mr-qrs/consensus-gap-manifest/v0":
+        fail("schema identifier contract mismatch")
+
+    status_const = schema.get("properties", {}).get("status", {}).get("const")
+    if status_const != "blocking_activation":
+        fail("schema status contract mismatch")
+
+
 def main() -> int:
     schema = load_json(SCHEMA)
     manifest = load_json(MANIFEST)
 
-    if schema.get("title") != "P2MR QRS Consensus Gap Manifest":
-        fail("schema title mismatch")
+    validate_schema_contract(schema)
     if manifest.get("schema") != "p2mr-qrs/consensus-gap-manifest/v0":
         fail("manifest schema identifier mismatch")
     if manifest.get("status") != "blocking_activation":

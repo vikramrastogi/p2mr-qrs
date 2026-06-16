@@ -14,6 +14,8 @@ RESOURCE_MD="$TMP_DIR/resource-accounting-decision.md"
 mkdir -p "$TMP_DIR"
 
 python3 "$ROOT/scripts/compute_qrs_digest_model.py" "$ROOT/test_vectors"
+python3 "$ROOT/scripts/validate_vector_coverage_matrix.py"
+python3 "$ROOT/scripts/validate_consensus_gap_manifest.py"
 python3 "$ROOT/scripts/validate_test_vectors.py" "$ROOT/test_vectors"
 python3 "$ROOT/scripts/verify_qrs_fixtures.py" "$ROOT/test_vectors"
 python3 "$ROOT/scripts/run_qrs_negative_tests.py"

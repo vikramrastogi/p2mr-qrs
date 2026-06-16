@@ -18,6 +18,8 @@ jobs:
       - name: Validate fixture docs and metadata
         run: |
           python3 scripts/compute_qrs_digest_model.py test_vectors
+          python3 scripts/validate_vector_coverage_matrix.py
+          python3 scripts/validate_consensus_gap_manifest.py
           python3 scripts/validate_test_vectors.py test_vectors/
           python3 scripts/verify_qrs_fixtures.py test_vectors/
           python3 scripts/run_qrs_negative_tests.py

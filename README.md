@@ -111,6 +111,9 @@ GitHub Actions structural smoke checks are not full release evidence when the
 runner lacks an OpenSSL provider exposing `SLH-DSA-SHA2-128s`. Strict release
 evidence requires the macOS release-check job or a local
 `bash scripts/release_check.sh` run with OpenSSL 3.5+ exposing that algorithm.
+The CI release-check job is strict when the runner's OpenSSL exposes
+`SLH-DSA-SHA2-128s`; if provider availability changes, the failure is treated as
+an environment capability failure, not as permission to weaken the release gate.
 
 For stricter publication evidence, run `bash scripts/full_release_check.sh`.
 This omits advisory mode and fails if the current benchmark evidence requires

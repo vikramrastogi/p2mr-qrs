@@ -4,8 +4,10 @@ This matrix makes fixture coverage explicit. It is not a final consensus-vector
 claim.
 
 The machine-readable matrix is
-`test_vectors/vector_coverage_matrix.json`, and the release gate validates it
-with `scripts/validate_vector_coverage_matrix.py`.
+`test_vectors/vector_coverage_matrix.json`. Its schema metadata is locked in
+`test_vectors/vector_coverage_matrix.schema.json`, whose title is
+`P2MR QRS Vector Coverage Matrix`. The release gate validates both files with
+`scripts/validate_vector_coverage_matrix.py`.
 
 Current coverage is split across:
 

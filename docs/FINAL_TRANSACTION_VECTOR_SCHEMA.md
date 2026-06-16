@@ -39,6 +39,7 @@ Bitcoin Core `SigMsg` equivalence. Final consensus vectors require:
 Each final vector must include:
 
 - `schema_status`
+- `vector_status`
 - `name`
 - `bip360_revision`
 - `qrs_bip_revision`
@@ -60,10 +61,22 @@ Each final vector must include:
 - `failure_stage`
 - `reaches_slh_dsa_verifier`
 
+## Machine-readable status fields
+
 `schema_status` is machine-readable and fail-closed. While this schema is only a
-placeholder, vectors using it must set
+placeholder, the acceptable schema posture is
 `schema_only_pending_final_bip360_qrs`. Future final serialized consensus
 vectors must instead set `final_consensus_vector`.
+
+`vector_status` is separate from `schema_status`. Current future-vector contract
+instances must use `future_final_vector_contract`. `vector_status =
+final_consensus_vector` must not appear until final BIP-360/QRS definitions and
+serialized transaction vectors exist.
+
+Current `test_vectors/` artifacts are provisional fixtures and draft
+cryptographic vectors. They are not instances of the final-vector contract
+unless a future release explicitly generates serialized transaction vectors
+under this schema.
 
 The machine-readable schema lives at
 `test_vectors/qrs_transaction_vector.schema.json`.

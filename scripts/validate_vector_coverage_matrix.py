@@ -11,6 +11,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 MATRIX = ROOT / "test_vectors" / "vector_coverage_matrix.json"
+SCHEMA = ROOT / "test_vectors" / "vector_coverage_matrix.schema.json"
 
 REQUIRED_CASE_IDS = {
     "valid_no_annex",
@@ -42,6 +43,23 @@ ARTIFACT_TYPES = {
     "negative_case",
     "digest_self_test",
     "benchmark_invalid_case",
+}
+
+REQUIRED_TOP_LEVEL_SCHEMA_KEYS = {
+    "schema",
+    "status",
+    "description",
+    "rows",
+}
+
+REQUIRED_ROW_SCHEMA_KEYS = {
+    "case_id",
+    "artifact_type",
+    "artifact",
+    "expected_result",
+    "failure_stage",
+    "reaches_slh_dsa_verifier",
+    "required_by",
 }
 
 
@@ -99,8 +117,31 @@ def validate_source_label(row: dict[str, Any], artifact: Path) -> None:
     require(label in text, f"{row['case_id']}: label {label!r} not found in {artifact.relative_to(ROOT)}")
 
 
+def validate_schema_contract(schema: dict[str, Any]) -> None:
+    require(schema.get("title") == "P2MR QRS Vector Coverage Matrix", "schema title mismatch")
+
+    top_required = set(schema.get("required", []))
+    missing_top = sorted(REQUIRED_TOP_LEVEL_SCHEMA_KEYS - top_required)
+    require(not missing_top, "schema top-level required keys missing: " + ", ".join(missing_top))
+
+    row_schema = schema.get("properties", {}).get("rows", {}).get("items", {})
+    row_required = set(row_schema.get("required", []))
+    missing_row = sorted(REQUIRED_ROW_SCHEMA_KEYS - row_required)
+    require(not missing_row, "schema row required keys missing: " + ", ".join(missing_row))
+
+    schema_const = schema.get("properties", {}).get("schema", {}).get("const")
+    require(schema_const == "p2mr-qrs/vector-coverage-matrix/v0", "schema identifier contract mismatch")
+    status_const = schema.get("properties", {}).get("status", {}).get("const")
+    require(
+        status_const == "provisional_executable_coverage_not_final_consensus_vectors",
+        "schema status contract mismatch",
+    )
+
+
 def main() -> int:
+    schema = load_json(SCHEMA)
     matrix = load_json(MATRIX)
+    validate_schema_contract(schema)
     require(matrix.get("schema") == "p2mr-qrs/vector-coverage-matrix/v0", "unexpected matrix schema")
     require(
         matrix.get("status") == "provisional_executable_coverage_not_final_consensus_vectors",
@@ -118,6 +159,13 @@ def main() -> int:
         seen.add(case_id)
         artifact_type = row.get("artifact_type")
         require(artifact_type in ARTIFACT_TYPES, f"{case_id}: unknown artifact_type {artifact_type!r}")
+        if "self_test_label" in row:
+            require(
+                artifact_type in {"digest_self_test", "benchmark_invalid_case"},
+                f"{case_id}: self_test_label is only valid for digest_self_test and benchmark_invalid_case",
+            )
+        if "artifact_case" in row:
+            require(artifact_type == "negative_case", f"{case_id}: artifact_case is only valid for negative_case rows")
         artifact_text = row.get("artifact")
         require(isinstance(artifact_text, str) and artifact_text, f"{case_id}: artifact is required")
         artifact = ROOT / artifact_text

@@ -107,6 +107,13 @@ grep -n "schema-only placeholder" "$ROOT/docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md
 grep -n "Schema for future P2MR QRS serialized transaction vectors" "$ROOT/test_vectors/qrs_transaction_vector.schema.json"
 grep -n "schema_status" "$ROOT/test_vectors/qrs_transaction_vector.schema.json"
 grep -n "schema_only_pending_final_bip360_qrs" "$ROOT/test_vectors/qrs_transaction_vector.schema.json"
+grep -n "vector_status" "$ROOT/test_vectors/qrs_transaction_vector.schema.json"
+grep -n "future_final_vector_contract" "$ROOT/test_vectors/qrs_transaction_vector.schema.json" "$ROOT/docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md"
+if grep -RniE "test_vectors/.*are final consensus vectors|current test_vectors/.*are final consensus vectors" \
+  "$ROOT/README.md" "$ROOT/00_README.md" "$ROOT/docs" "$ROOT/test_vectors"; then
+  echo "release_check.sh: current test_vectors/ must not be described as final consensus vectors" >&2
+  exit 1
+fi
 grep -n "docs/REPRODUCIBILITY.md" "$ROOT/.github/ISSUE_TEMPLATE/benchmark-reproduction.yml"
 grep -n "BIP360_DEPENDENCY_MATRIX.md" "$ROOT/README.md" "$BIP" "$DOSSIER" "$ROOT/docs/PUBLIC_REVIEW_READINESS.md"
 grep -n "CONSENSUS_GAP_MANIFEST.md" "$ROOT/README.md" "$DOSSIER" "$ROOT/docs/PUBLIC_REVIEW_READINESS.md" "$CHECKLIST"
@@ -143,6 +150,11 @@ grep -n "random bit flips are not a proof" "$ROOT/docs/SLH_DSA_VERIFY_COST_ANALY
 grep -n "PUBLIC_REVIEW_POST_DRAFT.md" "$ROOT/README.md" "$ROOT/docs/PUBLIC_REVIEW_READINESS.md" "$CHECKLIST"
 grep -n "REVIEW_THIS_FIRST.md" "$ROOT/README.md" "$ROOT/docs/PUBLIC_REVIEW_READINESS.md" "$CHECKLIST"
 grep -n "This package is not asking reviewers to support activation" "$ROOT/docs/REVIEW_THIS_FIRST.md"
+grep -n "bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki" "$ROOT/docs/REVIEW_THIS_FIRST.md"
+grep -n "RESOURCE_ACCOUNTING_DECISION.md" "$ROOT/docs/REVIEW_THIS_FIRST.md"
+grep -n "CONSENSUS_GAP_MANIFEST.md" "$ROOT/docs/REVIEW_THIS_FIRST.md"
+grep -n "VECTOR_COVERAGE_MATRIX.md" "$ROOT/docs/REVIEW_THIS_FIRST.md"
+grep -n "REPRODUCIBILITY.md" "$ROOT/docs/REVIEW_THIS_FIRST.md"
 grep -n "No legacy-output freeze, burn, throttle, sunset, or rescue policy" "$ROOT/docs/REVIEW_THIS_FIRST.md"
 grep -n "No tapscript opcode in v1" "$ROOT/docs/REVIEW_THIS_FIRST.md"
 grep -n "No witness discount" "$ROOT/docs/REVIEW_THIS_FIRST.md"
@@ -156,6 +168,9 @@ grep -n "compute_qrs_digest_model.py" "$ROOT/docs/FINAL_TRANSACTION_VECTOR_SCHEM
 grep -n "cross-implementation" "$ROOT/docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md" "$DOSSIER" "$CHECKLIST"
 grep -n "VECTOR_COVERAGE_MATRIX.md" "$ROOT/README.md" "$DOSSIER" "$CHECKLIST"
 grep -n "vector_coverage_matrix.json" "$ROOT/docs/VECTOR_COVERAGE_MATRIX.md" "$ROOT/test_vectors/README.md"
+grep -n "vector_coverage_matrix.schema.json" "$ROOT/docs/VECTOR_COVERAGE_MATRIX.md" "$ROOT/scripts/validate_vector_coverage_matrix.py"
+grep -n "P2MR QRS Vector Coverage Matrix" "$ROOT/test_vectors/vector_coverage_matrix.schema.json" "$ROOT/docs/VECTOR_COVERAGE_MATRIX.md"
+grep -n "P2MR QRS Consensus Gap Manifest" "$ROOT/docs/consensus-gap-manifest.schema.json" "$ROOT/scripts/validate_consensus_gap_manifest.py"
 grep -n "Final serialized consensus vectors remain blocked" "$ROOT/docs/VECTOR_COVERAGE_MATRIX.md"
 grep -n "second reviewed SLH-DSA backend" "$DOSSIER"
 grep -n "2.5x hypothetical reviewed-batch-Schnorr baseline" "$ROOT/docs/EXPLICIT_QRS_BUDGET_FALLBACK.md" "$ROOT/docs/RESOURCE_ACCOUNTING_DECISION.md"
