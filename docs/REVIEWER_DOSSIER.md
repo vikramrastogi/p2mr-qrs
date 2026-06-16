@@ -73,7 +73,7 @@ cannot support the no-additional-budget rule for activation review.
 
 Reviewed public libsecp256k1 batch API: unavailable in the bundled upstream
 commit. Experimental native BIP-340 batch baseline: available as sensitivity
-analysis only, not reviewed consensus code. See `04_batch_schnorr_baseline.md`
+analysis only, not reviewed consensus code. See `BATCH_SCHNORR_BASELINE_STATUS.md`
 and `../scripts/check_batch_schnorr_baseline.py`.
 
 The experimental batch path includes a BIP-340 challenge self-test. The test
@@ -203,7 +203,7 @@ Markdown artifacts. The platform target table is `REPRODUCTION_MATRIX.md`.
 | Why not ML-DSA? | This draft tests one conservative hash-based primitive first. | BIP Motivation and Rationale. |
 | Why not a tapscript opcode? | The 7,856-byte signature exceeds the retained 520-byte tapscript stack-element limit. | BIP Rationale; `../test_vectors/`. |
 | Why no witness discount? | The proposal does not hide a blockspace-policy change inside the crypto primitive. | BIP Resource accounting; `../out/full.md`. |
-| What about batch Schnorr? | Reviewed public batch API status is explicit; experimental batch is labeled non-consensus. | `../out/batch-evidence.md`; `../04_batch_schnorr_baseline.md`; `../scripts/check_batch_schnorr_baseline.py`. |
+| What about batch Schnorr? | Reviewed public batch API status is explicit; experimental batch is labeled non-consensus. | `../out/batch-evidence.md`; `BATCH_SCHNORR_BASELINE_STATUS.md`; `../scripts/check_batch_schnorr_baseline.py`. |
 | How does evidence map to the budget rule? | The decision criteria and current conclusion are in a separate decision record. | `RESOURCE_ACCOUNTING_DECISION.md`; `../out/quick.md`; `../out/full.md`. |
 | What if the no-budget rule fails? | Use the inactive explicit QRS budget fallback before activation. | `EXPLICIT_QRS_BUDGET_FALLBACK.md`; `../scripts/evaluate_resource_accounting.py`. |
 | What if BIP-360 changes? | Advancement is blocked on final BIP-360 definitions. | BIP Dependencies and Rationale; provisional vector notes. |

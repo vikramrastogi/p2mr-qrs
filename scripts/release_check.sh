@@ -25,6 +25,7 @@ BATCH_DISABLED_MD="$TMP_DIR/schnorr-batch-disabled.md"
 SECP_COMMIT_FILE="$ROOT/third_party/secp256k1.COMMIT"
 CONSENSUS_GAP_MANIFEST="$ROOT/docs/consensus-gap-manifest.json"
 CONSENSUS_GAP_MANIFEST_MD="$ROOT/docs/CONSENSUS_GAP_MANIFEST.md"
+BATCH_SCHNORR_STATUS="$ROOT/docs/BATCH_SCHNORR_BASELINE_STATUS.md"
 CONSOLIDATED_BIP="$ROOT/docs/bip-p2mr-slh-dsa-leaf-""consolidated.mediawiki"
 
 ensure_out_clean() {
@@ -104,6 +105,8 @@ grep -n "Bitcoin Core validation-path integration not implemented" "$ROOT/docs/B
 grep -n "qrs_transaction_vector.schema.json" "$ROOT/docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md"
 grep -n "schema-only placeholder" "$ROOT/docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md"
 grep -n "Schema for future P2MR QRS serialized transaction vectors" "$ROOT/test_vectors/qrs_transaction_vector.schema.json"
+grep -n "schema_status" "$ROOT/test_vectors/qrs_transaction_vector.schema.json"
+grep -n "schema_only_pending_final_bip360_qrs" "$ROOT/test_vectors/qrs_transaction_vector.schema.json"
 grep -n "docs/REPRODUCIBILITY.md" "$ROOT/.github/ISSUE_TEMPLATE/benchmark-reproduction.yml"
 grep -n "BIP360_DEPENDENCY_MATRIX.md" "$ROOT/README.md" "$BIP" "$DOSSIER" "$ROOT/docs/PUBLIC_REVIEW_READINESS.md"
 grep -n "CONSENSUS_GAP_MANIFEST.md" "$ROOT/README.md" "$DOSSIER" "$ROOT/docs/PUBLIC_REVIEW_READINESS.md" "$CHECKLIST"
@@ -114,6 +117,19 @@ grep -n "bip360_final_leaf_hashing" "$CONSENSUS_GAP_MANIFEST" "$CONSENSUS_GAP_MA
 grep -n "qrs_ext_flag_assignment" "$CONSENSUS_GAP_MANIFEST" "$CONSENSUS_GAP_MANIFEST_MD"
 grep -n "bitcoin_core_validation_path_integration" "$CONSENSUS_GAP_MANIFEST" "$CONSENSUS_GAP_MANIFEST_MD"
 grep -n "reviewed_public_batch_schnorr_baseline" "$CONSENSUS_GAP_MANIFEST" "$CONSENSUS_GAP_MANIFEST_MD"
+grep -n "BATCH_SCHNORR_BASELINE_STATUS.md" "$CONSENSUS_GAP_MANIFEST" "$CONSENSUS_GAP_MANIFEST_MD" "$ROOT/README.md" "$DOSSIER"
+grep -n "reviewed public BIP-340 batch verification baseline unavailable" "$BATCH_SCHNORR_STATUS"
+grep -n "not a reviewed public libsecp256k1 API" "$BATCH_SCHNORR_STATUS"
+grep -n "must never synthesize a fake batch baseline" "$BATCH_SCHNORR_STATUS"
+OLD_BATCH_SPEC="04_batch_schnorr_""baseline.md"
+if [ -e "$ROOT/$OLD_BATCH_SPEC" ]; then
+  echo "release_check.sh: batch Schnorr status must live in docs/BATCH_SCHNORR_BASELINE_STATUS.md, not $OLD_BATCH_SPEC" >&2
+  exit 1
+fi
+if grep -Rni "$OLD_BATCH_SPEC" "$ROOT/README.md" "$ROOT/docs" "$ROOT/scripts"; then
+  echo "release_check.sh: stale batch Schnorr task-spec filename found" >&2
+  exit 1
+fi
 grep -n "final_serialized_consensus_vectors" "$CONSENSUS_GAP_MANIFEST" "$CONSENSUS_GAP_MANIFEST_MD"
 grep -n "REPRODUCTION_MATRIX.md" "$ROOT/README.md" "$ROOT/docs/RELEASE_CHECKLIST.md" "$ROOT/docs/REPRODUCIBILITY.md"
 grep -n "Apple Silicon macOS" "$ROOT/docs/REPRODUCTION_MATRIX.md"
@@ -202,6 +218,10 @@ python3 "$ROOT/scripts/run_qrs_negative_tests.py"
 
 cmake -S "$ROOT" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release
 cmake --build "$BUILD_DIR" -j
+if ! "$BUILD_DIR/qrs_native_bench" --slh-probe; then
+  echo "release_check.sh: SLH-DSA backend probe failed; check OpenSSL version, provider loading, EVP_PKEY_CTX_new_from_name support for SLH-DSA-SHA2-128s, context-string support, and valid/mutated verification preflight" >&2
+  exit 1
+fi
 python3 "$ROOT/scripts/check_qrs_digest_agreement.py" \
   "$ROOT/test_vectors" \
   --binary "$BUILD_DIR/qrs_native_bench"
@@ -297,6 +317,8 @@ jq '.environment.compiler_flags' "$TMP_QUICK_JSON"
 jq '.environment.cmake_build_type' "$TMP_QUICK_JSON"
 jq '.environment.openssl_version' "$TMP_QUICK_JSON"
 jq '.environment.openssl_provider' "$TMP_QUICK_JSON"
+jq '.benchmarks.slh_dsa_sha2_128s.slh_dsa_backend_probe.keygen' "$TMP_QUICK_JSON"
+jq '.benchmarks.slh_dsa_sha2_128s.slh_dsa_backend_probe.verify_mutated_signature' "$TMP_QUICK_JSON"
 jq '.draft_rule_status' "$TMP_RESOURCE_DECISION_JSON"
 jq '.activation_ready' "$TMP_RESOURCE_DECISION_JSON"
 jq '.explicit_qrs_budget_required' "$TMP_RESOURCE_DECISION_JSON"

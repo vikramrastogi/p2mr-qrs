@@ -283,10 +283,12 @@ SlhDsaResult run_slh_dsa_benchmarks(BenchmarkMode mode) {
   openssl_backend.version = r.openssl_version;
   try {
     auto key = generate_key();
+    r.backend_probe.keygen = "passed";
     r.provider = provider_name(key.get());
     openssl_backend.provider = r.provider;
     const std::vector<unsigned char> raw_pub = raw_public_key(key.get());
     r.public_key_bytes = raw_pub.size();
+    r.backend_probe.public_key_bytes = raw_pub.size();
     openssl_backend.public_key_bytes = raw_pub.size();
     if (raw_pub.size() != 32) {
       throw std::runtime_error("SLH-DSA-SHA2-128s public key length was " +
@@ -298,16 +300,20 @@ SlhDsaResult run_slh_dsa_benchmarks(BenchmarkMode mode) {
       msg[i] = static_cast<unsigned char>(0xa5U ^ i);
     }
     std::vector<unsigned char> sig = sign_message(key.get(), msg);
+    r.backend_probe.sign = "passed";
     if (sig.size() != 7856) {
       throw std::runtime_error("SLH-DSA-SHA2-128s signature length was " +
                                std::to_string(sig.size()) + ", expected 7856");
     }
     r.signature_bytes = sig.size();
+    r.backend_probe.signature_bytes = sig.size();
     openssl_backend.signature_bytes = sig.size();
     r.mode = slh_dsa_mode();
+    r.backend_probe.context_string = "explicit_empty_context_set";
     if (!verify_message(public_key.get(), msg, sig)) {
       throw std::runtime_error("valid SLH-DSA signature failed before timing");
     }
+    r.backend_probe.verify_valid = "passed";
     std::vector<InvalidSignatureCase> invalid_cases =
         make_invalid_fixed_length_cases(raw_pub, msg, sig);
     for (const auto& c : invalid_cases) {
@@ -320,6 +326,7 @@ SlhDsaResult run_slh_dsa_benchmarks(BenchmarkMode mode) {
                                  " verified before timing");
       }
     }
+    r.backend_probe.verify_mutated_signature = "passed";
 
     const std::size_t batches =
         mode == BenchmarkMode::Quick ? 7 : (mode == BenchmarkMode::Standard ? 15 : 31);

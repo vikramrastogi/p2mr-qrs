@@ -33,6 +33,10 @@ ensure_out_clean
 
 cmake -S "$ROOT" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release
 cmake --build "$BUILD_DIR" -j
+if ! "$BUILD_DIR/qrs_native_bench" --slh-probe; then
+  echo "full_release_check.sh: SLH-DSA backend probe failed; check OpenSSL version, provider loading, EVP_PKEY_CTX_new_from_name support for SLH-DSA-SHA2-128s, context-string support, and valid/mutated verification preflight" >&2
+  exit 1
+fi
 
 mkdir -p "$TMP_DIR"
 BATCH_EVIDENCE_ARGS=(
