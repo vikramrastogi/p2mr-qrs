@@ -1,0 +1,203 @@
+{
+  "schema": "p2mr-qrs/vector-coverage-matrix/v0",
+  "status": "provisional_executable_coverage_not_final_consensus_vectors",
+  "description": "Coverage matrix for provisional QRS structured fixtures, negative/fuzz cases, digest mutation self-tests, and verifier invalid-case checks.",
+  "rows": [
+    {
+      "case_id": "valid_no_annex",
+      "artifact_type": "fixture",
+      "artifact": "test_vectors/qrs_valid_no_annex.json",
+      "expected_result": true,
+      "failure_stage": "none",
+      "reaches_slh_dsa_verifier": true,
+      "required_by": ["valid_spend", "no_annex_digest"]
+    },
+    {
+      "case_id": "valid_with_annex",
+      "artifact_type": "fixture",
+      "artifact": "test_vectors/qrs_valid_with_annex.json",
+      "expected_result": true,
+      "failure_stage": "none",
+      "reaches_slh_dsa_verifier": true,
+      "required_by": ["valid_spend", "annex_digest"]
+    },
+    {
+      "case_id": "invalid_fixed_length_signature",
+      "artifact_type": "fixture",
+      "artifact": "test_vectors/qrs_invalid_signature_fixed_length.json",
+      "expected_result": false,
+      "failure_stage": "slh_dsa_verify",
+      "reaches_slh_dsa_verifier": true,
+      "required_by": ["invalid_fixed_length_crypto_reject"]
+    },
+    {
+      "case_id": "invalid_public_key_length",
+      "artifact_type": "fixture",
+      "artifact": "test_vectors/qrs_invalid_pubkey_length.json",
+      "expected_result": false,
+      "failure_stage": "public_key_length",
+      "reaches_slh_dsa_verifier": false,
+      "required_by": ["structural_reject", "public_key_size"]
+    },
+    {
+      "case_id": "invalid_signature_length",
+      "artifact_type": "fixture",
+      "artifact": "test_vectors/qrs_invalid_signature_length.json",
+      "expected_result": false,
+      "failure_stage": "signature_length",
+      "reaches_slh_dsa_verifier": false,
+      "required_by": ["structural_reject", "signature_size"]
+    },
+    {
+      "case_id": "invalid_control_block_length",
+      "artifact_type": "fixture",
+      "artifact": "test_vectors/qrs_invalid_control_block_length.json",
+      "expected_result": false,
+      "failure_stage": "control_block_length",
+      "reaches_slh_dsa_verifier": false,
+      "required_by": ["structural_reject", "control_block_size"]
+    },
+    {
+      "case_id": "control_low_bit_unset",
+      "artifact_type": "fixture",
+      "artifact": "test_vectors/qrs_control_low_bit_unset.json",
+      "expected_result": false,
+      "failure_stage": "control_low_bit",
+      "reaches_slh_dsa_verifier": false,
+      "required_by": ["structural_reject", "control_block_low_bit"]
+    },
+    {
+      "case_id": "invalid_leaf_version",
+      "artifact_type": "fixture",
+      "artifact": "test_vectors/qrs_invalid_leaf_version.json",
+      "expected_result": false,
+      "failure_stage": "leaf_version",
+      "reaches_slh_dsa_verifier": false,
+      "required_by": ["structural_reject", "future_leaf_version"]
+    },
+    {
+      "case_id": "merkle_root_mismatch",
+      "artifact_type": "fixture",
+      "artifact": "test_vectors/qrs_merkle_root_mismatch.json",
+      "expected_result": false,
+      "failure_stage": "merkle_root_mismatch",
+      "reaches_slh_dsa_verifier": false,
+      "required_by": ["structural_reject", "p2mr_root_binding"]
+    },
+    {
+      "case_id": "malformed_witness_missing_element",
+      "artifact_type": "fuzz_case",
+      "artifact": "fuzz/qrs_witness_corpus/too_few_witness_elements.json",
+      "expected_result": false,
+      "failure_stage": "malformed_witness",
+      "reaches_slh_dsa_verifier": false,
+      "required_by": ["witness_exact_cardinality"]
+    },
+    {
+      "case_id": "malformed_witness_extra_element",
+      "artifact_type": "fixture",
+      "artifact": "test_vectors/qrs_malformed_witness_extra_element.json",
+      "expected_result": false,
+      "failure_stage": "malformed_witness",
+      "reaches_slh_dsa_verifier": false,
+      "required_by": ["witness_exact_cardinality"]
+    },
+    {
+      "case_id": "malformed_witness_extra_after_annex",
+      "artifact_type": "fixture",
+      "artifact": "test_vectors/qrs_malformed_witness_extra_after_annex.json",
+      "expected_result": false,
+      "failure_stage": "malformed_witness",
+      "reaches_slh_dsa_verifier": false,
+      "required_by": ["witness_exact_cardinality", "annex_position"]
+    },
+    {
+      "case_id": "maximum_depth_merkle_path",
+      "artifact_type": "fixture",
+      "artifact": "test_vectors/qrs_max_depth_path.json",
+      "expected_result": true,
+      "failure_stage": "none",
+      "reaches_slh_dsa_verifier": true,
+      "required_by": ["control_block_max_depth", "depth_model"]
+    },
+    {
+      "case_id": "multi_input_distinct_spent_outputs",
+      "artifact_type": "fixture",
+      "artifact": "test_vectors/qrs_multi_input_explicit_spent_outputs.json",
+      "expected_result": false,
+      "failure_stage": "merkle_root_mismatch",
+      "reaches_slh_dsa_verifier": false,
+      "required_by": ["multi_input_digest", "distinct_spent_outputs"]
+    },
+    {
+      "case_id": "annex_changes_qrs_msg",
+      "artifact_type": "digest_self_test",
+      "artifact": "scripts/compute_qrs_digest_model.py",
+      "self_test_label": "changed annex",
+      "expected_result": true,
+      "failure_stage": "qrs_msg_changed",
+      "reaches_slh_dsa_verifier": false,
+      "required_by": ["annex_digest"]
+    },
+    {
+      "case_id": "output_amount_changes_qrs_msg",
+      "artifact_type": "digest_self_test",
+      "artifact": "scripts/compute_qrs_digest_model.py",
+      "self_test_label": "changed output amount",
+      "expected_result": true,
+      "failure_stage": "qrs_msg_changed",
+      "reaches_slh_dsa_verifier": false,
+      "required_by": ["output_digest"]
+    },
+    {
+      "case_id": "spent_output_amount_changes_qrs_msg",
+      "artifact_type": "digest_self_test",
+      "artifact": "scripts/compute_qrs_digest_model.py",
+      "self_test_label": "changed spent output amount",
+      "expected_result": true,
+      "failure_stage": "qrs_msg_changed",
+      "reaches_slh_dsa_verifier": false,
+      "required_by": ["spent_output_digest"]
+    },
+    {
+      "case_id": "spent_output_script_changes_qrs_msg",
+      "artifact_type": "digest_self_test",
+      "artifact": "scripts/compute_qrs_digest_model.py",
+      "self_test_label": "changed spent output scriptPubKey",
+      "expected_result": true,
+      "failure_stage": "qrs_msg_changed",
+      "reaches_slh_dsa_verifier": false,
+      "required_by": ["spent_output_digest"]
+    },
+    {
+      "case_id": "leaf_pubkey_changes_qrs_msg",
+      "artifact_type": "digest_self_test",
+      "artifact": "scripts/compute_qrs_digest_model.py",
+      "self_test_label": "changed leaf pubkey",
+      "expected_result": true,
+      "failure_stage": "qrs_msg_changed",
+      "reaches_slh_dsa_verifier": false,
+      "required_by": ["leaf_hash_binding", "qrs_msg_extension"]
+    },
+    {
+      "case_id": "wrong_message_signature_fails",
+      "artifact_type": "benchmark_invalid_case",
+      "artifact": "src/slh_dsa_openssl.cpp",
+      "self_test_label": "wrong_message",
+      "expected_result": false,
+      "failure_stage": "slh_dsa_verify",
+      "reaches_slh_dsa_verifier": true,
+      "required_by": ["invalid_fixed_length_crypto_reject", "message_binding"]
+    },
+    {
+      "case_id": "wrong_public_key_signature_fails",
+      "artifact_type": "benchmark_invalid_case",
+      "artifact": "src/slh_dsa_openssl.cpp",
+      "self_test_label": "wrong_public_key",
+      "expected_result": false,
+      "failure_stage": "slh_dsa_verify",
+      "reaches_slh_dsa_verifier": true,
+      "required_by": ["invalid_fixed_length_crypto_reject", "public_key_binding"]
+    }
+  ]
+}

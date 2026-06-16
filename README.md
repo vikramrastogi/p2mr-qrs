@@ -45,6 +45,8 @@ validation budget before activation.
 - `docs/BIP360_DEPENDENCY_MATRIX.md` - BIP-360/P2MR dependency closure table.
 - `docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md` - schema and requirements for final
   serialized consensus vectors.
+- `docs/VECTOR_COVERAGE_MATRIX.md` - machine-checked provisional fixture and
+  negative-case coverage matrix.
 - `docs/REPRODUCIBILITY.md` - independent rerun protocol.
 - `docs/REPRODUCTION_MATRIX.md` - public reproduction tracker and platform
   targets.
