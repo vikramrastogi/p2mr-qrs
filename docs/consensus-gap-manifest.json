@@ -1,0 +1,148 @@
+{
+  "schema": "p2mr-qrs/consensus-gap-manifest/v0",
+  "status": "blocking_activation",
+  "description": "Machine-readable list of known consensus, integration, reproduction, and standards gaps that block activation or final vectors for the P2MR SLH-DSA Leaf draft.",
+  "gaps": [
+    {
+      "id": "bip360_final_leaf_hashing",
+      "status": "blocking_activation",
+      "blocks": [
+        "activation",
+        "complete_vectors"
+      ],
+      "owner_type": "future_bip360_review",
+      "description": "Final P2MR leaf hashing rules must be stable before QRS leaf hashes can be treated as consensus vector material.",
+      "evidence_required": "Final BIP-360/P2MR TapLeaf or successor leaf-hash definition and regenerated cross-implementation QRS vectors.",
+      "current_repo_artifact": "docs/BIP360_DEPENDENCY_MATRIX.md"
+    },
+    {
+      "id": "bip360_final_branch_hashing",
+      "status": "blocking_activation",
+      "blocks": [
+        "activation",
+        "complete_vectors"
+      ],
+      "owner_type": "future_bip360_review",
+      "description": "Final P2MR branch hashing rules must be stable before QRS Merkle roots can be treated as consensus vector material.",
+      "evidence_required": "Final BIP-360/P2MR branch-hash definition and regenerated branch-depth vectors.",
+      "current_repo_artifact": "docs/BIP360_DEPENDENCY_MATRIX.md"
+    },
+    {
+      "id": "bip360_final_future_leaf_behavior",
+      "status": "blocking_activation",
+      "blocks": [
+        "activation"
+      ],
+      "owner_type": "future_bip360_review",
+      "description": "Final P2MR future-leaf semantics must define how non-tapscript leaf versions are assigned, parsed, and soft-forked.",
+      "evidence_required": "Final BIP-360 future-leaf behavior and conflict review for the QRS leaf version.",
+      "current_repo_artifact": "docs/BIP360_DEPENDENCY_MATRIX.md"
+    },
+    {
+      "id": "qrs_ext_flag_assignment",
+      "status": "blocking_activation",
+      "blocks": [
+        "activation",
+        "complete_vectors"
+      ],
+      "owner_type": "future_bip360_review",
+      "description": "The provisional QRS ext_flag value must be reviewed against BIP-341/BIP-360 extension semantics and any competing assignments.",
+      "evidence_required": "Final QRS ext_flag assignment, collision review, and regenerated digest vectors.",
+      "current_repo_artifact": "docs/BIP360_DEPENDENCY_MATRIX.md"
+    },
+    {
+      "id": "final_sigmsg_definition",
+      "status": "blocking_activation",
+      "blocks": [
+        "activation",
+        "complete_vectors"
+      ],
+      "owner_type": "future_bip360_review",
+      "description": "The current executable vectors test a SigMsg-shaped model, not final Bitcoin Core transaction digest equivalence.",
+      "evidence_required": "Final QRS SigMsg definition, Bitcoin Core-shaped transaction serialization, and cross-implementation qrs_msg agreement.",
+      "current_repo_artifact": "docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md"
+    },
+    {
+      "id": "bitcoin_core_validation_path_integration",
+      "status": "blocking_activation",
+      "blocks": [
+        "activation",
+        "resource_accounting_decision"
+      ],
+      "owner_type": "future_core_review",
+      "description": "The current QRS validation-path benchmark is a local model and is not Bitcoin Core consensus integration.",
+      "evidence_required": "A Bitcoin Core validation-path prototype or review artifact that measures QRS validation in the actual consensus validation flow.",
+      "current_repo_artifact": "docs/BITCOIN_CORE_INTEGRATION_REQUIREMENTS.md"
+    },
+    {
+      "id": "second_reviewed_slh_dsa_backend",
+      "status": "blocking_activation",
+      "blocks": [
+        "activation"
+      ],
+      "owner_type": "future_implementation_review",
+      "description": "The package currently uses OpenSSL EVP evidence; consensus readiness requires an independently reviewed verifier strategy and cross-backend agreement.",
+      "evidence_required": "Second reviewed SLH-DSA-SHA2-128s verifier backend, pinned versions, and matching valid/invalid vector results.",
+      "current_repo_artifact": "docs/SLH_DSA_VERIFY_COST_ANALYSIS.md"
+    },
+    {
+      "id": "cross_hardware_reproduction",
+      "status": "blocking_activation",
+      "blocks": [
+        "activation",
+        "resource_accounting_decision"
+      ],
+      "owner_type": "future_reviewer_reproduction",
+      "description": "One machine's timing evidence is not global proof of validation-cost behavior.",
+      "evidence_required": "Independent quick/standard/full benchmark reproductions across the platform targets in the reproduction matrix.",
+      "current_repo_artifact": "docs/REPRODUCTION_MATRIX.md"
+    },
+    {
+      "id": "reviewed_public_batch_schnorr_baseline",
+      "status": "blocking_activation",
+      "blocks": [
+        "activation",
+        "resource_accounting_decision"
+      ],
+      "owner_type": "future_batch_schnorr_review",
+      "description": "The bundled libsecp256k1 commit has no reviewed public BIP-340 batch verification API wired by this package.",
+      "evidence_required": "Reviewed public batch-Schnorr baseline or explicit reviewer agreement that activation review can proceed without one.",
+      "current_repo_artifact": "04_batch_schnorr_baseline.md"
+    },
+    {
+      "id": "wallet_descriptor_psbt_hardware_standards",
+      "status": "blocking_activation",
+      "blocks": [
+        "activation",
+        "wallet_standards"
+      ],
+      "owner_type": "future_wallet_standards",
+      "description": "Wallet descriptor, PSBT, hardware-signing, and backup standards for QRS spends are outside this benchmark package.",
+      "evidence_required": "Wallet-facing standards or draft guidance for representing, signing, exporting, and recovering QRS leaves.",
+      "current_repo_artifact": "docs/PUBLIC_REVIEW_READINESS.md"
+    },
+    {
+      "id": "activation_parameters",
+      "status": "blocking_activation",
+      "blocks": [
+        "activation"
+      ],
+      "owner_type": "future_activation_process",
+      "description": "The Draft intentionally does not propose activation parameters.",
+      "evidence_required": "Separate activation proposal only after BIP-360/QRS definitions, Core integration, vectors, and resource accounting are resolved.",
+      "current_repo_artifact": "docs/PUBLIC_REVIEW_POST_DRAFT.md"
+    },
+    {
+      "id": "final_serialized_consensus_vectors",
+      "status": "blocking_activation",
+      "blocks": [
+        "activation",
+        "complete_vectors"
+      ],
+      "owner_type": "future_core_review",
+      "description": "Current fixtures are provisional executable structured fixtures, not final serialized consensus vectors.",
+      "evidence_required": "Serialized valid and invalid transactions generated from final BIP-360/QRS definitions and checked by at least two implementations.",
+      "current_repo_artifact": "docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md"
+    }
+  ]
+}
