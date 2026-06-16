@@ -45,7 +45,7 @@ fi
 grep -n "Version: 0.9.0" "$BIP"
 grep -n "Requires: 341, 342, 360" "$BIP"
 grep -n "Title: P2MR SLH-DSA Leaf" "$BIP"
-grep -n "Authors: Vikram Rastogi <vikramrastogi@gmail.com>" "$BIP"
+grep -n "Authors: Vikram K. Rastogi <vikramrastogi@gmail.com>, Mark H. Dodson <markhdodson@gmail.com>" "$BIP"
 grep -n "Assigned: ?" "$BIP"
 STALE_TITLE_PATTERN="Title: P2MR Quantum-""Rescue"" Leaf"
 if grep -nE "Author:|Created:|$STALE_TITLE_PATTERN" "$BIP"; then
