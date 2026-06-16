@@ -81,6 +81,9 @@ void set_empty_context(EVP_MD_CTX* ctx) {
   }
 #else
   (void)ctx;
+  throw std::runtime_error(
+      "OpenSSL headers do not expose OSSL_SIGNATURE_PARAM_CONTEXT_STRING; "
+      "cannot assert empty SLH-DSA context string");
 #endif
 }
 

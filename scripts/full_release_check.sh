@@ -18,6 +18,19 @@ TMP_RESOURCE_DECISION_JSON="$TMP_DIR/resource-accounting-decision.json"
 TMP_RESOURCE_DECISION_MD="$TMP_DIR/resource-accounting-decision.md"
 SECP_COMMIT_FILE="$ROOT/third_party/secp256k1.COMMIT"
 
+ensure_out_clean() {
+  if ! git -C "$ROOT" diff --quiet -- out; then
+    echo "full_release_check.sh: out/ has unstaged changes; release evidence must be committed or discarded" >&2
+    exit 1
+  fi
+  if ! git -C "$ROOT" diff --cached --quiet -- out; then
+    echo "full_release_check.sh: out/ has staged changes; release evidence must be committed or unstaged" >&2
+    exit 1
+  fi
+}
+
+ensure_out_clean
+
 cmake -S "$ROOT" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release
 cmake --build "$BUILD_DIR" -j
 
@@ -104,11 +117,15 @@ if [ "$DRAFT_RULE_STATUS" != "supports_no_additional_budget_for_draft_review" ];
   exit 1
 fi
 
-cp "$TMP_STANDARD_JSON" "$STANDARD_JSON"
-cp "$TMP_STANDARD_MD" "$STANDARD_MD"
-cp "$TMP_BATCH_EVIDENCE" "$BATCH_EVIDENCE"
-cp "$TMP_BATCH_EVIDENCE_MD" "$BATCH_EVIDENCE_MD"
-cp "$TMP_RESOURCE_DECISION_JSON" "$RESOURCE_DECISION_JSON"
-cp "$TMP_RESOURCE_DECISION_MD" "$RESOURCE_DECISION_MD"
+if [ "${QRS_RELEASE_UPDATE_ARTIFACTS:-0}" = "1" ]; then
+  cp "$TMP_STANDARD_JSON" "$STANDARD_JSON"
+  cp "$TMP_STANDARD_MD" "$STANDARD_MD"
+  cp "$TMP_BATCH_EVIDENCE" "$BATCH_EVIDENCE"
+  cp "$TMP_BATCH_EVIDENCE_MD" "$BATCH_EVIDENCE_MD"
+  cp "$TMP_RESOURCE_DECISION_JSON" "$RESOURCE_DECISION_JSON"
+  cp "$TMP_RESOURCE_DECISION_MD" "$RESOURCE_DECISION_MD"
+fi
+
+ensure_out_clean
 
 echo "full release checklist passed"

@@ -53,6 +53,11 @@ void json_estimate(std::ostringstream& o, const BlockEstimate& e, int indent) {
   const std::string pad(indent, ' ');
   o << "{\n";
   o << pad << "  \"status\": \"" << e.status << "\",\n";
+  o << pad << "  \"qrs_merkle_depth\": " << e.qrs_merkle_depth << ",\n";
+  o << pad << "  \"merkle_path_hashes_per_input\": "
+    << e.merkle_path_hashes_per_input << ",\n";
+  o << pad << "  \"merkle_path_hashes_per_block\": "
+    << e.merkle_path_hashes_per_block << ",\n";
   o << pad << "  \"input_weight_wu\": " << e.input_weight_wu << ",\n";
   o << pad << "  \"max_inputs\": " << e.max_inputs << ",\n";
   if (!e.available) {
@@ -65,6 +70,20 @@ void json_estimate(std::ostringstream& o, const BlockEstimate& e, int indent) {
     o << pad << "  \"p95_ms\": " << e.ms.at("p95_ms") << ",\n";
     o << pad << "  \"p99_ms\": " << e.ms.at("p99_ms") << ",\n";
     o << pad << "  \"max_ms\": " << e.ms.at("max_ms") << "\n";
+  }
+  o << pad << "}";
+}
+
+void json_estimate_vector(std::ostringstream& o,
+                          const std::vector<BlockEstimate>& estimates,
+                          int indent) {
+  const std::string pad(indent, ' ');
+  o << "{\n";
+  for (std::size_t i = 0; i < estimates.size(); ++i) {
+    const auto& e = estimates[i];
+    o << pad << "  \"depth_" << e.qrs_merkle_depth << "\": ";
+    json_estimate(o, e, indent + 2);
+    o << (i + 1 == estimates.size() ? "\n" : ",\n");
   }
   o << pad << "}";
 }
@@ -267,10 +286,16 @@ std::string render_json(const Environment& env,
   o << "    \"block_weight_wu\": " << block_model.block_weight_wu << ",\n";
   o << "    \"p2tr_keypath_input_wu\": " << block_model.p2tr_keypath_input_wu << ",\n";
   o << "    \"p2mr_qrs_depth0_input_wu\": " << block_model.p2mr_qrs_depth0_input_wu << ",\n";
+  o << "    \"p2mr_qrs_control_path_wu_per_depth\": "
+    << block_model.p2mr_qrs_control_path_wu_per_depth << ",\n";
   o << "    \"qrs_saturated_block_valid\": ";
   json_estimate(o, block_model.qrs_saturated_block_valid, 4);
   o << ",\n    \"qrs_saturated_block_invalid_fixed_length\": ";
   json_estimate(o, block_model.qrs_saturated_block_invalid_fixed_length, 4);
+  o << ",\n    \"qrs_saturated_block_valid_by_depth\": ";
+  json_estimate_vector(o, block_model.qrs_saturated_block_valid_by_depth, 4);
+  o << ",\n    \"qrs_saturated_block_invalid_fixed_length_by_depth\": ";
+  json_estimate_vector(o, block_model.qrs_saturated_block_invalid_fixed_length_by_depth, 4);
   o << ",\n    \"schnorr_individual_saturated_block\": ";
   json_estimate(o, block_model.schnorr_individual_saturated_block, 4);
   o << ",\n    \"schnorr_experimental_batch_saturated_block\": ";

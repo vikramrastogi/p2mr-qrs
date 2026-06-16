@@ -1,0 +1,66 @@
+{
+  "name": "qrs_multi_input_explicit_spent_outputs",
+  "version": "0.9.0-provisional",
+  "provisional_leaf_version": "c2",
+  "finalization_blocker": "BIP-360 final hashing and sighash definitions are not final.",
+  "transaction": {
+    "version": 2,
+    "lock_time": 0,
+    "inputs": [
+      {
+        "prevout": "44:0",
+        "sequence": 4294967294
+      },
+      {
+        "prevout": "55:7",
+        "sequence": 3
+      }
+    ],
+    "outputs": [
+      {
+        "value_sat": 900,
+        "script_pubkey": "00141111111111111111111111111111111111111111"
+      },
+      {
+        "value_sat": 100,
+        "script_pubkey": "00142222222222222222222222222222222222222222"
+      }
+    ]
+  },
+  "input_index": 1,
+  "spent_outputs": [
+    {
+      "amount_sats": 100000,
+      "script_pubkey": "00143333333333333333333333333333333333333333"
+    },
+    {
+      "amount_sats": 200000,
+      "script_pubkey": "51200000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "spent_output_scriptPubKey": "51200000000000000000000000000000000000000000000000000000000000000000",
+  "witness_stack": [
+    "qrs_signature",
+    "qrs_public_key",
+    "control_block"
+  ],
+  "qrs_public_key": {
+    "encoding": "repeat_byte",
+    "byte": "14",
+    "bytes": 32
+  },
+  "qrs_signature": {
+    "encoding": "repeat_byte",
+    "byte": "36",
+    "bytes": 7856
+  },
+  "control_block": {
+    "hex": "c3",
+    "depth": 0
+  },
+  "expected_leaf_hash": "6c27fdfa220608af9d7de577807ebfe3a61eca5216ec9930eca0750cf3cf4335",
+  "expected_qrs_msg": "686cbda889534b486fe04ee2a3ce9a6fd977c618a5d4dcf41032085d9e1acf3b",
+  "expected_result": false,
+  "failure_stage": "merkle_root_mismatch",
+  "reaches_slh_dsa_verifier": false
+}

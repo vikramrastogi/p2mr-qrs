@@ -67,6 +67,12 @@ For the strict local release contract:
 bash scripts/release_check.sh
 ```
 
+The release gate writes fresh reports under `build/release-check/` by default
+and validates those fresh artifacts. Checked-in `out/` files are sample
+artifacts. Use `QRS_RELEASE_UPDATE_ARTIFACTS=1 bash scripts/release_check.sh`
+only when intentionally refreshing committed samples; the gate fails if the
+refresh leaves uncommitted `out/` changes.
+
 For a full reviewer timing rerun:
 
 ```sh

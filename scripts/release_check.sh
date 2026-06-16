@@ -18,10 +18,25 @@ TMP_QUICK_JSON="$TMP_DIR/quick.json"
 TMP_QUICK_MD="$TMP_DIR/quick.md"
 TMP_BATCH_EVIDENCE="$TMP_DIR/batch-evidence.json"
 TMP_BATCH_EVIDENCE_MD="$TMP_DIR/batch-evidence.md"
+TMP_RESOURCE_DECISION_JSON="$TMP_DIR/resource-accounting-decision.json"
+TMP_RESOURCE_DECISION_MD="$TMP_DIR/resource-accounting-decision.md"
 BATCH_DISABLED_JSON="$TMP_DIR/schnorr-batch-disabled.json"
 BATCH_DISABLED_MD="$TMP_DIR/schnorr-batch-disabled.md"
 SECP_COMMIT_FILE="$ROOT/third_party/secp256k1.COMMIT"
 CONSOLIDATED_BIP="$ROOT/docs/bip-p2mr-slh-dsa-leaf-""consolidated.mediawiki"
+
+ensure_out_clean() {
+  if ! git -C "$ROOT" diff --quiet -- out; then
+    echo "release_check.sh: out/ has unstaged changes; release evidence must be committed or discarded" >&2
+    exit 1
+  fi
+  if ! git -C "$ROOT" diff --cached --quiet -- out; then
+    echo "release_check.sh: out/ has staged changes; release evidence must be committed or unstaged" >&2
+    exit 1
+  fi
+}
+
+ensure_out_clean
 
 if [ -e "$CONSOLIDATED_BIP" ]; then
   echo "release_check.sh: use docs/bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki as the single canonical BIP draft" >&2
@@ -178,15 +193,17 @@ python3 "$ROOT/scripts/verify_qrs_vectors.py" \
   --binary "$BUILD_DIR/qrs_native_bench" \
   --require-crypto
 "$BUILD_DIR/qrs_native_bench" --quick --json "$TMP_QUICK_JSON" --markdown "$TMP_QUICK_MD"
-cp "$TMP_BATCH_EVIDENCE" "$BATCH_EVIDENCE"
-cp "$TMP_BATCH_EVIDENCE_MD" "$BATCH_EVIDENCE_MD"
-cp "$TMP_QUICK_JSON" "$QUICK_JSON"
-cp "$TMP_QUICK_MD" "$QUICK_MD"
-cp "$QUICK_MD" "$SAMPLE_MD"
+if [ "${QRS_RELEASE_UPDATE_ARTIFACTS:-0}" = "1" ]; then
+  cp "$TMP_BATCH_EVIDENCE" "$BATCH_EVIDENCE"
+  cp "$TMP_BATCH_EVIDENCE_MD" "$BATCH_EVIDENCE_MD"
+  cp "$TMP_QUICK_JSON" "$QUICK_JSON"
+  cp "$TMP_QUICK_MD" "$QUICK_MD"
+  cp "$TMP_QUICK_MD" "$SAMPLE_MD"
+fi
 
 CURRENT_COMMIT="$(git -C "$ROOT" rev-parse HEAD)"
-REPORT_COMMIT="$(jq -r '.environment.git_commit' "$QUICK_JSON")"
-REPORT_DIRTY="$(jq -r '.environment.working_tree_dirty' "$QUICK_JSON")"
+REPORT_COMMIT="$(jq -r '.environment.git_commit' "$TMP_QUICK_JSON")"
+REPORT_DIRTY="$(jq -r '.environment.working_tree_dirty' "$TMP_QUICK_JSON")"
 if [ "$REPORT_COMMIT" != "$CURRENT_COMMIT" ]; then
   echo "release_check.sh: quick report commit $REPORT_COMMIT does not match HEAD $CURRENT_COMMIT" >&2
   exit 1
@@ -197,7 +214,7 @@ if [ "$REPORT_DIRTY" != "false" ]; then
 fi
 
 EXPECTED_SECP_COMMIT="$(tr -d '[:space:]' < "$SECP_COMMIT_FILE")"
-REPORT_SECP_COMMIT="$(jq -r '.benchmarks.schnorr_bip340.libsecp256k1_commit' "$QUICK_JSON")"
+REPORT_SECP_COMMIT="$(jq -r '.benchmarks.schnorr_bip340.libsecp256k1_commit' "$TMP_QUICK_JSON")"
 if [ "$REPORT_SECP_COMMIT" != "$EXPECTED_SECP_COMMIT" ]; then
   echo "release_check.sh: reported secp256k1 commit $REPORT_SECP_COMMIT does not match $SECP_COMMIT_FILE $EXPECTED_SECP_COMMIT" >&2
   exit 1
@@ -211,9 +228,9 @@ if [ -d "$ROOT/third_party/secp256k1/.git" ]; then
 fi
 
 python3 "$ROOT/scripts/assert_quick_report.py" \
-  --json "$QUICK_JSON" \
-  --markdown "$QUICK_MD" \
-  --batch-evidence-json "$BATCH_EVIDENCE"
+  --json "$TMP_QUICK_JSON" \
+  --markdown "$TMP_QUICK_MD" \
+  --batch-evidence-json "$TMP_BATCH_EVIDENCE"
 QRS_BENCH_DISABLE_EXPERIMENTAL_BATCH=1 \
   "$BUILD_DIR/qrs_native_bench" --quick --only schnorr \
   --json "$BATCH_DISABLED_JSON" \
@@ -227,41 +244,42 @@ jq -e '.benchmarks.schnorr_bip340.batch_experimental.status == "unavailable"' \
 jq -e '.block_model.schnorr_individual_saturated_block.status == "available"' \
   "$BATCH_DISABLED_JSON"
 python3 "$ROOT/scripts/evaluate_resource_accounting.py" \
-  --report-json "$QUICK_JSON" \
-  --batch-evidence-json "$BATCH_EVIDENCE" \
-  --json "$RESOURCE_DECISION_JSON" \
-  --markdown "$RESOURCE_DECISION_MD" \
+  --report-json "$TMP_QUICK_JSON" \
+  --batch-evidence-json "$TMP_BATCH_EVIDENCE" \
+  --json "$TMP_RESOURCE_DECISION_JSON" \
+  --markdown "$TMP_RESOURCE_DECISION_MD" \
   --advisory
 
-jq '.benchmarks.slh_dsa_sha2_128s.valid_verify.status' "$QUICK_JSON"
-jq '.benchmarks.slh_dsa_sha2_128s.backends.second_reviewed_backend.status' "$QUICK_JSON"
-jq '.benchmarks.schnorr_bip340.individual_valid_verify.status' "$QUICK_JSON"
-jq '.benchmarks.schnorr_bip340.batch_reviewed_public_api.status' "$QUICK_JSON"
-jq '.benchmarks.schnorr_bip340.batch_experimental.status' "$QUICK_JSON"
-jq '.benchmarks.schnorr_bip340.batch_experimental_challenge_self_test.status' "$QUICK_JSON"
-jq '.benchmarks.qrs_validation_path.total_valid.status' "$QUICK_JSON"
-jq '.environment.git_commit' "$QUICK_JSON"
-jq '.environment.working_tree_dirty' "$QUICK_JSON"
-jq '.environment.benchmark_binary_build_mode' "$QUICK_JSON"
-jq '.environment.benchmark_schema' "$QUICK_JSON"
-jq '.environment.compiler' "$QUICK_JSON"
-jq '.environment.compiler_version' "$QUICK_JSON"
-jq '.environment.compiler_flags' "$QUICK_JSON"
-jq '.environment.cmake_build_type' "$QUICK_JSON"
-jq '.environment.openssl_version' "$QUICK_JSON"
-jq '.environment.openssl_provider' "$QUICK_JSON"
-jq '.draft_rule_status' "$RESOURCE_DECISION_JSON"
-jq '.activation_ready' "$RESOURCE_DECISION_JSON"
-jq '.explicit_qrs_budget_required' "$RESOURCE_DECISION_JSON"
-jq '.batch_sensitivity.status' "$RESOURCE_DECISION_JSON"
-grep -n "Pass/Fail Conclusion" "$RESOURCE_DECISION_MD"
-grep -n "Batch-Speedup Sensitivity" "$RESOURCE_DECISION_MD"
-grep -n "Fallback Trigger Checks" "$RESOURCE_DECISION_MD"
-grep -n "fallback trigger" "$RESOURCE_DECISION_MD"
-grep -n "Hypothetical batch speedups are sensitivity analysis only" "$RESOURCE_DECISION_MD"
-grep -n "does not establish activation readiness" "$RESOURCE_DECISION_MD"
-grep -n "median of per-batch means" "$QUICK_MD"
-grep -n "second reviewed SLH-DSA backend" "$QUICK_MD"
-grep -n "BIP-340 challenge self-test" "$QUICK_MD" "$DOSSIER"
+jq '.benchmarks.slh_dsa_sha2_128s.valid_verify.status' "$TMP_QUICK_JSON"
+jq '.benchmarks.slh_dsa_sha2_128s.backends.second_reviewed_backend.status' "$TMP_QUICK_JSON"
+jq '.benchmarks.schnorr_bip340.individual_valid_verify.status' "$TMP_QUICK_JSON"
+jq '.benchmarks.schnorr_bip340.batch_reviewed_public_api.status' "$TMP_QUICK_JSON"
+jq '.benchmarks.schnorr_bip340.batch_experimental.status' "$TMP_QUICK_JSON"
+jq '.benchmarks.schnorr_bip340.batch_experimental_challenge_self_test.status' "$TMP_QUICK_JSON"
+jq '.benchmarks.qrs_validation_path.total_valid.status' "$TMP_QUICK_JSON"
+jq '.environment.git_commit' "$TMP_QUICK_JSON"
+jq '.environment.working_tree_dirty' "$TMP_QUICK_JSON"
+jq '.environment.benchmark_binary_build_mode' "$TMP_QUICK_JSON"
+jq '.environment.benchmark_schema' "$TMP_QUICK_JSON"
+jq '.environment.compiler' "$TMP_QUICK_JSON"
+jq '.environment.compiler_version' "$TMP_QUICK_JSON"
+jq '.environment.compiler_flags' "$TMP_QUICK_JSON"
+jq '.environment.cmake_build_type' "$TMP_QUICK_JSON"
+jq '.environment.openssl_version' "$TMP_QUICK_JSON"
+jq '.environment.openssl_provider' "$TMP_QUICK_JSON"
+jq '.draft_rule_status' "$TMP_RESOURCE_DECISION_JSON"
+jq '.activation_ready' "$TMP_RESOURCE_DECISION_JSON"
+jq '.explicit_qrs_budget_required' "$TMP_RESOURCE_DECISION_JSON"
+jq '.batch_sensitivity.status' "$TMP_RESOURCE_DECISION_JSON"
+grep -n "Pass/Fail Conclusion" "$TMP_RESOURCE_DECISION_MD"
+grep -n "Batch-Speedup Sensitivity" "$TMP_RESOURCE_DECISION_MD"
+grep -n "Fallback Trigger Checks" "$TMP_RESOURCE_DECISION_MD"
+grep -n "fallback trigger" "$TMP_RESOURCE_DECISION_MD"
+grep -n "Hypothetical batch speedups are sensitivity analysis only" "$TMP_RESOURCE_DECISION_MD"
+grep -n "does not establish activation readiness" "$TMP_RESOURCE_DECISION_MD"
+grep -n "median of per-batch means" "$TMP_QUICK_MD"
+grep -n "second reviewed SLH-DSA backend" "$TMP_QUICK_MD"
+grep -n "BIP-340 challenge self-test" "$TMP_QUICK_MD" "$DOSSIER"
+ensure_out_clean
 
 echo "release checklist passed"

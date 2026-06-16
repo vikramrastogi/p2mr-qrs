@@ -149,6 +149,19 @@ def main() -> int:
         == ("available" if experimental_available else "unavailable"),
         "experimental batch block model must match experimental batch availability",
     )
+    qrs_depths = block.get("qrs_saturated_block_valid_by_depth", {})
+    require(isinstance(qrs_depths, dict), "QRS depth-sensitive block model must be an object")
+    for depth in ["depth_0", "depth_1", "depth_3", "depth_128"]:
+        require(depth in qrs_depths, f"QRS depth-sensitive block model missing {depth}")
+        require(
+            qrs_depths[depth]["qrs_merkle_depth"] == int(depth.split("_")[1]),
+            f"QRS depth-sensitive row {depth} has wrong depth",
+        )
+        require(
+            qrs_depths[depth]["merkle_path_hashes_per_block"]
+            == qrs_depths[depth]["qrs_merkle_depth"] * qrs_depths[depth]["max_inputs"],
+            f"QRS depth-sensitive row {depth} has inconsistent Merkle hash count",
+        )
 
     slh = report["benchmarks"]["slh_dsa_sha2_128s"]
     slh_backends = slh.get("backends", {})
@@ -168,6 +181,14 @@ def main() -> int:
     if slh["status"] == "available":
         require(slh["public_key_bytes"] == 32, "SLH-DSA public key must be 32 bytes")
         require(slh["signature_bytes"] == 7856, "SLH-DSA signature must be 7856 bytes")
+        require(
+            "context-string explicitly set to empty" in slh["mode"],
+            "SLH-DSA mode must assert an explicitly empty context string",
+        )
+        require(
+            "headers do not expose" not in slh["mode"],
+            "SLH-DSA mode must not rely on unavailable context-string headers",
+        )
         require(
             slh_backends["openssl"]["status"] == "available",
             "OpenSSL SLH-DSA backend inventory must match available SLH timings",
@@ -273,6 +294,11 @@ def main() -> int:
             "Markdown must define timing-statistic samples",
         )
         require("QRS Validation Path Model" in md, "Markdown must include QRS path model")
+        require(
+            "QRS Depth-Sensitive Block Model" in md,
+            "Markdown must include QRS depth-sensitive block model",
+        )
+        require("TapBranch hashes/block" in md, "Markdown must report depth hash overhead")
 
     if args.batch_evidence_json:
         evidence = json.loads(args.batch_evidence_json.read_text(encoding="utf-8"))

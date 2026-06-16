@@ -216,6 +216,24 @@ std::string object_value(const std::string& json, const std::string& key) {
   throw std::runtime_error("unterminated JSON object for key: " + key);
 }
 
+std::string array_value(const std::string& json, const std::string& key) {
+  const std::size_t start = value_pos(json, key);
+  if (json[start] != '[') {
+    throw std::runtime_error("JSON key is not an array: " + key);
+  }
+  int depth = 0;
+  for (std::size_t pos = start; pos < json.size(); ++pos) {
+    if (json[pos] == '[') ++depth;
+    if (json[pos] == ']') {
+      --depth;
+      if (depth == 0) {
+        return json.substr(start, pos - start + 1);
+      }
+    }
+  }
+  throw std::runtime_error("unterminated JSON array for key: " + key);
+}
+
 std::vector<unsigned char> descriptor_value(const std::string& json, const std::string& key) {
   const std::size_t pos = value_pos(json, key);
   if (json[pos] == '"') {
@@ -283,6 +301,29 @@ std::vector<Output> parse_outputs(const std::string& json) {
   return out;
 }
 
+std::vector<Output> parse_spent_outputs(const std::string& json,
+                                        std::size_t input_count,
+                                        std::uint64_t fallback_amount,
+                                        const std::string& fallback_script) {
+  if (json.find("\"spent_outputs\"") == std::string::npos) {
+    return std::vector<Output>(input_count, {fallback_amount, fallback_script});
+  }
+
+  const std::string array = array_value(json, "spent_outputs");
+  std::vector<Output> out;
+  const std::regex re("\"amount_sats\"\\s*:\\s*([0-9]+)\\s*,\\s*\"script_pubkey\"\\s*:\\s*\"([0-9a-f]+)\"");
+  for (std::sregex_iterator it(array.begin(), array.end(), re), end; it != end; ++it) {
+    out.push_back({std::stoull((*it)[1].str()), (*it)[2].str()});
+  }
+  if (out.empty()) {
+    throw std::runtime_error("spent_outputs must be non-empty when present");
+  }
+  if (out.size() != input_count) {
+    throw std::runtime_error("spent_outputs length must match transaction input count");
+  }
+  return out;
+}
+
 std::vector<unsigned char> parse_prevout(const std::string& prevout) {
   const std::size_t sep = prevout.find(':');
   if (sep == std::string::npos) {
@@ -345,6 +386,9 @@ QrsDigestVectorResult compute_from_json(const std::string& json) {
   const std::uint64_t lock_time = number_value(json, "lock_time", 0, true);
   const std::uint64_t input_index = number_value(json, "input_index", 0, false);
   const std::string spent_script = string_value(json, "spent_output_scriptPubKey");
+  const std::uint64_t fallback_amount =
+      outputs.empty() ? 0 : outputs.front().value_sat;
+  const auto spent = parse_spent_outputs(json, inputs.size(), fallback_amount, spent_script);
 
   std::vector<unsigned char> prevouts_payload;
   std::vector<unsigned char> amounts_payload;
@@ -353,9 +397,8 @@ QrsDigestVectorResult compute_from_json(const std::string& json) {
   for (std::size_t i = 0; i < inputs.size(); ++i) {
     const auto prevout = parse_prevout(inputs[i].prevout);
     prevouts_payload.insert(prevouts_payload.end(), prevout.begin(), prevout.end());
-    const std::uint64_t amount = outputs.empty() ? 0 : outputs[std::min(i, outputs.size() - 1)].value_sat;
-    append_u64(amounts_payload, amount);
-    const auto script = serialize_script(spent_script);
+    append_u64(amounts_payload, spent[i].value_sat);
+    const auto script = serialize_script(spent[i].script_pubkey);
     scriptpubkeys_payload.insert(scriptpubkeys_payload.end(), script.begin(), script.end());
     append_u32(sequences_payload, inputs[i].sequence);
   }

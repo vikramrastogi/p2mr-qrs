@@ -138,9 +138,27 @@ def p2mr_root(script_pubkey: str, path: Path) -> bytes:
     return hex_bytes(script_pubkey[len(P2MR_SCRIPT_PREFIX) :], path, "spent_output_scriptPubKey root")
 
 
-def classify(data: dict, sig: bytes, pubkey: bytes, control_block: bytes, leaf_hash: bytes, path: Path) -> str:
+def witness_stack_after_annex_removal(data: dict) -> list[str] | None:
+    """Return the modeled QRS stack after removing the optional annex marker.
+
+    The current provisional fixtures model witness elements by semantic label
+    instead of serialized stack bytes. The optional annex, when represented in
+    this label stack, must be the final label and is stripped before enforcing
+    the QRS witness cardinality. Any other extra element remains visible and
+    must fail as malformed witness data.
+    """
+
     witness_stack = data.get("witness_stack")
-    if not isinstance(witness_stack, list) or witness_stack[:3] != [
+    if not isinstance(witness_stack, list) or not all(isinstance(v, str) for v in witness_stack):
+        return None
+    normalized = list(witness_stack)
+    if normalized and normalized[-1] == "annex":
+        normalized = normalized[:-1]
+    return normalized
+
+
+def classify(data: dict, sig: bytes, pubkey: bytes, control_block: bytes, leaf_hash: bytes, path: Path) -> str:
+    if witness_stack_after_annex_removal(data) != [
         "qrs_signature",
         "qrs_public_key",
         "control_block",
