@@ -34,25 +34,25 @@
       "passed": true
     },
     {
-      "detail": "qrs_worst=102.120 ms, individual_schnorr=358.329 ms",
+      "detail": "qrs_worst=256.198 ms, individual_schnorr=399.126 ms",
       "name": "QRS worst p99 below individual Schnorr p99",
       "passed": true
     },
     {
-      "detail": "qrs_worst=102.120 ms, experimental_batch=239.453 ms",
+      "detail": "qrs_worst=256.198 ms, experimental_batch=242.702 ms",
       "name": "QRS worst p99 below experimental batch Schnorr p99",
-      "passed": true
+      "passed": false
     }
   ],
-  "conclusion": "Current native evidence supports continuing with the no-additional-budget rule as Draft-stage review material.",
-  "draft_rule_status": "pass_draft_no_additional_budget_supported",
+  "conclusion": "QRS is below individual Schnorr but exceeds experimental batch Schnorr; resource accounting remains unresolved for activation.",
+  "draft_rule_status": "activation_unresolved_batch_baseline",
   "explicit_qrs_budget_required": false,
-  "fallback_budget_status": "not_required_by_current_draft_evidence",
+  "fallback_budget_status": "reviewer_decision_required",
   "p99_ms": {
-    "experimental_batch_schnorr_saturated_block": 239.453,
-    "individual_schnorr_saturated_block": 358.329,
-    "qrs_valid_saturated_block": 100.561,
-    "qrs_worst_invalid_fixed_length_saturated_block": 102.12,
+    "experimental_batch_schnorr_saturated_block": 242.702,
+    "individual_schnorr_saturated_block": 399.126,
+    "qrs_valid_saturated_block": 92.037,
+    "qrs_worst_invalid_fixed_length_saturated_block": 256.198,
     "reviewed_public_batch_schnorr_saturated_block": null
   },
   "schema": "qrs-native-bench/resource-accounting-decision/v0"

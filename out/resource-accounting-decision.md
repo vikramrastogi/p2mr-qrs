@@ -2,20 +2,20 @@
 
 ## Pass/Fail Conclusion
 
-- `draft_rule_status`: pass_draft_no_additional_budget_supported
+- `draft_rule_status`: activation_unresolved_batch_baseline
 - `activation_ready`: false
 - `explicit_qrs_budget_required`: false
-- `fallback_budget_status`: not_required_by_current_draft_evidence
-- `conclusion`: Current native evidence supports continuing with the no-additional-budget rule as Draft-stage review material.
+- `fallback_budget_status`: reviewer_decision_required
+- `conclusion`: QRS is below individual Schnorr but exceeds experimental batch Schnorr; resource accounting remains unresolved for activation.
 
 ## Compared Estimates
 
 | Estimate | p99 ms |
 | --- | ---: |
-| qrs_valid_saturated_block | 100.561 |
-| qrs_worst_invalid_fixed_length_saturated_block | 102.120 |
-| individual_schnorr_saturated_block | 358.329 |
-| experimental_batch_schnorr_saturated_block | 239.453 |
+| qrs_valid_saturated_block | 92.037 |
+| qrs_worst_invalid_fixed_length_saturated_block | 256.198 |
+| individual_schnorr_saturated_block | 399.126 |
+| experimental_batch_schnorr_saturated_block | 242.702 |
 | reviewed_public_batch_schnorr_saturated_block | unavailable |
 
 ## Checks
@@ -27,8 +27,8 @@
 | Individual Schnorr baseline available | pass | available |
 | Reviewed public batch status explicit | pass | unavailable |
 | Batch evidence forbids fake speedups | pass | No batch Schnorr timing is synthesized from assumed speedups. |
-| QRS worst p99 below individual Schnorr p99 | pass | qrs_worst=102.120 ms, individual_schnorr=358.329 ms |
-| QRS worst p99 below experimental batch Schnorr p99 | pass | qrs_worst=102.120 ms, experimental_batch=239.453 ms |
+| QRS worst p99 below individual Schnorr p99 | pass | qrs_worst=256.198 ms, individual_schnorr=399.126 ms |
+| QRS worst p99 below experimental batch Schnorr p99 | fail | qrs_worst=256.198 ms, experimental_batch=242.702 ms |
 
 ## Activation Blockers
 

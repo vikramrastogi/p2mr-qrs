@@ -5,6 +5,12 @@ reviewer rerun should produce raw artifacts that can be compared mechanically.
 
 ## Required Commands
 
+The strict QRS vector and release checks require OpenSSL 3.5 or newer with a
+loaded provider exposing `SLH-DSA-SHA2-128s` through EVP. The committed sample
+reports were generated with OpenSSL 3.6.1 from the `default` provider. If
+`EVP_PKEY_CTX_new_from_name(..., "SLH-DSA-SHA2-128s", ...)` fails locally, the
+run is useful as an environment diagnostic but is not a strict reproduction.
+
 ```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j
@@ -46,6 +52,7 @@ The generated report must identify:
 - compiler and compiler flags;
 - build mode;
 - OpenSSL version and provider;
+- OpenSSL SLH-DSA provider availability;
 - SLH-DSA mode;
 - libsecp256k1 commit;
 - benchmark harness commit;
