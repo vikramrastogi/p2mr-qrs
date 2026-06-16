@@ -7,6 +7,7 @@
   "additionalProperties": false,
   "required": [
     "schema_status",
+    "vector_status",
     "name",
     "bip360_revision",
     "qrs_bip_revision",
@@ -33,6 +34,13 @@
       "type": "string",
       "enum": [
         "schema_only_pending_final_bip360_qrs",
+        "final_consensus_vector"
+      ]
+    },
+    "vector_status": {
+      "type": "string",
+      "enum": [
+        "future_final_vector_contract",
         "final_consensus_vector"
       ]
     },

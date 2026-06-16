@@ -2,6 +2,19 @@
 
 This package is not asking reviewers to support activation.
 
+Primary review artifacts:
+
+- Canonical BIP draft:
+  `bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki`
+- Resource-accounting decision process:
+  `RESOURCE_ACCOUNTING_DECISION.md`
+- Machine-checked activation and final-vector blockers:
+  `CONSENSUS_GAP_MANIFEST.md`
+- Provisional vector coverage matrix:
+  `VECTOR_COVERAGE_MATRIX.md`
+- Reproduction protocol:
+  `REPRODUCIBILITY.md`
+
 ## One-sentence proposal
 
 Define one P2MR-only future leaf version that verifies one fixed-size

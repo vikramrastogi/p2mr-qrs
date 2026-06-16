@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/vikramrastogi/p2mr-qrs/test_vectors/vector_coverage_matrix.schema.json",
+  "title": "P2MR QRS Vector Coverage Matrix",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "status",
+    "description",
+    "rows"
+  ],
+  "properties": {
+    "schema": {
+      "const": "p2mr-qrs/vector-coverage-matrix/v0"
+    },
+    "status": {
+      "const": "provisional_executable_coverage_not_final_consensus_vectors"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "rows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "case_id",
+          "artifact_type",
+          "artifact",
+          "expected_result",
+          "failure_stage",
+          "reaches_slh_dsa_verifier",
+          "required_by"
+        ],
+        "properties": {
+          "case_id": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+$"
+          },
+          "artifact_type": {
+            "enum": [
+              "fixture",
+              "fuzz_case",
+              "negative_case",
+              "digest_self_test",
+              "benchmark_invalid_case"
+            ]
+          },
+          "artifact": {
+            "type": "string",
+            "minLength": 1
+          },
+          "artifact_case": {
+            "type": "string",
+            "minLength": 1
+          },
+          "self_test_label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_result": {
+            "type": "boolean"
+          },
+          "failure_stage": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reaches_slh_dsa_verifier": {
+            "type": "boolean"
+          },
+          "required_by": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}
