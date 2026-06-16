@@ -58,16 +58,21 @@ validate_committed_sample_reports() {
       "$report" >/dev/null
   done
   grep -n "$sample_commit" "$ROOT/docs/RESOURCE_ACCOUNTING_DECISION.md"
-  jq -e --slurpfile full "$FULL_JSON" --slurpfile decision "$RESOURCE_DECISION_JSON" '
-    ($decision[0].p99_ms.qrs_valid_saturated_block
-      == $full[0].block_model.qrs_saturated_block_valid.p99_ms) and
-    ($decision[0].p99_ms.qrs_worst_invalid_fixed_length_saturated_block
-      == $full[0].block_model.qrs_saturated_block_invalid_fixed_length.p99_ms) and
-    ($decision[0].p99_ms.individual_schnorr_saturated_block
-      == $full[0].block_model.schnorr_individual_saturated_block.p99_ms) and
-    ($decision[0].p99_ms.experimental_batch_schnorr_saturated_block
-      == $full[0].block_model.schnorr_experimental_batch_saturated_block.p99_ms)
-  ' >/dev/null
+  if ! jq -e \
+    --slurpfile full_report "$FULL_JSON" \
+    --slurpfile decision_report "$RESOURCE_DECISION_JSON" '
+      ($decision_report[0].p99_ms.qrs_valid_saturated_block
+        == $full_report[0].block_model.qrs_saturated_block_valid.p99_ms) and
+      ($decision_report[0].p99_ms.qrs_worst_invalid_fixed_length_saturated_block
+        == $full_report[0].block_model.qrs_saturated_block_invalid_fixed_length.p99_ms) and
+      ($decision_report[0].p99_ms.individual_schnorr_saturated_block
+        == $full_report[0].block_model.schnorr_individual_saturated_block.p99_ms) and
+      ($decision_report[0].p99_ms.experimental_batch_schnorr_saturated_block
+        == $full_report[0].block_model.schnorr_experimental_batch_saturated_block.p99_ms)
+    ' >/dev/null; then
+    echo "release_check.sh: committed resource-accounting decision does not match out/full.json" >&2
+    exit 1
+  fi
 }
 
 ensure_out_clean
