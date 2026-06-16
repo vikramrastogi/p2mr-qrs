@@ -46,6 +46,7 @@ jobs:
         run: |
           python3 scripts/validate_test_vectors.py test_vectors/
           python3 scripts/verify_qrs_fixtures.py test_vectors/
+          python3 scripts/verify_qrs_vectors.py test_vectors/ --binary build/qrs_native_bench
           python3 scripts/run_qrs_negative_tests.py
 
       - name: Check batch Schnorr evidence

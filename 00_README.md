@@ -62,6 +62,7 @@ Current implementation status:
 - The harness writes JSON and Markdown reports and includes the requested saturated-block model fields.
 - Provisional structured QRS fixture vectors live in `test_vectors/`; malformed witness and negative cases live in `fuzz/` and `tests/`.
 - `docs/REVIEWER_DOSSIER.md` maps predictable objections to evidence, caveats, blockers, or non-goals.
+- `docs/RESOURCE_ACCOUNTING_DECISION.md` maps benchmark evidence to the current Draft-stage resource-accounting conclusion.
 - `docs/RELEASE_CHECKLIST.md` lists the posting checks enforced by `scripts/release_check.sh`.
 - `THIRD_PARTY_NOTICES.md` identifies vendored third-party code and license locations.
 - `out/sample-native-report.md` is the stable sample Markdown report alias for public review.
@@ -92,6 +93,7 @@ python3 scripts/assert_quick_report.py out/quick.json out/quick.md
 python3 scripts/check_batch_schnorr_baseline.py --skip-upstream --markdown out/batch-evidence.md --json out/batch-evidence.json
 python3 scripts/validate_test_vectors.py test_vectors/
 python3 scripts/verify_qrs_fixtures.py test_vectors/
+python3 scripts/verify_qrs_vectors.py test_vectors/ --binary build/qrs_native_bench
 python3 scripts/run_qrs_negative_tests.py
 bash scripts/release_check.sh
 grep -n "Version: 0.9.0" docs/bip-p2mr-quantum-rescue-leaf-v0.9.0.mediawiki

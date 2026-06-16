@@ -206,9 +206,12 @@ void select_invalid_summary_stats(SlhDsaResult& r) {
   std::sort(available.begin(), available.end(), [](const NamedStats& a, const NamedStats& b) {
     return a.stats.p99_ns < b.stats.p99_ns;
   });
+  r.invalid_fixed_length_min_observed = available.front().stats;
   r.invalid_fixed_length_best_observed = available.front().stats;
   r.invalid_fixed_length_median_observed = available[available.size() / 2].stats;
+  r.invalid_fixed_length_p99_observed = available.back().stats;
   r.invalid_fixed_length_worst_observed = available.back().stats;
+  r.invalid_fixed_length_case_name_worst = available.back().name;
   r.invalid_fixed_length_verify = r.invalid_fixed_length_worst_observed;
 }
 #endif
@@ -223,8 +226,10 @@ SlhDsaResult run_slh_dsa_benchmarks(bool quick) {
   r.reason = "built without OpenSSL";
   r.valid_verify.status = "unavailable";
   r.invalid_fixed_length_verify.status = "unavailable";
+  r.invalid_fixed_length_min_observed.status = "unavailable";
   r.invalid_fixed_length_best_observed.status = "unavailable";
   r.invalid_fixed_length_median_observed.status = "unavailable";
+  r.invalid_fixed_length_p99_observed.status = "unavailable";
   r.invalid_fixed_length_worst_observed.status = "unavailable";
   return r;
 #else
@@ -291,8 +296,10 @@ SlhDsaResult run_slh_dsa_benchmarks(bool quick) {
     r.reason = e.what();
     r.valid_verify.status = "unavailable";
     r.invalid_fixed_length_verify.status = "unavailable";
+    r.invalid_fixed_length_min_observed.status = "unavailable";
     r.invalid_fixed_length_best_observed.status = "unavailable";
     r.invalid_fixed_length_median_observed.status = "unavailable";
+    r.invalid_fixed_length_p99_observed.status = "unavailable";
     r.invalid_fixed_length_worst_observed.status = "unavailable";
     return r;
   }

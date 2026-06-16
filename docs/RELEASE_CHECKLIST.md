@@ -17,11 +17,17 @@ Checklist enforced by the script:
 - Native individual Schnorr benchmark runs.
 - Batch Schnorr status is explicit.
 - Reports include machine/library/compiler metadata.
+- Reports include git commit, working-tree dirty status, and benchmark binary
+  build mode.
 - Timing stats are labeled as per-batch means.
 - Invalid fixed-length signatures are measured across multiple fixed-length
   mutations.
-- Structured fixture vectors are model-verified and explicitly marked
-  provisional.
+- Structured fixture vectors are model-verified by
+  `scripts/verify_qrs_fixtures.py`, and verifier-reaching vectors are
+  cryptographically checked by `scripts/verify_qrs_vectors.py`.
+- `scripts/check_batch_schnorr_baseline.py` regenerates batch-baseline evidence.
+- `docs/RESOURCE_ACCOUNTING_DECISION.md` maps the benchmark evidence to the
+  draft resource-accounting decision.
 - BIP-360 final dependency is documented.
 - README states package is Draft-stage pre-review.
 

@@ -65,7 +65,8 @@ std::string apple_arm_features() {
   }
   return out.empty() ? "unavailable" : out;
 }
-#else
+#endif
+
 std::string command_output(const char* command) {
   std::string out;
   FILE* pipe = popen(command, "r");
@@ -81,6 +82,25 @@ std::string command_output(const char* command) {
     out.pop_back();
   }
   return out.empty() ? "unavailable" : out;
+}
+
+std::string git_dirty_state() {
+  const std::string dirty = command_output(
+      "sh -c 'git diff --quiet && git diff --cached --quiet; "
+      "if [ $? -eq 0 ]; then echo false; else echo true; fi' 2>/dev/null");
+  if (dirty == "false" || dirty == "true") {
+    return dirty;
+  }
+  return "unavailable";
+}
+
+#if !defined(__APPLE__)
+std::string linux_cpu_model() {
+  return command_output("lscpu | sed -n 's/^Model name:[[:space:]]*//p' | head -1");
+}
+
+std::string linux_cpu_features() {
+  return command_output("lscpu | sed -n 's/^Flags:[[:space:]]*//p' | head -1");
 }
 #endif
 
@@ -101,8 +121,8 @@ Environment collect_environment() {
   env.fields["cpu_features"] = apple_arm_features();
   env.fields["cpu_frequency"] = sysctl_string("hw.cpufrequency");
 #else
-  env.fields["cpu_model"] = command_output("lscpu | sed -n 's/^Model name:[[:space:]]*//p' | head -1");
-  env.fields["cpu_features"] = command_output("lscpu | sed -n 's/^Flags:[[:space:]]*//p' | head -1");
+  env.fields["cpu_model"] = linux_cpu_model();
+  env.fields["cpu_features"] = linux_cpu_features();
   env.fields["cpu_frequency"] = "unavailable";
 #endif
 
@@ -116,12 +136,16 @@ Environment collect_environment() {
 
 #if defined(NDEBUG)
   env.fields["build_type"] = "Release/NDEBUG";
+  env.fields["benchmark_binary_build_mode"] = "Release/NDEBUG";
 #else
   env.fields["build_type"] = "non-release";
+  env.fields["benchmark_binary_build_mode"] = "non-release";
 #endif
 
   env.fields["compiler_flags"] = "CMake target: -O3 -Wall -Wextra -Wpedantic";
-  env.fields["benchmark_commit"] = "record with git rev-parse HEAD in published runs";
+  env.fields["git_commit"] = command_output("git rev-parse HEAD 2>/dev/null");
+  env.fields["working_tree_dirty"] = git_dirty_state();
+  env.fields["benchmark_commit"] = env.fields["git_commit"];
   env.fields["frequency_scaling"] = "not controlled by harness; reviewer must record governor/power mode";
   return env;
 }

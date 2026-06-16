@@ -116,9 +116,13 @@ std::string render_markdown(const Environment& env,
   for (const auto& c : slh.invalid_fixed_length_cases) {
     stats_row(o, c.name, c.stats);
   }
+  stats_row(o, "min observed invalid fixed-length", slh.invalid_fixed_length_min_observed);
   stats_row(o, "best observed invalid fixed-length", slh.invalid_fixed_length_best_observed);
   stats_row(o, "median observed invalid fixed-length", slh.invalid_fixed_length_median_observed);
+  stats_row(o, "p99 observed invalid fixed-length", slh.invalid_fixed_length_p99_observed);
   stats_row(o, "worst observed invalid fixed-length", slh.invalid_fixed_length_worst_observed);
+  o << "\nWorst observed invalid fixed-length case: `"
+    << slh.invalid_fixed_length_case_name_worst << "`.\n";
 
   o << "\n## QRS Validation Path Model\n\n";
   o << "- `status`: " << qrs_path.status << "\n";

@@ -9,6 +9,7 @@ QUICK_JSON="$ROOT/out/quick.json"
 QUICK_MD="$ROOT/out/quick.md"
 SAMPLE_MD="$ROOT/out/sample-native-report.md"
 BATCH_EVIDENCE="$ROOT/out/batch-evidence.json"
+BATCH_EVIDENCE_MD="$ROOT/out/batch-evidence.md"
 BUILD_DIR="$ROOT/build"
 
 grep -n "Version: 0.9.0" "$BIP"
@@ -16,8 +17,11 @@ grep -n "Requires: 341, 342, 360" "$BIP"
 grep -n "hypothesis to test" "$BIP"
 grep -n "BIP-360 is still draft" "$BIP"
 grep -n "strong unforgeability" "$BIP"
+grep -n "RESOURCE_ACCOUNTING_DECISION.md" "$BIP"
+grep -n "adversarial invalid fixed-length" "$BIP"
 grep -n "Draft-stage pre-review" "$ROOT/00_README.md"
 grep -n "Draft-stage pre-review" "$ROOT/README.md"
+grep -n "verify_qrs_vectors.py" "$CHECKLIST"
 
 if grep -RniE "QRS is [c]heaper|\\([c]heaper\\)|empirically supported" \
   "$BIP" "$DOSSIER" "$CHECKLIST" "$ROOT/00_README.md" "$ROOT/README.md"; then
@@ -35,6 +39,14 @@ python3 "$ROOT/scripts/run_qrs_negative_tests.py"
 
 cmake -S "$ROOT" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release
 cmake --build "$BUILD_DIR" -j
+python3 "$ROOT/scripts/check_batch_schnorr_baseline.py" \
+  --json "$BATCH_EVIDENCE" \
+  --markdown "$BATCH_EVIDENCE_MD" \
+  --upstream-timeout-seconds 15
+python3 "$ROOT/scripts/verify_qrs_vectors.py" \
+  "$ROOT/test_vectors" \
+  --binary "$BUILD_DIR/qrs_native_bench" \
+  --require-crypto
 "$BUILD_DIR/qrs_native_bench" --quick --json "$QUICK_JSON" --markdown "$QUICK_MD"
 cp "$QUICK_MD" "$SAMPLE_MD"
 
@@ -48,6 +60,9 @@ jq '.benchmarks.schnorr_bip340.individual_valid_verify.status' "$QUICK_JSON"
 jq '.benchmarks.schnorr_bip340.batch_reviewed_public_api.status' "$QUICK_JSON"
 jq '.benchmarks.schnorr_bip340.batch_experimental.status' "$QUICK_JSON"
 jq '.benchmarks.qrs_validation_path.total_valid.status' "$QUICK_JSON"
+jq '.environment.git_commit' "$QUICK_JSON"
+jq '.environment.working_tree_dirty' "$QUICK_JSON"
+jq '.environment.benchmark_binary_build_mode' "$QUICK_JSON"
 grep -n "median of per-batch means" "$QUICK_MD"
 
 echo "release checklist passed"
