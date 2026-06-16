@@ -27,6 +27,12 @@ The committed sample reports were generated with OpenSSL 3.6.1 from the
 version, provider configuration, and error output; the run is useful as an
 environment diagnostic but is not a strict reproduction.
 
+CI structural checks run the build, provisional fixture checks, digest
+agreement, quick benchmark, and advisory resource-accounting evaluation. They
+are portability smoke checks when OpenSSL SLH-DSA is unavailable. They do not
+replace `bash scripts/release_check.sh` on a machine with OpenSSL 3.5+ exposing
+`SLH-DSA-SHA2-128s`.
+
 ## Benchmark Modes
 
 - `--quick`: release-check and CI smoke mode. It proves the pipeline and

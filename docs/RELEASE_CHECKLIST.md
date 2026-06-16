@@ -28,6 +28,10 @@ GitHub Actions runs `bash scripts/release_check.sh` on macOS with Homebrew
 OpenSSL as the publication-gate CI job. The Linux/macOS smoke matrix remains a
 portability check and does not replace the release gate.
 
+The `docs-and-fixtures` and `native build and structural smoke` CI jobs prove
+structural integrity. They are not full release evidence if the runner lacks an
+OpenSSL provider exposing `SLH-DSA-SHA2-128s`.
+
 `release_check.sh` is the Draft-stage pre-review release gate: it uses the quick
 benchmark and the resource decision may be advisory. `full_release_check.sh` is
 the stricter evidence gate: it uses the standard benchmark, runs the resource

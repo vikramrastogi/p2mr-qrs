@@ -1,0 +1,91 @@
+name: QRS release checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  docs-and-fixtures:
+    name: docs and fixtures
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate fixture docs and metadata
+        run: |
+          python3 scripts/compute_qrs_digest_model.py test_vectors
+          python3 scripts/validate_test_vectors.py test_vectors/
+          python3 scripts/verify_qrs_fixtures.py test_vectors/
+          python3 scripts/run_qrs_negative_tests.py
+
+  native-build:
+    name: native build and structural smoke (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build jq libssl-dev
+
+      - name: Install macOS dependencies
+        if: runner.os == 'macOS'
+        run: |
+          brew install cmake ninja jq openssl@3
+
+      - name: Configure OpenSSL environment
+        if: runner.os == 'macOS'
+        run: |
+          echo "OPENSSL_ROOT_DIR=$(brew --prefix openssl@3)" >> "$GITHUB_ENV"
+          echo "CMAKE_PREFIX_PATH=$(brew --prefix openssl@3)" >> "$GITHUB_ENV"
+          echo "PKG_CONFIG_PATH=$(brew --prefix openssl@3)/lib/pkgconfig" >> "$GITHUB_ENV"
+
+      - name: Run structural smoke
+        run: bash scripts/ci_structural_check.sh
+
+      - name: Upload benchmark reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: qrs-structural-${{ matrix.os }}
+          path: |
+            build/ci-structural/quick.json
+            build/ci-structural/quick.md
+            build/ci-structural/batch-evidence.json
+            build/ci-structural/batch-evidence.md
+            build/ci-structural/resource-accounting-decision.json
+            build/ci-structural/resource-accounting-decision.md
+
+  release-check:
+    name: release check (macos-latest)
+    runs-on: macos-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install macOS dependencies
+        run: |
+          brew install cmake ninja jq openssl@3
+
+      - name: Configure OpenSSL environment
+        run: |
+          echo "OPENSSL_ROOT_DIR=$(brew --prefix openssl@3)" >> "$GITHUB_ENV"
+          echo "CMAKE_PREFIX_PATH=$(brew --prefix openssl@3)" >> "$GITHUB_ENV"
+          echo "PKG_CONFIG_PATH=$(brew --prefix openssl@3)/lib/pkgconfig" >> "$GITHUB_ENV"
+
+      - name: Run publication release gate
+        run: bash scripts/release_check.sh
