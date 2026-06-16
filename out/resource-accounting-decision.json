@@ -8,49 +8,49 @@
   ],
   "activation_ready": false,
   "batch_sensitivity": {
-    "experimental_batch_speedup_vs_individual": 1.4442614953043054,
+    "experimental_batch_speedup_vs_individual": 1.8609716692631701,
     "experimental_batch_tightens_individual": true,
     "hypothetical_speedups": [
       {
         "qrs_valid_exceeds": false,
         "qrs_worst_invalid_exceeds": false,
-        "schnorr_p99_ms": 236.83,
+        "schnorr_p99_ms": 301.02333333333337,
         "speedup_vs_individual": 1.5
       },
       {
         "qrs_valid_exceeds": false,
         "qrs_worst_invalid_exceeds": false,
-        "schnorr_p99_ms": 177.6225,
+        "schnorr_p99_ms": 225.7675,
         "speedup_vs_individual": 2.0
       },
       {
         "qrs_valid_exceeds": false,
         "qrs_worst_invalid_exceeds": false,
-        "schnorr_p99_ms": 142.098,
+        "schnorr_p99_ms": 180.614,
         "speedup_vs_individual": 2.5
       },
       {
         "qrs_valid_exceeds": false,
         "qrs_worst_invalid_exceeds": false,
-        "schnorr_p99_ms": 118.415,
+        "schnorr_p99_ms": 150.51166666666668,
         "speedup_vs_individual": 3.0
       },
       {
         "qrs_valid_exceeds": true,
         "qrs_worst_invalid_exceeds": true,
-        "schnorr_p99_ms": 88.81125,
+        "schnorr_p99_ms": 112.88375,
         "speedup_vs_individual": 4.0
       },
       {
         "qrs_valid_exceeds": true,
         "qrs_worst_invalid_exceeds": true,
-        "schnorr_p99_ms": 71.049,
+        "schnorr_p99_ms": 90.307,
         "speedup_vs_individual": 5.0
       }
     ],
     "policy": "Hypothetical batch speedups are sensitivity analysis only; they are not a measured baseline and no fake batch baseline is synthesized.",
-    "qrs_valid_exceeds_if_batch_speedup_gt": 3.6798843966562043,
-    "qrs_worst_invalid_exceeds_if_batch_speedup_gt": 3.4495834223456527,
+    "qrs_valid_exceeds_if_batch_speedup_gt": 3.885542427867033,
+    "qrs_worst_invalid_exceeds_if_batch_speedup_gt": 3.6539348573740646,
     "status": "available"
   },
   "checks": [
@@ -90,17 +90,17 @@
       "passed": true
     },
     {
-      "detail": "qrs_worst=102.982 ms, individual_schnorr=355.245 ms",
+      "detail": "qrs_worst=123.575 ms, individual_schnorr=451.535 ms",
       "name": "QRS worst p99 below individual Schnorr p99",
       "passed": true
     },
     {
-      "detail": "qrs_worst=102.982 ms, experimental_batch=245.970 ms",
+      "detail": "qrs_worst=123.575 ms, experimental_batch=242.634 ms",
       "name": "QRS worst p99 below experimental batch Schnorr p99",
       "passed": true
     },
     {
-      "detail": "experimental_batch=245.970 ms, individual_schnorr=355.245 ms",
+      "detail": "experimental_batch=242.634 ms, individual_schnorr=451.535 ms",
       "name": "Experimental batch tightens individual Schnorr baseline",
       "passed": true
     }
@@ -116,45 +116,45 @@
       {
         "detail": "fallback trigger if QRS worst-invalid p99 exceeds individual Schnorr p99",
         "name": "qrs_worst_exceeds_individual_schnorr",
-        "qrs_worst_p99_ms": 102.982,
-        "threshold_p99_ms": 355.245,
+        "qrs_worst_p99_ms": 123.575,
+        "threshold_p99_ms": 451.535,
         "triggered": false
       },
       {
         "detail": "fallback trigger if QRS worst-invalid p99 exceeds a 2.5x hypothetical reviewed-batch-Schnorr baseline",
         "name": "qrs_worst_exceeds_2_5x_hypothetical_reviewed_batch_schnorr",
-        "qrs_worst_p99_ms": 102.982,
-        "threshold_p99_ms": 142.098,
+        "qrs_worst_p99_ms": 123.575,
+        "threshold_p99_ms": 180.614,
         "triggered": false
       },
       {
         "detail": "fallback trigger if QRS worst-invalid p99 exceeds a 3.0x hypothetical reviewed-batch-Schnorr baseline",
         "name": "qrs_worst_exceeds_3_0x_hypothetical_reviewed_batch_schnorr",
-        "qrs_worst_p99_ms": 102.982,
-        "threshold_p99_ms": 118.415,
+        "qrs_worst_p99_ms": 123.575,
+        "threshold_p99_ms": 150.51166666666668,
         "triggered": false
       },
       {
         "detail": "fallback trigger if a reviewed public batch-Schnorr implementation becomes available and QRS exceeds it",
         "name": "qrs_worst_exceeds_reviewed_public_batch_schnorr",
-        "qrs_worst_p99_ms": 102.982,
+        "qrs_worst_p99_ms": 123.575,
         "threshold_p99_ms": null,
         "triggered": null
       },
       {
         "detail": "fallback trigger requires Bitcoin Core validation-path integration evidence; current harness models that path only",
         "name": "bitcoin_core_validation_path_overhead",
-        "qrs_worst_p99_ms": 102.982,
+        "qrs_worst_p99_ms": 123.575,
         "threshold_p99_ms": null,
         "triggered": null
       }
     ]
   },
   "p99_ms": {
-    "experimental_batch_schnorr_saturated_block": 245.97,
-    "individual_schnorr_saturated_block": 355.245,
-    "qrs_valid_saturated_block": 96.537,
-    "qrs_worst_invalid_fixed_length_saturated_block": 102.982,
+    "experimental_batch_schnorr_saturated_block": 242.634,
+    "individual_schnorr_saturated_block": 451.535,
+    "qrs_valid_saturated_block": 116.209,
+    "qrs_worst_invalid_fixed_length_saturated_block": 123.575,
     "reviewed_public_batch_schnorr_saturated_block": null
   },
   "schema": "qrs-native-bench/resource-accounting-decision/v0"
