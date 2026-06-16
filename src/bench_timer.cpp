@@ -1,6 +1,7 @@
 #include "qrs_bench/bench_timer.h"
 
 #include <chrono>
+#include <stdexcept>
 
 namespace qrs {
 
@@ -11,6 +12,10 @@ TimingSeries time_batches(const std::string& name,
                           std::size_t batches,
                           std::size_t iterations_per_batch,
                           std::size_t warmup_iterations) {
+  if (iterations_per_batch == 0) {
+    throw std::invalid_argument("iterations_per_batch must be greater than zero");
+  }
+
   for (std::size_t i = 0; i < warmup_iterations; ++i) {
     verification_sink += fn() ? 1ULL : 0ULL;
   }
@@ -39,4 +44,3 @@ TimingSeries time_batches(const std::string& name,
 }
 
 }  // namespace qrs
-

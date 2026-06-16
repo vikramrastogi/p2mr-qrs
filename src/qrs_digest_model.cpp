@@ -163,6 +163,27 @@ std::string string_value(const std::string& json, const std::string& key, std::s
   return parse_json_string_at(json, value_pos(json, key, start));
 }
 
+std::string optional_string_value(const std::string& json,
+                                  const std::string& key,
+                                  const std::string& fallback) {
+  const std::string needle = "\"" + key + "\"";
+  std::size_t search = 0;
+  while (true) {
+    const std::size_t key_at = json.find(needle, search);
+    if (key_at == std::string::npos) {
+      return fallback;
+    }
+    std::size_t pos = key_at + needle.size();
+    while (pos < json.size() && std::isspace(static_cast<unsigned char>(json[pos]))) {
+      ++pos;
+    }
+    if (pos < json.size() && json[pos] == ':') {
+      return parse_json_string_at(json, value_pos(json, key, key_at));
+    }
+    search = key_at + needle.size();
+  }
+}
+
 std::uint64_t number_value(const std::string& json,
                            const std::string& key,
                            std::uint64_t fallback,
@@ -385,7 +406,7 @@ QrsDigestVectorResult compute_from_json(const std::string& json) {
   const std::uint64_t tx_version = number_value(json, "version", 0, true);
   const std::uint64_t lock_time = number_value(json, "lock_time", 0, true);
   const std::uint64_t input_index = number_value(json, "input_index", 0, false);
-  const std::string spent_script = string_value(json, "spent_output_scriptPubKey");
+  const std::string spent_script = optional_string_value(json, "spent_output_scriptPubKey", "");
   const std::uint64_t fallback_amount =
       outputs.empty() ? 0 : outputs.front().value_sat;
   const auto spent = parse_spent_outputs(json, inputs.size(), fallback_amount, spent_script);
@@ -416,7 +437,6 @@ QrsDigestVectorResult compute_from_json(const std::string& json) {
   const unsigned char spend_type = static_cast<unsigned char>(kQrsExtFlag * 2 + annex_present);
   std::vector<unsigned char> sigmsg;
   sigmsg.push_back(kQrsHashType);
-  sigmsg.push_back(spend_type);
   append_u32(sigmsg, tx_version);
   append_u32(sigmsg, lock_time);
   const auto h_prevouts = sha256(prevouts_payload);
@@ -429,6 +449,7 @@ QrsDigestVectorResult compute_from_json(const std::string& json) {
   sigmsg.insert(sigmsg.end(), h_scripts.begin(), h_scripts.end());
   sigmsg.insert(sigmsg.end(), h_sequences.begin(), h_sequences.end());
   sigmsg.insert(sigmsg.end(), h_outputs.begin(), h_outputs.end());
+  sigmsg.push_back(spend_type);
   append_u32(sigmsg, input_index);
   if (!annex.empty()) {
     std::vector<unsigned char> annex_payload;

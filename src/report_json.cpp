@@ -19,7 +19,15 @@ std::string esc(const std::string& s) {
       case '\n': o << "\\n"; break;
       case '\r': o << "\\r"; break;
       case '\t': o << "\\t"; break;
-      default: o << c; break;
+      default:
+        if (static_cast<unsigned char>(c) < 0x20) {
+          o << "\\u" << std::hex << std::setw(4) << std::setfill('0')
+            << static_cast<int>(static_cast<unsigned char>(c))
+            << std::dec << std::setfill(' ');
+        } else {
+          o << c;
+        }
+        break;
     }
   }
   return o.str();

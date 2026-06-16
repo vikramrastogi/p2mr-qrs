@@ -185,7 +185,7 @@ def build_sigmsg(data: dict[str, Any], leaf_hash: bytes, annex: bytes, path: Pat
         fail(path, "input_index must select a transaction input")
 
     sigmsg = (
-        bytes([QRS_HASH_TYPE, spend_type])
+        bytes([QRS_HASH_TYPE])
         + ser_u32(int(tx.get("version", 0)))
         + ser_u32(int(tx.get("lock_time", 0)))
         + hashlib.sha256(prevouts_payload).digest()
@@ -193,6 +193,7 @@ def build_sigmsg(data: dict[str, Any], leaf_hash: bytes, annex: bytes, path: Pat
         + hashlib.sha256(scriptpubkeys_payload).digest()
         + hashlib.sha256(sequences_payload).digest()
         + hashlib.sha256(outputs_payload).digest()
+        + bytes([spend_type])
         + ser_u32(input_index)
     )
     if annex_present:

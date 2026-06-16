@@ -18,9 +18,9 @@ preimage shape where it can: leaf hashes use
 `TapLeaf(version || compact_size(len(pubkey)) || pubkey)`, branch hashes use
 `TapBranch`, and message hashes use
 `TapSighash(0x00 || modeled_sigmsg || leaf_hash)` with an ext_flag=2
-spend-type byte. The modeled SigMsg is not a final BIP-341 transaction digest;
-it is a deterministic fixture payload until the final BIP-360/QRS digest rules
-exist.
+spend-type byte in the BIP-341 input-data position after the common transaction
+hashes. The modeled SigMsg is not a final BIP-341 transaction digest; it is a
+deterministic fixture payload until the final BIP-360/QRS digest rules exist.
 
 Each vector includes the fields required for final consensus-vector review:
 structured transaction fields, spent output scriptPubKey, witness stack,

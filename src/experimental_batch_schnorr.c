@@ -193,7 +193,8 @@ static int qrs_exp_mult_cb(secp256k1_scalar* sc, secp256k1_ge* pt, size_t idx, v
 qrs_exp_bip340_batch_context* qrs_exp_bip340_batch_context_create(size_t capacity) {
     qrs_exp_bip340_batch_context* ctx;
     size_t scratch_size;
-    if (capacity == 0 || capacity > ((size_t)-1) / 2) {
+    if (capacity == 0 || capacity > ((size_t)-1) / 2 ||
+        capacity > (((size_t)-1) - 1024 * 1024) / 768) {
         return NULL;
     }
     ctx = (qrs_exp_bip340_batch_context*)calloc(1, sizeof(*ctx));
