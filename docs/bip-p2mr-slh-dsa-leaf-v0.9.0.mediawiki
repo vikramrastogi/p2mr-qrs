@@ -244,7 +244,7 @@ The current pre-review repository contains the native benchmark harness, provisi
 
 ==Acknowledgements==
 
-This proposal builds on BIP-360's P2MR construction and its stated goal of enabling future post-quantum signatures in P2MR outputs. BIP-360 reference material includes exploratory P2MR/PQC examples using SLH-DSA in script-like leaves. This BIP takes a narrower consensus-design approach: a single P2MR future leaf version whose payload is one SLH-DSA-SHA2-128s public key and whose validation rule verifies one fixed-size SLH-DSA signature, without adding a tapscript opcode, witness discount, algorithm registry, or legacy-output migration policy. It also addresses the post-quantum signature primitive left unspecified by BIP-361 and relies on the NIST FIPS 205 SLH-DSA standard. The benchmark, resource-accounting, vector, and review package in this repository are provided to evaluate the proposed P2MR SLH-DSA leaf design.
+This proposal builds on BIP-360's P2MR construction and its stated goal of enabling future post-quantum signatures in key-path-free outputs. BIP-360's reference material includes exploratory P2MR/PQC examples using SLH-DSA in script-like leaves. This BIP takes a narrower consensus-design approach: a single P2MR future leaf version whose payload is one SLH-DSA-SHA2-128s public key and whose validation rule verifies one fixed-size SLH-DSA signature, without adding a tapscript opcode, witness discount, algorithm registry, or legacy-output migration policy.
 
 ==Reference links==
 
