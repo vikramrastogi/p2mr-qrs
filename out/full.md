@@ -9,7 +9,7 @@ The run contains QRS, individual Schnorr, and experimental batch Schnorr timings
 ## Environment
 
 - `benchmark_binary_build_mode`: Release/NDEBUG
-- `benchmark_commit`: 34a1a1deb57f5c80bb1a893dca8265183a55e84b
+- `benchmark_commit`: 5eba230f958e28366e52bdcf020bf646e04b16ab
 - `build_type`: Release/NDEBUG
 - `compiler`: clang 17.0.0 (clang-1700.6.4.2)
 - `compiler_flags`: CMake target: -O3 -Wall -Wextra -Wpedantic
@@ -17,7 +17,7 @@ The run contains QRS, individual Schnorr, and experimental batch Schnorr timings
 - `cpu_frequency`: unavailable
 - `cpu_model`: Apple M2 Pro
 - `frequency_scaling`: not controlled by harness; reviewer must record governor/power mode
-- `git_commit`: 34a1a1deb57f5c80bb1a893dca8265183a55e84b
+- `git_commit`: 5eba230f958e28366e52bdcf020bf646e04b16ab
 - `os`: Darwin 25.3.0 arm64
 - `working_tree_dirty`: false
 - `OpenSSL`: OpenSSL 3.6.1 27 Jan 2026
@@ -33,12 +33,12 @@ Timing statistics are computed as the median of per-batch means, p95 of per-batc
 
 | Benchmark | Status | Median batch-mean ns | p95 batch-mean ns | p99 batch-mean ns | Max batch-mean ns | Ops/sec |
 |---|---:|---:|---:|---:|---:|---:|
-| SLH-DSA-SHA2-128s valid verify | available | 177911.250 | 180996.875 | 181459.750 | 181626.250 | 5619.610 |
-| SLH-DSA-SHA2-128s invalid fixed-length verify | available | 175700.000 | 180009.795 | 207922.963 | 219865.840 | 5635.045 |
-| BIP-340 Schnorr individual valid verify | available | 19911.040 | 20262.627 | 20700.023 | 20753.069 | 50055.497 |
-| BIP-340 Schnorr individual invalid verify | available | 20002.010 | 22278.752 | 23913.907 | 24068.233 | 49298.851 |
+| SLH-DSA-SHA2-128s valid verify | available | 186167.910 | 187212.080 | 187965.831 | 188245.830 | 5374.392 |
+| SLH-DSA-SHA2-128s invalid fixed-length verify | available | 186402.920 | 263561.040 | 315783.160 | 321121.660 | 4966.962 |
+| BIP-340 Schnorr individual valid verify | available | 19884.015 | 20799.744 | 22229.094 | 23472.463 | 49843.726 |
+| BIP-340 Schnorr individual invalid verify | available | 19832.044 | 19949.954 | 20111.952 | 20165.675 | 50411.268 |
 | BIP-340 Schnorr reviewed-public batch per-signature verify | unavailable | | | | | |
-| BIP-340 Schnorr experimental batch primary per-signature verify | available | 13716.156 | 14944.449 | 16452.751 | 16829.827 | 71437.107 |
+| BIP-340 Schnorr experimental batch primary per-signature verify | available | 13545.243 | 14816.595 | 29190.907 | 32784.485 | 68900.480 |
 
 ## SLH-DSA Invalid Fixed-Length Suite
 
@@ -46,22 +46,22 @@ Each case keeps the signature length at 7,856 bytes and is checked to fail befor
 
 | Case | Status | Median batch-mean ns | p95 batch-mean ns | p99 batch-mean ns | Max batch-mean ns | Ops/sec |
 |---|---:|---:|---:|---:|---:|---:|
-| byte0_bitflip | available | 193024.590 | 195923.330 | 196848.667 | 197024.170 | 5176.670 |
-| middle_bitflip | available | 191395.000 | 194853.755 | 198061.082 | 198960.830 | 5211.845 |
-| last_bitflip | available | 177667.920 | 180199.790 | 180392.543 | 180470.420 | 5623.614 |
-| spread_32_bitflips | available | 183899.590 | 186057.080 | 187298.000 | 187576.250 | 5440.856 |
-| all_zero | available | 174074.580 | 176680.625 | 177524.375 | 177530.000 | 5740.304 |
-| all_ff | available | 175700.000 | 180009.795 | 207922.963 | 219865.840 | 5635.045 |
-| deterministic_garbage | available | 177909.580 | 180395.620 | 182856.998 | 183837.500 | 5619.186 |
-| wrong_message | available | 189207.920 | 192189.375 | 192732.662 | 192780.410 | 5280.785 |
-| wrong_public_key | available | 185199.170 | 187595.625 | 189611.543 | 190224.170 | 5400.212 |
-| min observed invalid fixed-length | available | 174074.580 | 176680.625 | 177524.375 | 177530.000 | 5740.304 |
-| best observed invalid fixed-length | available | 174074.580 | 176680.625 | 177524.375 | 177530.000 | 5740.304 |
-| median observed invalid fixed-length | available | 185199.170 | 187595.625 | 189611.543 | 190224.170 | 5400.212 |
-| p99 observed invalid fixed-length | available | 175700.000 | 180009.795 | 207922.963 | 219865.840 | 5635.045 |
-| worst observed invalid fixed-length | available | 175700.000 | 180009.795 | 207922.963 | 219865.840 | 5635.045 |
+| byte0_bitflip | available | 175087.910 | 177175.000 | 177239.081 | 177248.330 | 5705.078 |
+| middle_bitflip | available | 180093.330 | 183070.415 | 184358.751 | 184856.250 | 5547.301 |
+| last_bitflip | available | 187644.590 | 190494.795 | 190585.752 | 190620.000 | 5324.689 |
+| spread_32_bitflips | available | 195185.000 | 197559.585 | 198111.000 | 198281.250 | 5121.499 |
+| all_zero | available | 186402.920 | 263561.040 | 315783.160 | 321121.660 | 4966.962 |
+| all_ff | available | 184587.500 | 190786.665 | 204344.079 | 209992.080 | 5387.623 |
+| deterministic_garbage | available | 188906.250 | 192695.625 | 195612.169 | 196517.920 | 5280.462 |
+| wrong_message | available | 186060.420 | 189006.250 | 190623.581 | 190969.580 | 5367.345 |
+| wrong_public_key | available | 188335.830 | 190259.375 | 193012.375 | 194113.750 | 5306.034 |
+| min observed invalid fixed-length | available | 175087.910 | 177175.000 | 177239.081 | 177248.330 | 5705.078 |
+| best observed invalid fixed-length | available | 175087.910 | 177175.000 | 177239.081 | 177248.330 | 5705.078 |
+| median observed invalid fixed-length | available | 188335.830 | 190259.375 | 193012.375 | 194113.750 | 5306.034 |
+| p99 observed invalid fixed-length | available | 186402.920 | 263561.040 | 315783.160 | 321121.660 | 4966.962 |
+| worst observed invalid fixed-length | available | 186402.920 | 263561.040 | 315783.160 | 321121.660 | 4966.962 |
 
-Worst observed invalid fixed-length case: `all_ff`.
+Worst observed invalid fixed-length case: `all_zero`.
 
 ## QRS Validation Path Model
 
@@ -71,12 +71,12 @@ Worst observed invalid fixed-length case: `all_ff`.
 
 | Bucket | Status | Median batch-mean ns | p95 batch-mean ns | p99 batch-mean ns | Max batch-mean ns | Ops/sec |
 |---|---:|---:|---:|---:|---:|---:|
-| structural checks | available | 353.979 | 363.301 | 366.399 | 367.250 | 2824671.591 |
-| qrs_msg construction | available | 707.467 | 714.785 | 718.218 | 719.302 | 1414412.762 |
-| verifier valid call | available | 180327.500 | 182437.080 | 183317.706 | 183652.080 | 5535.054 |
-| total modeled valid path | available | 182207.920 | 184139.585 | 185389.207 | 185900.830 | 5487.063 |
-| invalid structural reject | available | 2.642 | 2.820 | 3.110 | 3.233 | 372942201.177 |
-| invalid fixed-length crypto reject | available | 181084.580 | 182339.165 | 182525.625 | 182587.500 | 5526.470 |
+| structural checks | available | 353.306 | 362.876 | 365.964 | 367.110 | 2824936.460 |
+| qrs_msg construction | available | 715.648 | 723.715 | 726.073 | 727.044 | 1396653.551 |
+| verifier valid call | available | 187309.160 | 189681.465 | 190135.083 | 190312.080 | 5334.779 |
+| total modeled valid path | available | 188927.500 | 190838.125 | 191485.294 | 191635.420 | 5294.460 |
+| invalid structural reject | available | 2.717 | 3.274 | 3.553 | 3.627 | 355904163.045 |
+| invalid fixed-length crypto reject | available | 185224.170 | 186819.790 | 187254.794 | 187415.420 | 5398.701 |
 
 ## Batch Schnorr Baseline
 
@@ -97,21 +97,21 @@ This benchmark implements the experimental native BIP-340 batch baseline for sen
 
 | Batch size | Status | Total median batch-mean ns | Total p99 batch-mean ns | Per-signature median batch-mean ns | Per-signature p99 batch-mean ns |
 |---:|---:|---:|---:|---:|---:|
-| 64 | available | 1443864.583 | 2030029.167 | 22560.384 | 31719.206 |
-| 128 | available | 2805079.917 | 3952223.600 | 21914.687 | 30876.747 |
-| 512 | available | 8696628.500 | 10930236.800 | 16985.603 | 21348.119 |
-| 2048 | available | 31599750.000 | 36646516.720 | 15429.565 | 17893.807 |
-| 17391 | available | 238537667.000 | 286129799.800 | 13716.156 | 16452.751 |
+| 64 | available | 1360121.583 | 1404230.533 | 21251.900 | 21941.102 |
+| 128 | available | 2494923.667 | 2565680.533 | 19491.591 | 20044.379 |
+| 512 | available | 8626326.417 | 9697471.533 | 16848.294 | 18940.374 |
+| 2048 | available | 31103708.400 | 31397418.360 | 15187.358 | 15330.771 |
+| 17391 | available | 235565312.500 | 507659062.300 | 13545.243 | 29190.907 |
 
 ## Experimental Invalid Batch Timing
 
 | Batch size | Status | Total median batch-mean ns | Total p99 batch-mean ns | Per-signature median batch-mean ns | Per-signature p99 batch-mean ns |
 |---:|---:|---:|---:|---:|---:|
-| 64 | available | 1340215.250 | 1380469.450 | 20940.863 | 21569.835 |
-| 128 | available | 2500524.250 | 2611060.367 | 19535.346 | 20398.909 |
-| 512 | available | 8709128.417 | 8836867.350 | 17010.016 | 17259.507 |
-| 2048 | available | 31374691.600 | 35792411.720 | 15319.674 | 17476.764 |
-| 17391 | available | 238998687.500 | 276132966.500 | 13742.665 | 15877.923 |
+| 64 | available | 1427965.250 | 3446259.000 | 22311.957 | 53847.797 |
+| 128 | available | 2517180.500 | 2555354.833 | 19665.473 | 19963.710 |
+| 512 | available | 8768086.833 | 8978886.800 | 17125.170 | 17536.888 |
+| 2048 | available | 31338716.800 | 31948069.920 | 15302.108 | 15599.644 |
+| 17391 | available | 236017875.000 | 239496745.900 | 13571.265 | 13771.304 |
 
 ## Block Model
 
@@ -119,16 +119,16 @@ Simplified per-input saturation approximation. Real blocks include transaction o
 
 | Model | Status | Max inputs | Median ms | p95 ms | p99 ms | Max ms |
 |---|---:|---:|---:|---:|---:|---:|
-| QRS valid saturated block | available | 496 | 88.244 | 89.774 | 90.004 | 90.087 |
-| QRS invalid fixed-length saturated block | available | 496 | 87.147 | 89.285 | 103.130 | 109.053 |
-| Schnorr individual saturated block | available | 17391 | 346.273 | 352.387 | 359.994 | 360.917 |
-| Schnorr experimental batch saturated block | available | 17391 | 238.538 | 259.899 | 286.130 | 292.688 |
+| QRS valid saturated block | available | 496 | 92.339 | 92.857 | 93.231 | 93.370 |
+| QRS invalid fixed-length saturated block | available | 496 | 92.456 | 130.726 | 156.628 | 159.276 |
+| Schnorr individual saturated block | available | 17391 | 345.803 | 361.728 | 386.586 | 408.210 |
+| Schnorr experimental batch saturated block | available | 17391 | 235.565 | 257.675 | 507.659 | 570.155 |
 | Schnorr reviewed-public batch saturated block | unavailable | 17391 | | | | |
 
 ## QRS vs experimental batch Schnorr
 
-- `qrs_valid_p99_ms`: 90.004
-- `experimental_batch_schnorr_p99_ms`: 286.130
+- `qrs_valid_p99_ms`: 93.231
+- `experimental_batch_schnorr_p99_ms`: 507.659
 
 ## Caveats
 
