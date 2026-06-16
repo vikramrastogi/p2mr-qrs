@@ -10,6 +10,9 @@ from pathlib import Path
 from typing import Any
 
 
+HYPOTHETICAL_BATCH_SPEEDUPS = (2.0, 2.5, 3.0, 4.0)
+
+
 class DecisionError(AssertionError):
     pass
 
@@ -47,6 +50,56 @@ def write_text(path: Path | None, text: str) -> None:
     path.write_text(text, encoding="utf-8")
 
 
+def build_batch_sensitivity(
+    qrs_valid: float | None,
+    qrs_invalid: float | None,
+    schnorr_individual: float | None,
+    experimental_batch: float | None,
+) -> dict[str, Any]:
+    if qrs_valid is None or qrs_invalid is None or schnorr_individual is None:
+        return {
+            "status": "unavailable",
+            "policy": (
+                "Hypothetical batch speedups are sensitivity analysis only; "
+                "no fake batch baseline is synthesized."
+            ),
+            "reason": "required QRS or individual Schnorr p99 estimates are unavailable",
+            "hypothetical_speedups": [],
+        }
+
+    qrs_worst = max(qrs_valid, qrs_invalid)
+    experimental_speedup = None
+    experimental_tightens = None
+    if experimental_batch is not None and experimental_batch > 0:
+        experimental_speedup = schnorr_individual / experimental_batch
+        experimental_tightens = experimental_batch < schnorr_individual
+
+    hypothetical: list[dict[str, Any]] = []
+    for speedup in HYPOTHETICAL_BATCH_SPEEDUPS:
+        synthetic_schnorr = schnorr_individual / speedup
+        hypothetical.append(
+            {
+                "speedup_vs_individual": speedup,
+                "schnorr_p99_ms": synthetic_schnorr,
+                "qrs_valid_exceeds": qrs_valid > synthetic_schnorr,
+                "qrs_worst_invalid_exceeds": qrs_worst > synthetic_schnorr,
+            }
+        )
+
+    return {
+        "status": "available",
+        "policy": (
+            "Hypothetical batch speedups are sensitivity analysis only; "
+            "they are not a measured baseline and no fake batch baseline is synthesized."
+        ),
+        "experimental_batch_tightens_individual": experimental_tightens,
+        "experimental_batch_speedup_vs_individual": experimental_speedup,
+        "qrs_valid_exceeds_if_batch_speedup_gt": schnorr_individual / qrs_valid,
+        "qrs_worst_invalid_exceeds_if_batch_speedup_gt": schnorr_individual / qrs_worst,
+        "hypothetical_speedups": hypothetical,
+    }
+
+
 def render_markdown(decision: dict[str, Any]) -> str:
     lines = [
         "# Resource Accounting Evaluation",
@@ -74,6 +127,52 @@ def render_markdown(decision: dict[str, Any]) -> str:
         lines.append(
             f"| {item['name']} | {'pass' if item['passed'] else 'fail'} | {item['detail']} |"
         )
+    sensitivity = decision.get("batch_sensitivity", {})
+    lines.extend(
+        [
+            "",
+            "## Batch-Speedup Sensitivity",
+            "",
+            sensitivity.get(
+                "policy",
+                "Hypothetical batch speedups are sensitivity analysis only; no fake batch baseline is synthesized.",
+            ),
+            "",
+        ]
+    )
+    if sensitivity.get("status") == "available":
+        experimental_tightens = sensitivity.get("experimental_batch_tightens_individual")
+        experimental_speedup = sensitivity.get("experimental_batch_speedup_vs_individual")
+        lines.append(
+            "- Experimental batch tightens individual Schnorr: "
+            + ("unavailable" if experimental_tightens is None else str(experimental_tightens).lower())
+        )
+        if experimental_speedup is not None:
+            lines.append(f"- Experimental batch speedup vs individual: {experimental_speedup:.3f}x")
+        lines.append(
+            "- QRS valid exceeds a hypothetical batch baseline if speedup is greater than "
+            f"{sensitivity['qrs_valid_exceeds_if_batch_speedup_gt']:.3f}x."
+        )
+        lines.append(
+            "- QRS worst-invalid exceeds a hypothetical batch baseline if speedup is greater than "
+            f"{sensitivity['qrs_worst_invalid_exceeds_if_batch_speedup_gt']:.3f}x."
+        )
+        lines.extend(
+            [
+                "",
+                "| Hypothetical speedup vs individual | Hypothetical Schnorr p99 ms | QRS valid exceeds | QRS worst-invalid exceeds |",
+                "| ---: | ---: | --- | --- |",
+            ]
+        )
+        for item in sensitivity["hypothetical_speedups"]:
+            lines.append(
+                f"| {item['speedup_vs_individual']:.1f}x | "
+                f"{item['schnorr_p99_ms']:.3f} | "
+                f"{str(item['qrs_valid_exceeds']).lower()} | "
+                f"{str(item['qrs_worst_invalid_exceeds']).lower()} |"
+            )
+    else:
+        lines.append(f"- unavailable: {sensitivity.get('reason', 'unknown')}")
     lines.extend(["", "## Activation Blockers", ""])
     for blocker in decision["activation_blockers"]:
         lines.append(f"- {blocker}")
@@ -184,6 +283,7 @@ def evaluate(report: dict[str, Any], batch_evidence: dict[str, Any], allow_unava
                 "experimental_batch_schnorr_saturated_block": None,
                 "reviewed_public_batch_schnorr_saturated_block": None,
             },
+            "batch_sensitivity": build_batch_sensitivity(None, None, None, None),
             "checks": checks,
             "activation_blockers": blockers,
         }
@@ -216,8 +316,16 @@ def evaluate(report: dict[str, Any], batch_evidence: dict[str, Any], allow_unava
             experimental_pass,
             f"qrs_worst={qrs_worst:.3f} ms, experimental_batch={experimental_batch:.3f} ms",
         )
+        experimental_tightens_individual = experimental_batch < schnorr_individual
+        add_check(
+            checks,
+            "Experimental batch tightens individual Schnorr baseline",
+            experimental_tightens_individual,
+            f"experimental_batch={experimental_batch:.3f} ms, individual_schnorr={schnorr_individual:.3f} ms",
+        )
     else:
         experimental_pass = False
+        experimental_tightens_individual = False
         blockers.append("Experimental batch Schnorr sensitivity baseline unavailable.")
 
     if reviewed_batch is None:
@@ -246,13 +354,20 @@ def evaluate(report: dict[str, Any], batch_evidence: dict[str, Any], allow_unava
             "QRS worst-case p99 exceeds individual Schnorr; the draft must add an "
             "explicit per-QRS validation budget before activation."
         )
-    elif not experimental_pass:
+    elif not experimental_pass or not experimental_tightens_individual:
         draft_status = "unresolved_requires_reviewer_decision"
         fallback_status = "reviewer_decision_required"
-        conclusion = (
-            "QRS is below individual Schnorr but exceeds experimental batch Schnorr; "
-            "resource accounting remains unresolved for activation."
-        )
+        if experimental_batch is not None and not experimental_tightens_individual:
+            conclusion = (
+                "QRS is below individual Schnorr, but the experimental batch Schnorr "
+                "baseline does not tighten the individual baseline; resource accounting "
+                "remains unresolved for activation."
+            )
+        else:
+            conclusion = (
+                "QRS is below individual Schnorr but exceeds experimental batch Schnorr; "
+                "resource accounting remains unresolved for activation."
+            )
     else:
         draft_status = "supports_no_additional_budget_for_draft"
         fallback_status = "not_required_by_current_draft_evidence"
@@ -275,6 +390,9 @@ def evaluate(report: dict[str, Any], batch_evidence: dict[str, Any], allow_unava
             "experimental_batch_schnorr_saturated_block": experimental_batch,
             "reviewed_public_batch_schnorr_saturated_block": reviewed_batch,
         },
+        "batch_sensitivity": build_batch_sensitivity(
+            qrs_valid, qrs_invalid, schnorr_individual, experimental_batch
+        ),
         "checks": checks,
         "activation_blockers": blockers,
     }

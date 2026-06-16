@@ -23,7 +23,7 @@ advancement, or a reproducible release check.
 
 ## Evidence Package
 
-- `docs/bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki` is the BIP draft.
+- `docs/bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki` is the canonical BIP draft.
 - `docs/REVIEWER_DOSSIER.md` maps predictable objections to evidence,
   non-goals, or blockers.
 - `src/` and `include/` implement the native benchmark harness.

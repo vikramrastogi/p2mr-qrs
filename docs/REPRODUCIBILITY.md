@@ -43,6 +43,11 @@ batch baseline. The package records reviewed-public batch availability through
 native sensitivity analysis only; it is not a reviewed public libsecp256k1 API
 and is not consensus-grade validation code.
 
+`scripts/evaluate_resource_accounting.py` also emits batch-speedup sensitivity
+rows. Those rows divide the measured individual Schnorr saturated-block
+estimate by illustrative speedups to show where QRS would become unresolved;
+they are not measured baselines and must not be cited as batch evidence.
+
 Ordinary local release checks use local-only batch evidence. When publishing a
 network-checked upstream batch evidence refresh, run:
 

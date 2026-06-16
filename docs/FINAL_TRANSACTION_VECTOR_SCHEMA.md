@@ -7,6 +7,13 @@ fixtures. They are stronger than metadata because verifier-reaching draft
 cryptographic vectors carry real SLH-DSA-SHA2-128s signatures, but they are
 still not final consensus vectors.
 
+The provisional fixture model now covers the current BIP's non-provisional
+preimage structure where possible: TapLeaf-style length-prefixed leaf payloads,
+TapBranch-style Merkle paths, and a TapSighash-style message with a modeled
+ext_flag=2 SigMsg payload followed by `leaf_hash`. What remains provisional is
+the serialized transaction digest itself, because final BIP-360/QRS sighash
+definitions are not yet fixed.
+
 Final vectors must be serialized spend vectors. They must bind the exact bytes
 that a consensus implementation validates.
 

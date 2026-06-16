@@ -13,6 +13,15 @@ fixed-length SLH-DSA-SHA2-128s signatures checked by
 vectors are still provisional because the hashing model is provisional pending
 final BIP-360/QRS definitions.
 
+The provisional model intentionally follows the current BIP's structural
+preimage shape where it can: leaf hashes use
+`TapLeaf(version || compact_size(len(pubkey)) || pubkey)`, branch hashes use
+`TapBranch`, and message hashes use
+`TapSighash(0x00 || modeled_sigmsg || leaf_hash)` with an ext_flag=2
+spend-type byte. The modeled SigMsg is not a final BIP-341 transaction digest;
+it is a deterministic fixture payload until the final BIP-360/QRS digest rules
+exist.
+
 Each vector includes the fields required for final consensus-vector review:
 structured transaction fields, spent output scriptPubKey, witness stack,
 `qrs_public_key`, `qrs_signature`, `control_block`, `expected_leaf_hash`,

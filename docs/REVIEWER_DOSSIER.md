@@ -29,9 +29,11 @@ primitive narrow. See the BIP Rationale and `test_vectors/`.
 
 ## Why SLH-DSA-SHA2-128s
 
-It is stateless and hash-based, keeping the first post-quantum consensus path
-on assumptions Bitcoin already relies on through SHA-256. The cost is a large
-signature, which receives no witness discount.
+It is stateless and hash-based, avoids introducing a lattice assumption into
+the first post-quantum consensus verifier, and targets NIST Category 1, the
+closest NIST post-quantum category to Bitcoin's existing roughly 128-bit
+classical security target. The cost is a large signature, which receives no
+witness discount.
 
 ## Why no legacy-output policy
 
@@ -52,6 +54,11 @@ No-new-budget is a hypothesis to test, not an established consensus conclusion.
 The harness emits QRS, individual Schnorr, experimental batch Schnorr, and
 reviewed-public batch status separately. See `../out/full.md` and
 `../out/full.json`.
+
+The generated decision record also includes batch-speedup sensitivity rows. They
+are explicitly hypothetical and must not be cited as measured batch evidence;
+their purpose is to show where reviewer concern about a faster batch baseline
+would make the no-additional-budget rule unresolved.
 
 ## Batch Schnorr status
 
@@ -75,9 +82,12 @@ vectors are marked provisional for the same reason.
 
 Provisional executable structured fixtures exist in `test_vectors/` and are
 checked by `scripts/validate_test_vectors.py` and
-`scripts/verify_qrs_fixtures.py`. They recompute the modeled fixture hashes and
+`scripts/verify_qrs_fixtures.py`. They recompute the modeled hashes and
 distinguish structural rejects from the invalid fixed-length signature case
-that reaches the modeled SLH-DSA verifier boundary.
+that reaches the modeled SLH-DSA verifier boundary. The model now uses the
+current BIP's structural preimage shape where possible: length-prefixed TapLeaf
+payloads, TapBranch paths, and a TapSighash message over a SigMsg-shaped
+ext_flag=2 fixture payload plus `leaf_hash`.
 
 Draft cryptographic vectors are checked by `scripts/verify_qrs_vectors.py`,
 which calls the native SLH-DSA-SHA2-128s verifier for valid and invalid

@@ -21,6 +21,12 @@ TMP_BATCH_EVIDENCE_MD="$TMP_DIR/batch-evidence.md"
 BATCH_DISABLED_JSON="$TMP_DIR/schnorr-batch-disabled.json"
 BATCH_DISABLED_MD="$TMP_DIR/schnorr-batch-disabled.md"
 SECP_COMMIT_FILE="$ROOT/third_party/secp256k1.COMMIT"
+CONSOLIDATED_BIP="$ROOT/docs/bip-p2mr-slh-dsa-leaf-""consolidated.mediawiki"
+
+if [ -e "$CONSOLIDATED_BIP" ]; then
+  echo "release_check.sh: use docs/bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki as the single canonical BIP draft" >&2
+  exit 1
+fi
 
 grep -n "Version: 0.9.0" "$BIP"
 grep -n "Requires: 341, 342, 360" "$BIP"
@@ -182,7 +188,10 @@ jq '.environment.openssl_provider' "$QUICK_JSON"
 jq '.draft_rule_status' "$RESOURCE_DECISION_JSON"
 jq '.activation_ready' "$RESOURCE_DECISION_JSON"
 jq '.explicit_qrs_budget_required' "$RESOURCE_DECISION_JSON"
+jq '.batch_sensitivity.status' "$RESOURCE_DECISION_JSON"
 grep -n "Pass/Fail Conclusion" "$RESOURCE_DECISION_MD"
+grep -n "Batch-Speedup Sensitivity" "$RESOURCE_DECISION_MD"
+grep -n "Hypothetical batch speedups are sensitivity analysis only" "$RESOURCE_DECISION_MD"
 grep -n "does not establish activation readiness" "$RESOURCE_DECISION_MD"
 grep -n "median of per-batch means" "$QUICK_MD"
 grep -n "BIP-340 challenge self-test" "$QUICK_MD" "$DOSSIER"
