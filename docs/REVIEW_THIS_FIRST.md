@@ -23,6 +23,8 @@ SLH-DSA-SHA2-128s signature against one fixed-size SLH-DSA-SHA2-128s public key.
 ## What this BIP does
 
 - Specifies a narrow P2MR SLH-DSA leaf for Draft-stage review.
+- Complements BIP-360 by specifying one concrete future-leaf validation rule
+  for the P2MR container, rather than replacing BIP-360.
 - Uses one 32-byte SLH-DSA-SHA2-128s public key as the leaf payload.
 - Uses one 7,856-byte SLH-DSA-SHA2-128s signature in the witness.
 - Keeps all QRS witness bytes under existing SegWit weight accounting.
@@ -115,6 +117,8 @@ gate.
 ## Requested reviewer feedback
 
 - Is a future P2MR leaf version the right abstraction?
+- Should this remain a dependent BIP, or should BIP-360 absorb it as the
+  concrete SLH-DSA future-leaf specification?
 - Is the witness shape acceptable?
 - Is pure SLH-DSA-SHA2-128s with explicit empty context specified clearly?
 - Is `ext_flag = 2` the right provisional digest-separation approach?

@@ -7,6 +7,12 @@ and it does not propose legacy-output policy. The draft defines one P2MR-only
 future leaf version whose payload is one SLH-DSA-SHA2-128s public key and whose
 spend verifies one fixed-size SLH-DSA-SHA2-128s signature.
 
+The intended relationship to BIP-360 is complementary: BIP-360 defines the
+key-path-free P2MR container, while this draft specifies one concrete SLH-DSA
+future-leaf validation rule for that container. If BIP-360 absorbs the leaf
+directly, this package can serve as the leaf specification; if BIP-360 remains
+algorithm-neutral, this can remain a dependent BIP.
+
 The proposal intentionally does not add a tapscript opcode, witness discount,
 algorithm registry, activation parameters, or old-output freeze/burn/throttle/
 sunset/rescue rule.

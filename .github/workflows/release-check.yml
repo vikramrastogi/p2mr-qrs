@@ -85,6 +85,10 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          # The release gate verifies that committed sample evidence references
+          # commits reachable from HEAD. Shallow PR checkouts cannot answer that.
+          fetch-depth: 0
 
       - name: Install macOS dependencies
         run: |
