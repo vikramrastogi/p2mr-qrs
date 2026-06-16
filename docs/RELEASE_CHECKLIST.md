@@ -37,7 +37,8 @@ unresolved.
 Failure of `full_release_check.sh` means the current machine's standard-run evidence is not strong enough for the stricter gate; it does not change the Draft-stage status of the BIP.
 
 See `PUBLIC_REVIEW_READINESS.md` for the public pre-review readiness checklist
-and `PUBLIC_REVIEW_POST_DRAFT.md` for the short public-posting draft.
+`REVIEW_THIS_FIRST.md` for the reviewer entrypoint, and
+`PUBLIC_REVIEW_POST_DRAFT.md` for the short public-posting draft.
 
 Checklist enforced by the script:
 

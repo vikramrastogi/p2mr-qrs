@@ -5,6 +5,8 @@ the P2MR / quantum-migration discussion.
 
 This is not activation-ready consensus evidence.
 
+Start with `docs/REVIEW_THIS_FIRST.md` if you are reviewing the proposal.
+
 ## Scope
 
 This repository proposes and tests one narrow primitive:
@@ -36,6 +38,8 @@ validation budget before activation.
 - `docs/bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki` - canonical BIP draft.
 - `docs/REVIEWER_DOSSIER.md` - predictable objections mapped to evidence,
   blockers, or non-goals.
+- `docs/REVIEW_THIS_FIRST.md` - reviewer-facing entrypoint and requested
+  feedback.
 - `docs/RESOURCE_ACCOUNTING_DECISION.md` - decision criteria and current
   Draft-stage conclusion for the proposed no-additional-budget rule.
 - `docs/EXPLICIT_QRS_BUDGET_FALLBACK.md` - inactive fallback rule if weight
