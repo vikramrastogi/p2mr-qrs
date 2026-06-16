@@ -161,6 +161,8 @@ void append_array(std::vector<unsigned char>& out, const std::array<unsigned cha
 }
 
 std::array<unsigned char, 32> modeled_leaf_hash(const std::vector<unsigned char>& public_key) {
+  // Deliberately non-consensus benchmark prefix. Final BIP-360/QRS hashing must
+  // be implemented and benchmarked in Bitcoin Core-shaped validation code.
   std::vector<unsigned char> buf;
   const char prefix[] = "QRS modeled TapLeaf v0";
   buf.insert(buf.end(), prefix, prefix + sizeof(prefix) - 1);
@@ -175,6 +177,7 @@ std::array<unsigned char, 32> modeled_root(const std::array<unsigned char, 32>& 
   std::array<unsigned char, 32> cur = leaf_hash;
   const std::size_t depth = (control_block.size() - 1) / 32;
   for (std::size_t i = 0; i < depth; ++i) {
+    // Deliberately non-consensus benchmark prefix; see modeled_leaf_hash.
     std::vector<unsigned char> buf;
     const char prefix[] = "QRS modeled Branch v0";
     buf.insert(buf.end(), prefix, prefix + sizeof(prefix) - 1);
@@ -200,6 +203,8 @@ bool structural_checks(const ModeledSpend& spend) {
 
 std::array<unsigned char, 32> construct_qrs_msg(const ModeledSpend& spend) {
   const auto leaf = modeled_leaf_hash(spend.public_key);
+  // Deliberately non-consensus benchmark prefix; this is a bucketed validation
+  // path model, not final TapSighash consensus integration.
   std::vector<unsigned char> buf;
   const char prefix[] = "QRS modeled SigMsg v0";
   buf.insert(buf.end(), prefix, prefix + sizeof(prefix) - 1);

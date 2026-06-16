@@ -6,7 +6,8 @@ readiness.
 ## What this proposal does
 
 Defines one P2MR-only future leaf version that verifies one
-SLH-DSA-SHA2-128s signature over a BIP-341-style transaction digest. See
+SLH-DSA-SHA2-128s signature over a P2MR/QRS transaction digest derived from the
+BIP-341 `SigMsg` structure, pending final BIP-360 definitions. See
 `bip-p2mr-slh-dsa-leaf-v0.9.0.mediawiki`.
 
 ## What this proposal does not do
@@ -136,6 +137,12 @@ Native OpenSSL SLH-DSA-SHA2-128s, native individual libsecp256k1 BIP-340, and
 experimental native batch BIP-340 are measured. The QRS validation-path section
 is a model, not Bitcoin Core integration. The artifact required to close that
 caveat is specified in `BITCOIN_CORE_INTEGRATION_REQUIREMENTS.md`.
+
+The modeled validation path intentionally uses explicit non-consensus prefixes
+such as `QRS modeled TapLeaf v0`, `QRS modeled Branch v0`, and
+`QRS modeled SigMsg v0`. Those prefixes make the benchmark bucket stable for
+pre-review while preventing the report from being mistaken for final
+TapLeaf/TapBranch/TapSighash consensus code.
 
 The report now lists SLH-DSA backend status explicitly. Consensus readiness
 requires a reviewed/pinned verifier strategy and cross-backend agreement.

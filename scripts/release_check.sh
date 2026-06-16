@@ -85,6 +85,9 @@ if grep -nE "$STALE_BIP_WORDING_PATTERN" "$BIP"; then
 fi
 grep -n "hypothesis to test" "$BIP"
 grep -n "BIP-360 is still draft" "$BIP"
+grep -n "P2MR/QRS transaction digest derived from the BIP-341" "$BIP"
+grep -n "pending final BIP-360 definitions" "$BIP" "$DOSSIER" "$ROOT/docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md"
+grep -n "proposed script-tree output that removes the Taproot key-path spend" "$BIP"
 grep -n "Fixed-length encoding and witness malleability" "$BIP"
 grep -n "RESOURCE_ACCOUNTING_DECISION.md" "$BIP"
 grep -n "EXPLICIT_QRS_BUDGET_FALLBACK.md" "$BIP"
@@ -97,6 +100,8 @@ grep -n "OpenSSL 3.5 or newer" "$ROOT/README.md" "$ROOT/docs/REPRODUCIBILITY.md"
 grep -n "EXPLICIT_QRS_BUDGET_FALLBACK.md" "$ROOT/docs/RESOURCE_ACCOUNTING_DECISION.md"
 grep -n "Bitcoin Core validation-path integration not implemented" "$ROOT/docs/BITCOIN_CORE_INTEGRATION_REQUIREMENTS.md"
 grep -n "qrs_transaction_vector.schema.json" "$ROOT/docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md"
+grep -n "schema-only placeholder" "$ROOT/docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md"
+grep -n "Schema for future P2MR QRS serialized transaction vectors" "$ROOT/test_vectors/qrs_transaction_vector.schema.json"
 grep -n "docs/REPRODUCIBILITY.md" "$ROOT/.github/ISSUE_TEMPLATE/benchmark-reproduction.yml"
 grep -n "BIP360_DEPENDENCY_MATRIX.md" "$ROOT/README.md" "$BIP" "$DOSSIER" "$ROOT/docs/PUBLIC_REVIEW_READINESS.md"
 grep -n "future leaf version behavior" "$ROOT/docs/BIP360_DEPENDENCY_MATRIX.md"
@@ -143,6 +148,10 @@ fi
 if grep -Rni "consensus test vectors" \
   "$ROOT/README.md" "$ROOT/00_README.md" "$ROOT/docs" "$ROOT/test_vectors"; then
   echo "release_check.sh: vectors must not be described as consensus test vectors" >&2
+  exit 1
+fi
+if grep -Rni "P2MR is the only key-path-free output" "$BIP" "$DOSSIER" "$ROOT/README.md"; then
+  echo "release_check.sh: avoid overbroad key-path-free-output claims" >&2
   exit 1
 fi
 
@@ -279,6 +288,8 @@ grep -n "Hypothetical batch speedups are sensitivity analysis only" "$TMP_RESOUR
 grep -n "does not establish activation readiness" "$TMP_RESOURCE_DECISION_MD"
 grep -n "median of per-batch means" "$TMP_QUICK_MD"
 grep -n "second reviewed SLH-DSA backend" "$TMP_QUICK_MD"
+grep -n "explicit non-consensus prefixes" "$TMP_QUICK_MD"
+grep -n "QRS modeled TapLeaf v0" "$TMP_QUICK_MD" "$DOSSIER"
 grep -n "BIP-340 challenge self-test" "$TMP_QUICK_MD" "$DOSSIER"
 ensure_out_clean
 
