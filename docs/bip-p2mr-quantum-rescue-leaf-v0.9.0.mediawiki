@@ -15,7 +15,7 @@
 
 ===Abstract===
 
-This document specifies a single new Pay-to-Merkle-Root (P2MR) leaf version that verifies one stateless, hash-based post-quantum signature. The new leaf version, the Quantum-Rescue Signature (QRS) leaf, is valid only inside BIP-360 P2MR outputs and commits to exactly one 32-byte SLH-DSA-SHA2-128s public key. Spending it reveals the public key, a BIP-360 control block, and one SLH-DSA-SHA2-128s signature over a BIP-341-style transaction digest.
+This document specifies a single new Pay-to-Merkle-Root (P2MR) leaf version that verifies one stateless, hash-based post-quantum signature. The new QRS leaf is valid only inside BIP-360 P2MR outputs and commits to exactly one 32-byte SLH-DSA-SHA2-128s public key. Spending it reveals the public key, a BIP-360 control block, and one SLH-DSA-SHA2-128s signature over a BIP-341-style transaction digest.
 
 This BIP is purely additive. It does not restrict, freeze, burn, throttle, sunset, or otherwise encumber any existing output type, and it does not modify the validation of ECDSA, Schnorr, P2PK, P2PKH, P2SH, P2WPKH, P2WSH, or P2TR. It defines exactly one new, opt-in, post-quantum spending condition for new P2MR outputs, and nothing else.
 
@@ -240,11 +240,13 @@ A Complete version MUST include vectors for: valid QRS spend without annex; vali
 
 ==Reference implementation==
 
-A reference implementation MUST include: P2MR QRS leaf validation; an audited, pinned SLH-DSA-SHA2-128s verifier; transaction-digest tests; consensus tests; fuzz tests for malformed witnesses and control blocks; worst-case per-block validation benchmarks (per Resource Accounting); a native benchmark harness comparing QRS validation against individual and batch BIP-340 verification baselines, with median, p95, p99, and maximum timings; signet activation parameters; and a wallet demo creating a two-leaf P2MR output with an efficient spend leaf and a QRS rescue leaf.
+A reference implementation MUST include: P2MR QRS leaf validation; an audited, pinned SLH-DSA-SHA2-128s verifier; transaction-digest tests; consensus tests; fuzz tests for malformed witnesses and control blocks; worst-case per-block validation benchmarks (per Resource Accounting); a native benchmark harness comparing QRS validation against individual and batch BIP-340 verification baselines, with median, p95, p99, and maximum timings; signet activation parameters; and a wallet demo creating a two-leaf P2MR output with an efficient spend leaf and a QRS leaf.
+
+The current pre-review repository contains the native benchmark harness, provisional executable structured fixtures, draft cryptographic vectors verified through OpenSSL SLH-DSA where available, and negative/fuzz cases for witness-shape failures. These artifacts are review scaffolding for the Draft stage; final consensus vectors remain pending final BIP-360/QRS hashing and transaction-digest definitions.
 
 ==Acknowledgements==
 
-The v1 leaf-version design — QRS leaf, P2MR-only scoping, single conservative hash-based algorithm, no discount, and explicit refusal to decide legacy-output policy — follows a draft circulated as "P2MR SLH-DSA Rescue Leaf," and builds directly on BIP-360 (Hunter Beast, Ethan Heilman, Isabel Foxen Duke) and the dependency named by BIP-361 (Jameson Lopp, Christian Papathanasiou, Ian Smith, Joe Ross, Steve Vaile, Pierre-Luc Dallaire-Demers), without endorsing any migration policy. The concrete resource-accounting rule, the de-risked activation language, and the composable-opcode roadmap are refinements layered on that design. It relies on the NIST PQC standards, particularly FIPS 205.
+The v1 leaf-version design — QRS leaf, P2MR-only scoping, single conservative hash-based algorithm, no discount, and explicit refusal to decide legacy-output policy — follows a draft circulated as "P2MR SLH-DSA Leaf," and builds directly on BIP-360 (Hunter Beast, Ethan Heilman, Isabel Foxen Duke) and the dependency named by BIP-361 (Jameson Lopp, Christian Papathanasiou, Ian Smith, Joe Ross, Steve Vaile, Pierre-Luc Dallaire-Demers), without endorsing any migration policy. The concrete resource-accounting rule, the de-risked activation language, and the composable-opcode roadmap are refinements layered on that design. It relies on the NIST PQC standards, particularly FIPS 205.
 
 ==Reference links==
 

@@ -180,6 +180,11 @@ std::string render_json(const Environment& env,
   o << ",\n      \"batch_experimental_challenge_self_test\": {\n";
   o << "        \"status\": \""
     << esc(schnorr.batch_experimental_challenge_self_test_status) << "\",\n";
+  o << "        \"result\": \""
+    << (schnorr.batch_experimental_challenge_self_test_status == "available" ? "passed"
+                                                                             : "unavailable")
+    << "\",\n";
+  o << "        \"description\": \"Compared hardcoded-midstate challenge computation against independent BIP0340/challenge tagged-hash computation.\",\n";
   o << "        \"reason\": \""
     << esc(schnorr.batch_experimental_challenge_self_test_reason) << "\"\n";
   o << "      }";

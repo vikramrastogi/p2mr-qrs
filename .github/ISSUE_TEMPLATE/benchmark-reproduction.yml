@@ -1,4 +1,4 @@
-name: Native benchmark reproduction
+name: Benchmark reproduction report
 description: Submit an independent QRS native benchmark rerun.
 title: "Benchmark reproduction: <hardware / OS>"
 labels:
@@ -8,21 +8,89 @@ body:
   - type: markdown
     attributes:
       value: |
-        Please run the protocol in `docs/REPRODUCIBILITY.md` and attach the generated artifacts.
-  - type: textarea
-    id: environment
+        Please run the protocol in `docs/REPRODUCIBILITY.md` and attach the generated JSON and Markdown artifacts.
+  - type: input
+    id: os
     attributes:
-      label: Environment
-      description: Hardware, OS, compiler, compiler flags, OpenSSL version/provider, and build mode.
-      placeholder: Apple M2 Pro, Darwin 25.x, clang ..., OpenSSL ...
+      label: OS
+      placeholder: macOS 15.x / Ubuntu 24.04 / ...
+    validations:
+      required: true
+  - type: input
+    id: cpu
+    attributes:
+      label: CPU
+      placeholder: Apple M2 Pro / Intel Xeon ... / AMD ...
+    validations:
+      required: true
+  - type: input
+    id: compiler
+    attributes:
+      label: Compiler
+      placeholder: clang 17.0.0 / gcc 14.2.0 / ...
+    validations:
+      required: true
+  - type: input
+    id: compiler_flags
+    attributes:
+      label: Compiler flags
+      placeholder: -O3 -Wall -Wextra -Wpedantic
+    validations:
+      required: true
+  - type: input
+    id: openssl
+    attributes:
+      label: OpenSSL version/provider
+      placeholder: OpenSSL 3.6.1, default provider, SLH-DSA-SHA2-128s available
+    validations:
+      required: true
+  - type: input
+    id: secp256k1_commit
+    attributes:
+      label: libsecp256k1 commit
+      placeholder: aea86bc3509f3ceb5c047fe6567bf8910f72a728
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Benchmark mode
+      options:
+        - quick
+        - standard
+        - full
+    validations:
+      required: true
+  - type: dropdown
+    id: release_check
+    attributes:
+      label: Did release_check.sh pass?
+      options:
+        - "yes"
+        - "no"
+    validations:
+      required: true
+  - type: input
+    id: batch_status
+    attributes:
+      label: Batch status
+      placeholder: reviewed public unavailable; experimental available
     validations:
       required: true
   - type: textarea
-    id: commits
+    id: json_attachment
     attributes:
-      label: Commits
-      description: Benchmark harness commit, libsecp256k1 commit, and working-tree dirty status.
-      placeholder: benchmark_commit=..., libsecp256k1=..., working_tree_dirty=false
+      label: JSON attachment
+      description: Attach or link `out/full.json` or `out/quick.json`, plus `out/resource-accounting-decision.json`.
+      placeholder: Attach files or paste durable links.
+    validations:
+      required: true
+  - type: textarea
+    id: markdown_attachment
+    attributes:
+      label: Markdown attachment
+      description: Attach or link `out/full.md` or `out/quick.md`, plus `out/resource-accounting-decision.md`.
+      placeholder: Attach files or paste durable links.
     validations:
       required: true
   - type: textarea
@@ -35,20 +103,7 @@ body:
         qrs_worst_invalid_fixed_length_saturated_block=...
         individual_schnorr_saturated_block=...
         experimental_batch_schnorr_saturated_block=...
-    validations:
-      required: true
-  - type: textarea
-    id: attachments
-    attributes:
-      label: Attached artifacts
-      description: Confirm that raw JSON/Markdown reports are attached.
-      placeholder: |
-        - out/full.json
-        - out/full.md
-        - out/batch-evidence.json
-        - out/batch-evidence.md
-        - out/resource-accounting-decision.json
-        - out/resource-accounting-decision.md
+        reviewed_public_batch_schnorr_saturated_block=...
     validations:
       required: true
   - type: textarea

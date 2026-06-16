@@ -9,7 +9,7 @@ Defines one P2MR-only future leaf version that verifies one
 SLH-DSA-SHA2-128s signature over a BIP-341-style transaction digest. See
 `bip-p2mr-quantum-rescue-leaf-v0.9.0.mediawiki`.
 
-## What this proposal explicitly does not do
+## What this proposal does not do
 
 It does not freeze, burn, throttle, sunset, rescue, or otherwise regulate
 legacy outputs. It does not add ML-DSA, an algorithm menu, a new address family,
@@ -19,7 +19,7 @@ or a tapscript opcode.
 
 P2MR is key-path-free. A post-quantum rescue leaf inside an output with an
 exposed key path would not remove the discrete-log exposure. See the BIP
-Rationale section and `../01_bip_spec_hardening.md`.
+Rationale section and `../docs/bip-p2mr-quantum-rescue-leaf-v0.9.0.mediawiki`.
 
 ## Why a leaf version instead of opcode
 
@@ -44,7 +44,7 @@ treats that as an explicit non-goal, not an omission.
 
 The signature, public key, control block, and annex are counted under existing
 SegWit weight rules. See Resource accounting in the v0.9.0 BIP and
-`../05_block_validation_model.md`.
+`../docs/RESOURCE_ACCOUNTING_DECISION.md`.
 
 ## Resource-accounting status
 
@@ -71,17 +71,18 @@ The BIP requires BIP-360 and remains blocked on final BIP-360 definitions for
 P2MR hashing, sighash tagging, annex handling, and future-leaf behavior. The
 vectors are marked provisional for the same reason.
 
-## Test-vector status
+## Vector status
 
-Structured provisional fixture vectors exist in `test_vectors/` and are checked
-by `scripts/validate_test_vectors.py` and
+Provisional executable structured fixtures exist in `test_vectors/` and are
+checked by `scripts/validate_test_vectors.py` and
 `scripts/verify_qrs_fixtures.py`. They recompute the modeled fixture hashes and
 distinguish structural rejects from the invalid fixed-length signature case
-that reaches the modeled SLH-DSA verifier boundary. Verifier-reaching vectors
-are checked by `scripts/verify_qrs_vectors.py`, which calls the native
-SLH-DSA-SHA2-128s verifier for valid and invalid fixed-length signatures. They
-are still not final consensus vectors because the modeled hashing rules remain
-provisional pending final BIP-360/QRS definitions.
+that reaches the modeled SLH-DSA verifier boundary.
+
+Draft cryptographic vectors are checked by `scripts/verify_qrs_vectors.py`,
+which calls the native SLH-DSA-SHA2-128s verifier for valid and invalid
+fixed-length signatures. They are still not final consensus vectors because the
+modeled hashing rules remain provisional pending final BIP-360/QRS definitions.
 
 ## Benchmark status
 
@@ -123,7 +124,7 @@ Markdown artifacts.
 | Why not ML-DSA? | This draft tests one conservative hash-based primitive first. | BIP Motivation and Rationale. |
 | Why not a tapscript opcode? | The 7,856-byte signature exceeds the retained 520-byte tapscript stack-element limit. | BIP Rationale; `../test_vectors/`. |
 | Why no witness discount? | The proposal does not hide a blockspace-policy change inside the crypto primitive. | BIP Resource accounting; `../out/full.md`. |
-| What about batch Schnorr? | Reviewed public batch API status is explicit; experimental batch is labeled non-consensus. | `../out/batch-evidence.md`; `../04_batch_schnorr_baseline.md`. |
+| What about batch Schnorr? | Reviewed public batch API status is explicit; experimental batch is labeled non-consensus. | `../out/batch-evidence.md`; `../04_batch_schnorr_baseline.md`; `../scripts/check_batch_schnorr_baseline.py`. |
 | How does evidence map to the budget rule? | The decision criteria and current conclusion are in a separate decision record. | `RESOURCE_ACCOUNTING_DECISION.md`; `../out/quick.md`; `../out/full.md`. |
 | What if the no-budget rule fails? | Use the inactive explicit QRS budget fallback before activation. | `EXPLICIT_QRS_BUDGET_FALLBACK.md`; `../scripts/evaluate_resource_accounting.py`. |
 | What if BIP-360 changes? | Advancement is blocked on final BIP-360 definitions. | BIP Dependencies and Rationale; provisional vector notes. |

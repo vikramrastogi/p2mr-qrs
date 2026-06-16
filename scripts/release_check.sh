@@ -13,6 +13,13 @@ BATCH_EVIDENCE_MD="$ROOT/out/batch-evidence.md"
 RESOURCE_DECISION_JSON="$ROOT/out/resource-accounting-decision.json"
 RESOURCE_DECISION_MD="$ROOT/out/resource-accounting-decision.md"
 BUILD_DIR="$ROOT/build"
+TMP_DIR="$BUILD_DIR/release-check"
+TMP_QUICK_JSON="$TMP_DIR/quick.json"
+TMP_QUICK_MD="$TMP_DIR/quick.md"
+TMP_BATCH_EVIDENCE="$TMP_DIR/batch-evidence.json"
+TMP_BATCH_EVIDENCE_MD="$TMP_DIR/batch-evidence.md"
+BATCH_DISABLED_JSON="$TMP_DIR/schnorr-batch-disabled.json"
+BATCH_DISABLED_MD="$TMP_DIR/schnorr-batch-disabled.md"
 SECP_COMMIT_FILE="$ROOT/third_party/secp256k1.COMMIT"
 
 grep -n "Version: 0.9.0" "$BIP"
@@ -23,6 +30,10 @@ grep -n "Assigned: ?" "$BIP"
 STALE_TITLE_PATTERN="Title: P2MR Quantum-""Rescue Leaf"
 if grep -nE "Author:|Created:|$STALE_TITLE_PATTERN" "$BIP"; then
   echo "release_check.sh: stale BIP preamble field found" >&2
+  exit 1
+fi
+if grep -n "Quantum-""Rescue" "$BIP"; then
+  echo "release_check.sh: stale Q-R wording found" >&2
   exit 1
 fi
 grep -n "hypothesis to test" "$BIP"
@@ -47,7 +58,7 @@ if [ -e "$PRIVATE_SCAFFOLD_A" ] || [ -e "$PRIVATE_SCAFFOLD_B" ]; then
   exit 1
 fi
 if grep -RniE "Cl[a]ude|Co[d]ex|ChatG[P]T|A[I]-generated|\\bA[I]\\b|\\bL[L]M\\b|assist[a]nt" \
-  --exclude-dir=.git --exclude-dir=build --exclude-dir=third_party \
+  --exclude-dir=.git --exclude-dir=build --exclude-dir=third_party --exclude-dir=__pycache__ \
   --exclude=.git \
   "$ROOT"; then
   echo "release_check.sh: non-technical process artifact wording found" >&2
@@ -70,15 +81,28 @@ python3 "$ROOT/scripts/run_qrs_negative_tests.py"
 
 cmake -S "$ROOT" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release
 cmake --build "$BUILD_DIR" -j
+
+mkdir -p "$TMP_DIR"
+BATCH_EVIDENCE_ARGS=(
+  --json "$TMP_BATCH_EVIDENCE"
+  --markdown "$TMP_BATCH_EVIDENCE_MD"
+)
+if [ "${QRS_RELEASE_NETWORK_BATCH:-0}" = "1" ]; then
+  BATCH_EVIDENCE_ARGS+=(--upstream-timeout-seconds 15)
+else
+  BATCH_EVIDENCE_ARGS+=(--skip-upstream)
+fi
 python3 "$ROOT/scripts/check_batch_schnorr_baseline.py" \
-  --json "$BATCH_EVIDENCE" \
-  --markdown "$BATCH_EVIDENCE_MD" \
-  --upstream-timeout-seconds 15
+  "${BATCH_EVIDENCE_ARGS[@]}"
 python3 "$ROOT/scripts/verify_qrs_vectors.py" \
   "$ROOT/test_vectors" \
   --binary "$BUILD_DIR/qrs_native_bench" \
   --require-crypto
-"$BUILD_DIR/qrs_native_bench" --quick --json "$QUICK_JSON" --markdown "$QUICK_MD"
+"$BUILD_DIR/qrs_native_bench" --quick --json "$TMP_QUICK_JSON" --markdown "$TMP_QUICK_MD"
+cp "$TMP_BATCH_EVIDENCE" "$BATCH_EVIDENCE"
+cp "$TMP_BATCH_EVIDENCE_MD" "$BATCH_EVIDENCE_MD"
+cp "$TMP_QUICK_JSON" "$QUICK_JSON"
+cp "$TMP_QUICK_MD" "$QUICK_MD"
 cp "$QUICK_MD" "$SAMPLE_MD"
 
 CURRENT_COMMIT="$(git -C "$ROOT" rev-parse HEAD)"
@@ -111,6 +135,18 @@ python3 "$ROOT/scripts/assert_quick_report.py" \
   --json "$QUICK_JSON" \
   --markdown "$QUICK_MD" \
   --batch-evidence-json "$BATCH_EVIDENCE"
+QRS_BENCH_DISABLE_EXPERIMENTAL_BATCH=1 \
+  "$BUILD_DIR/qrs_native_bench" --quick --only schnorr \
+  --json "$BATCH_DISABLED_JSON" \
+  --markdown "$BATCH_DISABLED_MD"
+jq -e '.benchmarks.schnorr_bip340.individual_valid_verify.status == "available"' \
+  "$BATCH_DISABLED_JSON"
+jq -e '.benchmarks.schnorr_bip340.individual_invalid_verify.status == "available"' \
+  "$BATCH_DISABLED_JSON"
+jq -e '.benchmarks.schnorr_bip340.batch_experimental.status == "unavailable"' \
+  "$BATCH_DISABLED_JSON"
+jq -e '.block_model.schnorr_individual_saturated_block.status == "available"' \
+  "$BATCH_DISABLED_JSON"
 python3 "$ROOT/scripts/evaluate_resource_accounting.py" \
   --report-json "$QUICK_JSON" \
   --batch-evidence-json "$BATCH_EVIDENCE" \
@@ -127,10 +163,18 @@ jq '.benchmarks.qrs_validation_path.total_valid.status' "$QUICK_JSON"
 jq '.environment.git_commit' "$QUICK_JSON"
 jq '.environment.working_tree_dirty' "$QUICK_JSON"
 jq '.environment.benchmark_binary_build_mode' "$QUICK_JSON"
+jq '.environment.benchmark_schema' "$QUICK_JSON"
+jq '.environment.compiler' "$QUICK_JSON"
+jq '.environment.compiler_version' "$QUICK_JSON"
+jq '.environment.compiler_flags' "$QUICK_JSON"
+jq '.environment.cmake_build_type' "$QUICK_JSON"
+jq '.environment.openssl_version' "$QUICK_JSON"
+jq '.environment.openssl_provider' "$QUICK_JSON"
 jq '.draft_rule_status' "$RESOURCE_DECISION_JSON"
 jq '.activation_ready' "$RESOURCE_DECISION_JSON"
 jq '.explicit_qrs_budget_required' "$RESOURCE_DECISION_JSON"
 grep -n "Pass/Fail Conclusion" "$RESOURCE_DECISION_MD"
+grep -n "does not establish activation readiness" "$RESOURCE_DECISION_MD"
 grep -n "median of per-batch means" "$QUICK_MD"
 grep -n "BIP-340 challenge self-test" "$QUICK_MD" "$DOSSIER"
 

@@ -23,12 +23,14 @@ hardware:
 Decision language:
 
 - If QRS valid and worst-invalid p99 are below individual Schnorr and
-  experimental batch Schnorr p99 on named hardware, current evidence supports
-  continuing with no additional QRS validation budget as the Draft-stage rule.
+  experimental batch Schnorr p99 on named hardware, the generated status is
+  `supports_no_additional_budget_for_draft`.
 - If QRS exceeds experimental batch but not individual Schnorr, resource
-  accounting remains unresolved for activation and requires reviewer decision.
-- If QRS exceeds individual Schnorr, the draft must add an explicit per-QRS
-  validation budget before activation.
+  accounting remains unresolved for activation and the generated status is
+  `unresolved_requires_reviewer_decision`.
+- If QRS exceeds individual Schnorr, native data is missing, invalid
+  fixed-length data is missing, or required report metadata is incomplete, the
+  generated status is `explicit_budget_required_before_activation`.
 - If a reviewed public batch Schnorr API is unavailable, experimental batch
   timings remain sensitivity analysis, not consensus proof.
 
@@ -85,7 +87,7 @@ verifier before timing, including wrong-message and wrong-public-key cases.
 Current full-run evidence leaves resource accounting unresolved for activation:
 QRS is below individual Schnorr but exceeds the experimental batch Schnorr
 sensitivity baseline on this benchmark package and machine. The generated
-decision status is `activation_unresolved_batch_baseline`.
+decision status is `unresolved_requires_reviewer_decision`.
 
 This conclusion is deliberately narrow:
 

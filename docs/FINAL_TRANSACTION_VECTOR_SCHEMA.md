@@ -2,9 +2,10 @@
 
 Status: schema defined; final vectors blocked on final BIP-360/QRS definitions.
 
-The current `test_vectors/` files are executable structured fixtures. They are
-stronger than metadata because verifier-reaching vectors carry real
-SLH-DSA-SHA2-128s signatures, but they are still not final consensus vectors.
+The current `test_vectors/` files are provisional executable structured
+fixtures. They are stronger than metadata because verifier-reaching draft
+cryptographic vectors carry real SLH-DSA-SHA2-128s signatures, but they are
+still not final consensus vectors.
 
 Final vectors must be serialized spend vectors. They must bind the exact bytes
 that a consensus implementation validates.
@@ -57,6 +58,7 @@ The final vector set must include:
 ## Release Rule
 
 Until final BIP-360/QRS hashing and sighash definitions are available, this
-repository must label vectors as provisional structured fixtures. When final
-definitions exist, release checks should add serialized-vector validation and
-the BIP should stop referring to the vector set as provisional.
+repository must label vectors as provisional executable structured fixtures or
+draft cryptographic vectors, depending on the artifact. When final definitions
+exist, release checks should add serialized-vector validation and the BIP should
+stop referring to the vector set as provisional.

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Execute QRS vector validation, including native SLH-DSA checks.
 
-The vectors remain provisional until BIP-360/QRS hashing is final, but this
-script is intentionally stronger than metadata validation: it recomputes the
-modeled leaf/message hashes, checks structural failure staging, and verifies
-real fixed-length SLH-DSA signatures through the native benchmark binary.
+The vectors remain provisional until BIP-360/QRS hashing is final. This script
+checks the draft cryptographic vectors: it recomputes the modeled leaf/message
+hashes, checks structural failure staging, and verifies real fixed-length
+SLH-DSA signatures through the native benchmark binary.
 """
 
 from __future__ import annotations
@@ -251,7 +251,7 @@ def main() -> int:
     run_self_tests(args.binary, crypto_available, verified)
     suffix = "with native SLH-DSA crypto" if crypto_available else "without native SLH-DSA crypto"
     print(
-        f"verified {len(verified)} executable QRS vectors "
+        f"verified {len(verified)} draft cryptographic QRS vectors "
         f"({crypto_vectors} verifier-reaching, {structural_vectors} structural) {suffix}"
     )
     return 0

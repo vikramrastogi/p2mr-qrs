@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Execute the provisional QRS structured-fixture model.
 
-These fixtures are not final consensus vectors: the BIP-360/P2MR leaf hashing
-and QRS sighash rules are still draft material, and the fixture signatures are
-descriptor bytes rather than real SLH-DSA signatures. This verifier makes the
-current fixture model executable by recomputing modeled hashes and failure-stage
-classification, without pretending to provide final consensus-vector coverage.
+These are provisional executable structured fixtures, not final consensus
+vectors: the BIP-360/P2MR leaf hashing and QRS sighash rules are still draft
+material. This verifier makes the current fixture model executable by
+recomputing modeled hashes and failure-stage classification, without pretending
+to provide final consensus-vector coverage.
 """
 
 from __future__ import annotations
@@ -207,9 +207,9 @@ def main() -> int:
     verified = [verify_one(path, args.update) for path in paths]
     crypto_reaching = [v["name"] for v in verified if v["failure_stage"] in {"none", "slh_dsa_verify"}]
     print(
-        f"verified {len(verified)} provisional QRS structured fixtures "
+        f"verified {len(verified)} provisional executable QRS structured fixtures "
         f"({len(crypto_reaching)} reach the modeled SLH-DSA verifier boundary; "
-        "cryptographic fixture signatures are not final consensus vectors)"
+        "draft cryptographic vectors are checked separately by verify_qrs_vectors.py)"
     )
     return 0
 

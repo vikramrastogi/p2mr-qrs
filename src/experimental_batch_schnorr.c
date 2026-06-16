@@ -112,6 +112,35 @@ int qrs_exp_bip340_challenge_self_test(void) {
     return memcmp(scalar_tagged, scalar_independent, 32) == 0;
 }
 
+int qrs_exp_bip340_challenge_self_test_with_input(const unsigned char* sig64,
+                                                  const unsigned char* msg32,
+                                                  const unsigned char* pubkey32) {
+    secp256k1_hash_ctx hash_ctx;
+    unsigned char tagged[32];
+    unsigned char independent[32];
+    unsigned char scalar_tagged[32];
+    unsigned char scalar_independent[32];
+    secp256k1_scalar e_tagged;
+    secp256k1_scalar e_independent;
+
+    if (sig64 == NULL || msg32 == NULL || pubkey32 == NULL) {
+        return 0;
+    }
+
+    secp256k1_hash_ctx_init(&hash_ctx);
+    qrs_bip340_challenge_hash_tagged(&hash_ctx, tagged, sig64, msg32, pubkey32);
+    qrs_bip340_challenge_hash_independent(&hash_ctx, independent, sig64, msg32, pubkey32);
+    if (memcmp(tagged, independent, 32) != 0) {
+        return 0;
+    }
+
+    qrs_bip340_challenge(&hash_ctx, &e_tagged, sig64, msg32, pubkey32);
+    secp256k1_scalar_set_b32(&e_independent, independent, NULL);
+    secp256k1_scalar_get_b32(scalar_tagged, &e_tagged);
+    secp256k1_scalar_get_b32(scalar_independent, &e_independent);
+    return memcmp(scalar_tagged, scalar_independent, 32) == 0;
+}
+
 static void qrs_batch_seed(const secp256k1_hash_ctx* hash_ctx,
                            unsigned char out32[32],
                            size_t n,

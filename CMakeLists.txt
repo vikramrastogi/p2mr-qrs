@@ -25,6 +25,11 @@ add_executable(qrs_native_bench
 
 target_include_directories(qrs_native_bench PRIVATE include)
 target_compile_options(qrs_native_bench PRIVATE -O3 -Wall -Wextra -Wpedantic)
+target_compile_definitions(qrs_native_bench PRIVATE
+  QRS_BENCH_CMAKE_BUILD_TYPE="$<IF:$<BOOL:${CMAKE_BUILD_TYPE}>,${CMAKE_BUILD_TYPE},unspecified>"
+  QRS_BENCH_COMPILER_FLAGS="-O3 -Wall -Wextra -Wpedantic"
+  QRS_BENCH_SCHEMA="qrs-native-bench/v0"
+)
 set_source_files_properties(src/experimental_batch_schnorr.c PROPERTIES
   COMPILE_OPTIONS "$<$<COMPILE_LANG_AND_ID:C,AppleClang,Clang,GNU>:-Wno-unused-function>"
 )

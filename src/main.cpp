@@ -99,7 +99,12 @@ int main(int argc, char** argv) {
             ? &schnorr.batch_reviewed_public_per_signature_verify
             : nullptr;
 
-    const auto env = qrs::collect_environment();
+    auto env = qrs::collect_environment();
+    env.fields["openssl_version"] =
+        slh.openssl_version.empty() ? "unavailable" : slh.openssl_version;
+    env.fields["openssl_provider"] = slh.provider;
+    env.fields["openssl_slh_dsa_algorithm"] = slh.algorithm;
+    env.fields["openssl_slh_dsa_mode"] = slh.mode;
     const auto model =
         qrs::build_block_model(qrs_valid, qrs_invalid, schnorr_individual,
                                schnorr_experimental_batch, schnorr_batch);

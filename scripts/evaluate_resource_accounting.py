@@ -80,7 +80,8 @@ def render_markdown(decision: dict[str, Any]) -> str:
     lines.extend(
         [
             "",
-            "This generated file is release evidence, not consensus activation evidence.",
+            "This generated file does not establish activation readiness.",
+            "It is release evidence, not consensus activation evidence.",
             "Activation still requires final BIP-360/QRS definitions, Bitcoin Core",
             "validation-path integration, independent reproduction, implementation review,",
             "and reviewer agreement on the batch-Schnorr baseline question.",
@@ -93,14 +94,35 @@ def render_markdown(decision: dict[str, Any]) -> str:
 def evaluate(report: dict[str, Any], batch_evidence: dict[str, Any], allow_unavailable_qrs: bool) -> dict[str, Any]:
     checks: list[dict[str, Any]] = []
     blockers: list[str] = []
+    required_metadata = [
+        "git_commit",
+        "working_tree_dirty",
+        "benchmark_binary_build_mode",
+        "compiler",
+        "compiler_version",
+        "compiler_flags",
+        "cmake_build_type",
+        "openssl_version",
+        "openssl_provider",
+        "benchmark_schema",
+    ]
+    env = report.get("environment", {})
+    missing_metadata = [key for key in required_metadata if not env.get(key)]
 
     slh_status = status(report, "benchmarks.slh_dsa_sha2_128s")
     qrs_path_status = status(report, "benchmarks.qrs_validation_path")
     schnorr_status = status(report, "benchmarks.schnorr_bip340.individual_valid_verify")
     reviewed_batch_status = status(report, "benchmarks.schnorr_bip340.batch_reviewed_public_api")
     experimental_batch_status = status(report, "benchmarks.schnorr_bip340.batch_experimental_valid")
+    invalid_status = status(report, "benchmarks.slh_dsa_sha2_128s.invalid_fixed_length_verify")
 
     add_check(checks, "SLH-DSA timings available", slh_status == "available", slh_status)
+    add_check(
+        checks,
+        "Invalid fixed-length SLH-DSA timings available",
+        invalid_status == "available",
+        invalid_status,
+    )
     add_check(checks, "QRS validation-path model available", qrs_path_status == "available", qrs_path_status)
     add_check(checks, "Individual Schnorr baseline available", schnorr_status == "available", schnorr_status)
     add_check(
@@ -115,21 +137,46 @@ def evaluate(report: dict[str, Any], batch_evidence: dict[str, Any], allow_unava
         "speedup" in batch_evidence.get("policy", "").lower(),
         batch_evidence.get("policy", ""),
     )
+    add_check(
+        checks,
+        "Report metadata complete",
+        not missing_metadata,
+        "complete" if not missing_metadata else ", ".join(missing_metadata),
+    )
 
     require(schnorr_status == "available", "individual Schnorr baseline is mandatory")
-    if not allow_unavailable_qrs:
-        require(slh_status == "available", "SLH-DSA timings are mandatory")
-        require(qrs_path_status == "available", "QRS validation-path model timings are mandatory")
 
-    if slh_status != "available" or qrs_path_status != "available":
-        blockers.append("Native SLH-DSA/QRS timings unavailable on this platform.")
+    if (
+        slh_status != "available"
+        or invalid_status != "available"
+        or qrs_path_status != "available"
+        or missing_metadata
+    ):
+        if slh_status != "available" or qrs_path_status != "available":
+            blockers.append("Native SLH-DSA/QRS timings unavailable on this platform.")
+        if invalid_status != "available":
+            blockers.append("Invalid fixed-length QRS timing unavailable.")
+        if missing_metadata:
+            blockers.append("Report metadata incomplete: " + ", ".join(missing_metadata) + ".")
+        if allow_unavailable_qrs and (slh_status != "available" or qrs_path_status != "available"):
+            draft_status = "unresolved_requires_reviewer_decision"
+            fallback_status = "not_evaluable_on_this_platform"
+            conclusion = "QRS evidence is incomplete on this platform."
+            explicit_required = False
+        else:
+            draft_status = "explicit_budget_required_before_activation"
+            fallback_status = "required_before_activation"
+            conclusion = (
+                "Native QRS evidence or required report metadata is missing; the draft "
+                "cannot advance without an explicit per-QRS validation budget or new evidence."
+            )
         return {
             "schema": "qrs-native-bench/resource-accounting-decision/v0",
-            "draft_rule_status": "evidence_incomplete",
+            "draft_rule_status": draft_status,
             "activation_ready": False,
-            "explicit_qrs_budget_required": False,
-            "fallback_budget_status": "not_evaluable",
-            "conclusion": "QRS evidence is incomplete on this platform.",
+            "explicit_qrs_budget_required": explicit_required,
+            "fallback_budget_status": fallback_status,
+            "conclusion": conclusion,
             "p99_ms": {
                 "qrs_valid_saturated_block": None,
                 "qrs_worst_invalid_fixed_length_saturated_block": None,
@@ -170,6 +217,7 @@ def evaluate(report: dict[str, Any], batch_evidence: dict[str, Any], allow_unava
             f"qrs_worst={qrs_worst:.3f} ms, experimental_batch={experimental_batch:.3f} ms",
         )
     else:
+        experimental_pass = False
         blockers.append("Experimental batch Schnorr sensitivity baseline unavailable.")
 
     if reviewed_batch is None:
@@ -192,21 +240,21 @@ def evaluate(report: dict[str, Any], batch_evidence: dict[str, Any], allow_unava
 
     explicit_budget_required = not individual_pass
     if explicit_budget_required:
-        draft_status = "fail_explicit_qrs_budget_required"
+        draft_status = "explicit_budget_required_before_activation"
         fallback_status = "required_before_activation"
         conclusion = (
             "QRS worst-case p99 exceeds individual Schnorr; the draft must add an "
             "explicit per-QRS validation budget before activation."
         )
     elif not experimental_pass:
-        draft_status = "activation_unresolved_batch_baseline"
+        draft_status = "unresolved_requires_reviewer_decision"
         fallback_status = "reviewer_decision_required"
         conclusion = (
             "QRS is below individual Schnorr but exceeds experimental batch Schnorr; "
             "resource accounting remains unresolved for activation."
         )
     else:
-        draft_status = "pass_draft_no_additional_budget_supported"
+        draft_status = "supports_no_additional_budget_for_draft"
         fallback_status = "not_required_by_current_draft_evidence"
         conclusion = (
             "Current native evidence supports continuing with the no-additional-budget "
@@ -255,8 +303,6 @@ def main() -> int:
     print(decision["conclusion"])
 
     if decision["explicit_qrs_budget_required"] and not args.advisory:
-        return 2
-    if decision["draft_rule_status"] == "evidence_incomplete" and not args.allow_unavailable_qrs:
         return 2
     return 0
 
