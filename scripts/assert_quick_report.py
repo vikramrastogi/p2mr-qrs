@@ -151,9 +151,27 @@ def main() -> int:
     )
 
     slh = report["benchmarks"]["slh_dsa_sha2_128s"]
+    slh_backends = slh.get("backends", {})
+    require("openssl" in slh_backends, "SLH-DSA backend inventory must include OpenSSL")
+    require(
+        "second_reviewed_backend" in slh_backends,
+        "SLH-DSA backend inventory must include second reviewed backend status",
+    )
+    require(
+        slh_backends["second_reviewed_backend"]["status"] == "unavailable",
+        "second reviewed SLH-DSA backend must remain explicitly unavailable",
+    )
+    require(
+        slh_backends["second_reviewed_backend"].get("reason"),
+        "second reviewed SLH-DSA backend must report a reason",
+    )
     if slh["status"] == "available":
         require(slh["public_key_bytes"] == 32, "SLH-DSA public key must be 32 bytes")
         require(slh["signature_bytes"] == 7856, "SLH-DSA signature must be 7856 bytes")
+        require(
+            slh_backends["openssl"]["status"] == "available",
+            "OpenSSL SLH-DSA backend inventory must match available SLH timings",
+        )
         require(slh["valid_verify"]["status"] == "available", "valid SLH timing missing")
         require(
             slh["invalid_fixed_length_verify"]["status"] == "available",

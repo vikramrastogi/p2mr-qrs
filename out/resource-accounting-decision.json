@@ -7,6 +7,52 @@
     "Second reviewed SLH-DSA implementation not wired."
   ],
   "activation_ready": false,
+  "batch_sensitivity": {
+    "experimental_batch_speedup_vs_individual": 1.8609716692631701,
+    "experimental_batch_tightens_individual": true,
+    "hypothetical_speedups": [
+      {
+        "qrs_valid_exceeds": false,
+        "qrs_worst_invalid_exceeds": false,
+        "schnorr_p99_ms": 301.02333333333337,
+        "speedup_vs_individual": 1.5
+      },
+      {
+        "qrs_valid_exceeds": false,
+        "qrs_worst_invalid_exceeds": false,
+        "schnorr_p99_ms": 225.7675,
+        "speedup_vs_individual": 2.0
+      },
+      {
+        "qrs_valid_exceeds": false,
+        "qrs_worst_invalid_exceeds": false,
+        "schnorr_p99_ms": 180.614,
+        "speedup_vs_individual": 2.5
+      },
+      {
+        "qrs_valid_exceeds": false,
+        "qrs_worst_invalid_exceeds": false,
+        "schnorr_p99_ms": 150.51166666666668,
+        "speedup_vs_individual": 3.0
+      },
+      {
+        "qrs_valid_exceeds": true,
+        "qrs_worst_invalid_exceeds": true,
+        "schnorr_p99_ms": 112.88375,
+        "speedup_vs_individual": 4.0
+      },
+      {
+        "qrs_valid_exceeds": true,
+        "qrs_worst_invalid_exceeds": true,
+        "schnorr_p99_ms": 90.307,
+        "speedup_vs_individual": 5.0
+      }
+    ],
+    "policy": "Hypothetical batch speedups are sensitivity analysis only; they are not a measured baseline and no fake batch baseline is synthesized.",
+    "qrs_valid_exceeds_if_batch_speedup_gt": 3.885542427867033,
+    "qrs_worst_invalid_exceeds_if_batch_speedup_gt": 3.6539348573740646,
+    "status": "available"
+  },
   "checks": [
     {
       "detail": "available",
@@ -44,25 +90,71 @@
       "passed": true
     },
     {
-      "detail": "qrs_worst=95.910 ms, individual_schnorr=345.599 ms",
+      "detail": "qrs_worst=123.575 ms, individual_schnorr=451.535 ms",
       "name": "QRS worst p99 below individual Schnorr p99",
       "passed": true
     },
     {
-      "detail": "qrs_worst=95.910 ms, experimental_batch=240.083 ms",
+      "detail": "qrs_worst=123.575 ms, experimental_batch=242.634 ms",
       "name": "QRS worst p99 below experimental batch Schnorr p99",
+      "passed": true
+    },
+    {
+      "detail": "experimental_batch=242.634 ms, individual_schnorr=451.535 ms",
+      "name": "Experimental batch tightens individual Schnorr baseline",
       "passed": true
     }
   ],
   "conclusion": "Current native evidence supports continuing with the no-additional-budget rule as Draft-stage review material.",
-  "draft_rule_status": "supports_no_additional_budget_for_draft",
+  "draft_rule_status": "supports_no_additional_budget_for_draft_review",
   "explicit_qrs_budget_required": false,
   "fallback_budget_status": "not_required_by_current_draft_evidence",
+  "fallback_triggers": {
+    "policy": "Fallback trigger checks identify when the inactive explicit QRS budget must be reconsidered before activation.",
+    "status": "available",
+    "triggers": [
+      {
+        "detail": "fallback trigger if QRS worst-invalid p99 exceeds individual Schnorr p99",
+        "name": "qrs_worst_exceeds_individual_schnorr",
+        "qrs_worst_p99_ms": 123.575,
+        "threshold_p99_ms": 451.535,
+        "triggered": false
+      },
+      {
+        "detail": "fallback trigger if QRS worst-invalid p99 exceeds a 2.5x hypothetical reviewed-batch-Schnorr baseline",
+        "name": "qrs_worst_exceeds_2_5x_hypothetical_reviewed_batch_schnorr",
+        "qrs_worst_p99_ms": 123.575,
+        "threshold_p99_ms": 180.614,
+        "triggered": false
+      },
+      {
+        "detail": "fallback trigger if QRS worst-invalid p99 exceeds a 3.0x hypothetical reviewed-batch-Schnorr baseline",
+        "name": "qrs_worst_exceeds_3_0x_hypothetical_reviewed_batch_schnorr",
+        "qrs_worst_p99_ms": 123.575,
+        "threshold_p99_ms": 150.51166666666668,
+        "triggered": false
+      },
+      {
+        "detail": "fallback trigger if a reviewed public batch-Schnorr implementation becomes available and QRS exceeds it",
+        "name": "qrs_worst_exceeds_reviewed_public_batch_schnorr",
+        "qrs_worst_p99_ms": 123.575,
+        "threshold_p99_ms": null,
+        "triggered": null
+      },
+      {
+        "detail": "fallback trigger requires Bitcoin Core validation-path integration evidence; current harness models that path only",
+        "name": "bitcoin_core_validation_path_overhead",
+        "qrs_worst_p99_ms": 123.575,
+        "threshold_p99_ms": null,
+        "triggered": null
+      }
+    ]
+  },
   "p99_ms": {
-    "experimental_batch_schnorr_saturated_block": 240.083,
-    "individual_schnorr_saturated_block": 345.599,
-    "qrs_valid_saturated_block": 90.887,
-    "qrs_worst_invalid_fixed_length_saturated_block": 95.91,
+    "experimental_batch_schnorr_saturated_block": 242.634,
+    "individual_schnorr_saturated_block": 451.535,
+    "qrs_valid_saturated_block": 116.209,
+    "qrs_worst_invalid_fixed_length_saturated_block": 123.575,
     "reviewed_public_batch_schnorr_saturated_block": null
   },
   "schema": "qrs-native-bench/resource-accounting-decision/v0"

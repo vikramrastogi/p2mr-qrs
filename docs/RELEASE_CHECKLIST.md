@@ -26,7 +26,8 @@ explicit QRS validation budget or leaves the resource-accounting decision
 unresolved.
 Failure of `full_release_check.sh` means the current machine's standard-run evidence is not strong enough for the stricter gate; it does not change the Draft-stage status of the BIP.
 
-See `PUBLIC_REVIEW_READINESS.md` for the public pre-review readiness checklist.
+See `PUBLIC_REVIEW_READINESS.md` for the public pre-review readiness checklist
+and `PUBLIC_REVIEW_POST_DRAFT.md` for the short public-posting draft.
 
 Checklist enforced by the script:
 
@@ -55,6 +56,9 @@ Checklist enforced by the script:
 - Structured fixture vectors are model-verified by
   `scripts/verify_qrs_fixtures.py`, and verifier-reaching vectors are
   cryptographically checked by `scripts/verify_qrs_vectors.py`.
+- `scripts/compute_qrs_digest_model.py` recomputes the byte-level provisional
+  QRS digest model, and `scripts/check_qrs_digest_agreement.py` checks
+  cross-implementation agreement with the native model.
 - `scripts/check_batch_schnorr_baseline.py` regenerates batch-baseline
   evidence. Local release checks skip the upstream network scan by default; set
   `QRS_RELEASE_NETWORK_BATCH=1` when publishing network-checked upstream
@@ -75,11 +79,16 @@ Checklist enforced by the script:
   fallback if weight-only accounting fails.
 - `docs/BITCOIN_CORE_INTEGRATION_REQUIREMENTS.md` states the exact Core
   validation-path artifact required before activation.
+- `docs/BIP360_DEPENDENCY_MATRIX.md` tracks final BIP-360/P2MR dependencies.
 - `docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md` and
   `test_vectors/qrs_transaction_vector.schema.json` define the final serialized
   vector shape once BIP-360/QRS definitions are final.
 - `docs/REPRODUCIBILITY.md` and the benchmark reproduction issue template
   define the independent rerun protocol.
+- `docs/REPRODUCTION_MATRIX.md` tracks Apple Silicon macOS, Linux x86_64, and
+  pre-activation reproduction targets.
+- `docs/SLH_DSA_VERIFY_COST_ANALYSIS.md` separates empirical timing evidence
+  from algorithmic worst-case review.
 - BIP-360 final dependency is documented.
 - README states package is Draft-stage pre-review.
 

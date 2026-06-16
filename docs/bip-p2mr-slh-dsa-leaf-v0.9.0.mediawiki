@@ -78,6 +78,8 @@ This BIP has no effect unless BIP-360 is active. Its rules MUST NOT become activ
 
 Because BIP-360 is still draft, the final version of this BIP MUST be checked against the final BIP-360 definitions for leaf hashing, branch hashing, sighash tagging, annex handling, and future-leaf behavior. If final BIP-360 uses P2MR-specific tagged hashes or changes the P2MR sighash construction, this BIP MUST adopt those final P2MR definitions rather than assuming Taproot tag reuse. The assignment of <code>QRS_EXT_FLAG = 2</code> is also provisional pending conflict review with any other <code>SigMsg</code>-extending proposals.
 
+The pre-review repository tracks these external dependencies in <code>docs/BIP360_DEPENDENCY_MATRIX.md</code>, including future leaf version behavior and SigMsg extension behavior.
+
 ===Witness structure===
 
 When spending a P2MR output through an SLH-DSA leaf, the witness stack MUST be:

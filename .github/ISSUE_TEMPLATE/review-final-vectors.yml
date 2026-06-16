@@ -1,0 +1,43 @@
+name: Final vector review
+description: Review final serialized transaction vector requirements.
+title: "Review: Final transaction vector requirements"
+labels:
+  - review
+  - vectors
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for final serialized vectors, provisional fixture boundaries, and cross-implementation digest agreement.
+  - type: textarea
+    id: objection_or_confirmation
+    attributes:
+      label: Objection or confirmation
+      description: State whether the current vector plan is sufficient or what final vectors must include.
+    validations:
+      required: true
+  - type: input
+    id: affected_section
+    attributes:
+      label: Affected file or section
+      placeholder: docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md, test_vectors/, scripts/check_qrs_digest_agreement.py
+    validations:
+      required: true
+  - type: textarea
+    id: proposed_fix
+    attributes:
+      label: Proposed fix or evidence
+      description: Include serialized transaction requirements or digest agreement notes.
+    validations:
+      required: false
+  - type: dropdown
+    id: blocking_level
+    attributes:
+      label: Blocking level
+      options:
+        - blocking Draft pre-review
+        - blocking Draft completion
+        - blocking activation
+        - non-blocking
+    validations:
+      required: true

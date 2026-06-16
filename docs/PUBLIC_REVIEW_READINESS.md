@@ -12,3 +12,7 @@ This repository is ready for public pre-review only if:
 - Bitcoin Core integration remains listed as a blocker.
 - Final BIP-360/QRS definitions remain listed as a blocker.
 - No private scaffolding, AI/process artifacts, or unsupported prior-draft acknowledgements remain.
+
+Before posting, read `PUBLIC_REVIEW_POST_DRAFT.md` and confirm it still matches
+the current `BIP360_DEPENDENCY_MATRIX.md`, resource-accounting decision output,
+and vector status.

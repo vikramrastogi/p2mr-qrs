@@ -5,6 +5,10 @@ reviewer rerun should produce raw JSON and Markdown artifacts that can be
 compared mechanically, while still recognizing that timing results are
 machine-specific.
 
+The platform target table is maintained in `REPRODUCTION_MATRIX.md`. The
+SLH-DSA verifier-cost caveat is maintained in
+`SLH_DSA_VERIFY_COST_ANALYSIS.md`.
+
 ## Minimum Toolchain
 
 - CMake 3.22 or newer.

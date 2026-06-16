@@ -13,6 +13,16 @@ struct NamedStats {
   Stats stats;
 };
 
+struct SlhDsaBackendInfo {
+  std::string name;
+  std::string status = "unavailable";
+  std::string reason;
+  std::string provider = "unavailable";
+  std::string version = "unavailable";
+  std::size_t public_key_bytes = 32;
+  std::size_t signature_bytes = 7856;
+};
+
 struct SlhDsaResult {
   std::string status = "unavailable";
   std::string reason;
@@ -31,6 +41,7 @@ struct SlhDsaResult {
   Stats invalid_fixed_length_p99_observed;
   Stats invalid_fixed_length_worst_observed;
   std::string invalid_fixed_length_case_name_worst;
+  std::vector<SlhDsaBackendInfo> backends;
 };
 
 SlhDsaResult run_slh_dsa_benchmarks(BenchmarkMode mode);

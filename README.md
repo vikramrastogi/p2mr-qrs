@@ -42,11 +42,18 @@ validation budget before activation.
   alone fails native validation-cost review.
 - `docs/BITCOIN_CORE_INTEGRATION_REQUIREMENTS.md` - exact artifact required to
   close the Core validation-path caveat.
+- `docs/BIP360_DEPENDENCY_MATRIX.md` - BIP-360/P2MR dependency closure table.
 - `docs/FINAL_TRANSACTION_VECTOR_SCHEMA.md` - schema and requirements for final
   serialized consensus vectors.
 - `docs/REPRODUCIBILITY.md` - independent rerun protocol.
+- `docs/REPRODUCTION_MATRIX.md` - public reproduction tracker and platform
+  targets.
+- `docs/SLH_DSA_VERIFY_COST_ANALYSIS.md` - verifier-cost evidence and
+  algorithmic worst-case caveat.
 - `docs/RELEASE_CHECKLIST.md` - posting and release checks.
 - `docs/PUBLIC_REVIEW_READINESS.md` - public pre-review readiness checklist.
+- `docs/PUBLIC_REVIEW_POST_DRAFT.md` - short draft text for opening public
+  pre-review.
 - `src/` and `include/` - native benchmark harness.
 - `scripts/` - validation, report, and batch-Schnorr evidence scripts.
 - `test_vectors/` - provisional executable structured fixtures and draft

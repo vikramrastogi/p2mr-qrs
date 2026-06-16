@@ -98,10 +98,17 @@ baseline, and several illustrative speedup rows. Those rows are sensitivity
 analysis only. They are not measured baselines and are not used as fake batch
 evidence.
 
+The generated decision also includes explicit fallback trigger checks. A
+fallback trigger is not an activation rule by itself; it is a flag that the BIP
+must either add an explicit QRS validation budget before activation or remain
+unresolved. Current trigger checks include individual Schnorr, a 2.5x hypothetical reviewed-batch-Schnorr baseline, a 3.0x hypothetical reviewed-batch-Schnorr baseline, any reviewed public batch-Schnorr implementation becomes available, and Bitcoin Core validation-path integration overhead.
+
 The worst observed invalid fixed-length SLH-DSA case in the sample run is
 `wrong_message`. The invalid-fixed-length bucket is a crypto bucket: every case keeps
 the 7,856-byte signature length and is asserted to fail through the SLH-DSA
 verifier before timing, including wrong-message and wrong-public-key cases.
+Verifier-cost review still requires algorithmic worst-case analysis; see
+`SLH_DSA_VERIFY_COST_ANALYSIS.md`.
 
 ## Decision
 

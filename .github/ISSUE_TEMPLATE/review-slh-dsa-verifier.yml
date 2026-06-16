@@ -1,0 +1,43 @@
+name: SLH-DSA verifier review
+description: Review verifier strategy, backend selection, and cross-backend requirements.
+title: "Review: SLH-DSA verifier strategy for consensus"
+labels:
+  - review
+  - slh-dsa
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for OpenSSL backend review, second reviewed verifier strategy, and cross-backend agreement requirements.
+  - type: textarea
+    id: objection_or_confirmation
+    attributes:
+      label: Objection or confirmation
+      description: State whether the verifier strategy is sufficient for Draft review or what must be added.
+    validations:
+      required: true
+  - type: input
+    id: affected_section
+    attributes:
+      label: Affected file or section
+      placeholder: src/slh_dsa_openssl.cpp, include/qrs_bench/slh_dsa_backend.h, docs/SLH_DSA_VERIFY_COST_ANALYSIS.md
+    validations:
+      required: true
+  - type: textarea
+    id: proposed_fix
+    attributes:
+      label: Proposed fix or evidence
+      description: Identify backend, version, license, vectors, or review evidence.
+    validations:
+      required: false
+  - type: dropdown
+    id: blocking_level
+    attributes:
+      label: Blocking level
+      options:
+        - blocking Draft pre-review
+        - blocking Draft completion
+        - blocking activation
+        - non-blocking
+    validations:
+      required: true

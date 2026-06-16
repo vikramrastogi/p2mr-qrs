@@ -28,8 +28,13 @@ advancement, or a reproducible release check.
 - `src/` and `include/` implement the native benchmark harness.
 - `scripts/evaluate_resource_accounting.py` generates the resource-accounting
   decision from benchmark JSON.
+- `scripts/compute_qrs_digest_model.py` and
+  `scripts/check_qrs_digest_agreement.py` check the provisional byte-level QRS
+  digest model across Python and native implementations.
 - `scripts/release_check.sh` rebuilds the benchmark binary, regenerates reports,
   verifies vectors, and checks the public release contract.
+- `docs/BIP360_DEPENDENCY_MATRIX.md`, `docs/REPRODUCTION_MATRIX.md`, and
+  `docs/SLH_DSA_VERIFY_COST_ANALYSIS.md` track the main external blockers.
 - `test_vectors/` contains provisional executable structured fixtures and draft
   cryptographic vectors. Final consensus vectors are blocked on final
   BIP-360/QRS hashing and sighash definitions.

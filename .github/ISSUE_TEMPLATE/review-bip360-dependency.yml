@@ -1,0 +1,43 @@
+name: BIP-360 dependency review
+description: Review P2MR dependency assumptions for the QRS leaf.
+title: "Review: BIP-360 dependency and future leaf semantics"
+labels:
+  - review
+  - bip360
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for BIP-360 dependency review, including future leaf version behavior, P2MR hashing, control blocks, and annex handling.
+  - type: textarea
+    id: objection_or_confirmation
+    attributes:
+      label: Objection or confirmation
+      description: State the dependency concern or confirm the current assumption.
+    validations:
+      required: true
+  - type: input
+    id: affected_section
+    attributes:
+      label: Affected file or section
+      placeholder: docs/BIP360_DEPENDENCY_MATRIX.md, BIP Dependencies, test_vectors/...
+    validations:
+      required: true
+  - type: textarea
+    id: proposed_fix
+    attributes:
+      label: Proposed fix or evidence
+      description: Describe the change or evidence needed.
+    validations:
+      required: false
+  - type: dropdown
+    id: blocking_level
+    attributes:
+      label: Blocking level
+      options:
+        - blocking Draft pre-review
+        - blocking Draft completion
+        - blocking activation
+        - non-blocking
+    validations:
+      required: true

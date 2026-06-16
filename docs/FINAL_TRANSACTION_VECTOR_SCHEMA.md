@@ -14,6 +14,11 @@ ext_flag=2 SigMsg payload followed by `leaf_hash`. What remains provisional is
 the serialized transaction digest itself, because final BIP-360/QRS sighash
 definitions are not yet fixed.
 
+`scripts/compute_qrs_digest_model.py` is the Python byte-level model for these
+provisional vectors. The native benchmark binary exposes the same model through
+`--qrs-digest-vector`, and `scripts/check_qrs_digest_agreement.py` verifies
+cross-implementation agreement on `leaf_hash`, `merkle_root`, and `qrs_msg`.
+
 Final vectors must be serialized spend vectors. They must bind the exact bytes
 that a consensus implementation validates.
 

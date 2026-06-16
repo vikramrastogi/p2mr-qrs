@@ -64,6 +64,23 @@ BIP-340 verification, a reviewed public batch baseline, or another baseline
 reviewers choose. Experimental batch timing in this package is sensitivity
 analysis, not a reviewed baseline by itself.
 
+## Fallback Triggers
+
+The inactive budget fallback should be treated as required before activation if
+any fallback trigger is hit during native or Core-shaped review:
+
+- QRS worst-observed p99 saturated-block time exceeds individual Schnorr p99.
+- QRS worst-observed p99 saturated-block time exceeds a 2.5x hypothetical reviewed-batch-Schnorr baseline.
+- QRS worst-observed p99 saturated-block time exceeds a 3.0x hypothetical
+  reviewed-batch-Schnorr baseline.
+- A reviewed public batch-Schnorr implementation becomes available and QRS worst-observed p99 exceeds that measured baseline.
+- Bitcoin Core validation-path integration adds enough overhead that weight
+  alone no longer bounds QRS validation cost.
+
+These triggers are conservative review tripwires. They do not activate a budget
+constant automatically, but they do mean `QRS_ADDITIONAL_VALIDATION_WU = 0`
+must not be treated as ready for deployment without reviewer agreement.
+
 ## Release Gate
 
 If `scripts/evaluate_resource_accounting.py` reports
