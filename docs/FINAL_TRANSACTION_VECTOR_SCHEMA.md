@@ -1,6 +1,7 @@
 # Final Transaction Vector Schema
 
-Status: schema defined; final vectors blocked on final BIP-360/QRS definitions.
+Status: schema-only placeholder; final vectors are blocked on final BIP-360/QRS
+definitions.
 
 The current `test_vectors/` files are provisional executable structured
 fixtures. They are stronger than metadata because verifier-reaching draft
@@ -60,6 +61,8 @@ Each final vector must include:
 
 The machine-readable schema lives at
 `test_vectors/qrs_transaction_vector.schema.json`.
+Its title is intentionally phrased as a future-vector schema, not as evidence
+that final serialized transaction vectors already exist.
 
 ## Required Cases
 
