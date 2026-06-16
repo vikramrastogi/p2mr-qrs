@@ -57,6 +57,12 @@ validation budget before activation.
 
 ## Quick Check
 
+The native SLH-DSA path requires OpenSSL 3.5 or newer with a provider that
+exposes `SLH-DSA-SHA2-128s` through EVP. The sample reports use OpenSSL 3.6.1
+from the `default` provider. Older OpenSSL builds, or builds whose loaded
+providers do not expose `SLH-DSA-SHA2-128s`, cannot reproduce the strict
+release checks.
+
 ```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j
@@ -78,7 +84,7 @@ network-checked upstream evidence.
 ## Current Status
 
 - Native OpenSSL SLH-DSA-SHA2-128s timing is measured where the local OpenSSL
-  build exposes the algorithm.
+  build exposes the algorithm through EVP.
 - Native libsecp256k1 individual BIP-340 Schnorr timing is measured.
 - Experimental native BIP-340 batch timing is included for sensitivity analysis
   only, with an executable BIP-340 challenge self-test before timing.

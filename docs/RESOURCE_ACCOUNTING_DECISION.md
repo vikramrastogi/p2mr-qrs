@@ -44,6 +44,11 @@ Source reports:
 - `scripts/evaluate_resource_accounting.py`
 - `scripts/release_check.sh`
 
+The generated `out/resource-accounting-decision.*` files are the current
+machine-readable decision artifacts. This document records the decision rule and
+the committed sample full-run evidence; reviewers should regenerate `out/full.*`
+using `docs/REPRODUCIBILITY.md` before citing local performance numbers.
+
 Current sample run metadata from `out/full.json`:
 
 - Hardware: Apple M2 Pro

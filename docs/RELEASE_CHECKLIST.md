@@ -14,6 +14,8 @@ Checklist enforced by the script:
 - BIP does not claim a QRS cost advantage over Schnorr.
 - Resource accounting says no-new-budget is a hypothesis to test.
 - Native QRS benchmark runs.
+- Strict QRS release checks run with OpenSSL 3.5 or newer and a loaded provider
+  exposing `SLH-DSA-SHA2-128s` through EVP.
 - Native individual Schnorr benchmark runs.
 - Batch Schnorr status is explicit.
 - Release checks configure, build, regenerate `out/quick.json` and
