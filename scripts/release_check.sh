@@ -74,6 +74,7 @@ validate_committed_sample_reports() {
 }
 
 ensure_out_clean
+python3 "$ROOT/scripts/check_doc_paths.py"
 validate_committed_sample_reports
 
 BIP_V090_COUNT="$(find "$ROOT/docs/spec" -maxdepth 1 -name 'bip-*v0.9.0.mediawiki' -print | wc -l | tr -d ' ')"
@@ -109,6 +110,7 @@ grep -n "Fixed-length encoding and witness malleability" "$BIP"
 grep -n "docs/evidence/resource-accounting-decision.md" "$BIP" "$START_HERE"
 grep -n "docs/evidence/explicit-qrs-budget-fallback.md" "$BIP" "$ROOT/docs/evidence/resource-accounting-decision.md"
 grep -n "docs/spec/bip360-dependency-matrix.md" "$ROOT/README.md" "$BIP" "$START_HERE"
+grep -n "docs/README.md" "$ROOT/README.md"
 grep -n "docs/evidence/consensus-gap-manifest.md" "$ROOT/README.md" "$START_HERE"
 grep -n "docs/evidence/vector-coverage-matrix.md" "$START_HERE"
 grep -n "docs/reproducibility/reproducibility.md" "$START_HERE"
@@ -133,6 +135,8 @@ grep -n "Schema for future P2MR QRS serialized transaction vectors" "$ROOT/test_
 grep -n "future_final_vector_contract" "$ROOT/test_vectors/qrs_transaction_vector.schema.json" "$ROOT/docs/spec/final-transaction-vector-schema.md"
 grep -n "docs/evidence/consensus-gap-manifest.json" "$CONSENSUS_GAP_MANIFEST_MD" "$ROOT/docs/evidence/resource-accounting-decision.md"
 grep -n "future leaf version behavior" "$ROOT/docs/spec/bip360-dependency-matrix.md"
+grep -n "zero-depth / single-leaf P2MR tree behavior" "$ROOT/docs/spec/bip360-dependency-matrix.md" "$BIP"
+grep -n "one validation rule, not a recommendation to rely on a zero-depth" "$BIP"
 grep -n "SigMsg extension behavior" "$ROOT/docs/spec/bip360-dependency-matrix.md"
 grep -n "bip360_final_leaf_hashing" "$CONSENSUS_GAP_MANIFEST" "$CONSENSUS_GAP_MANIFEST_MD"
 grep -n "qrs_ext_flag_assignment" "$CONSENSUS_GAP_MANIFEST" "$CONSENSUS_GAP_MANIFEST_MD"
