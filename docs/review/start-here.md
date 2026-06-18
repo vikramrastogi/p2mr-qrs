@@ -72,6 +72,7 @@ Final serialized vectors remain blocked until those definitions are stable.
 ## Known Blockers Before Advancing Beyond Draft
 
 - Final BIP-360 leaf hashing, branch hashing, annex, and future-leaf behavior.
+- Final BIP-360 zero-depth / single-leaf P2MR tree behavior.
 - Final QRS `ext_flag` assignment and SigMsg definition.
 - Bitcoin Core consensus validation-path integration.
 - Cross-hardware benchmark reproduction.

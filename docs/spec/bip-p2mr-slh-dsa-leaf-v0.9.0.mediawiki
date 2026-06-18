@@ -80,7 +80,9 @@ This BIP has no effect unless BIP-360 is active. Its rules MUST NOT become activ
 
 Because BIP-360 is still draft, the final version of this BIP MUST be checked against the final BIP-360 definitions for leaf hashing, branch hashing, sighash tagging, annex handling, and future-leaf behavior. If final BIP-360 uses P2MR-specific tagged hashes or changes the P2MR sighash construction, this BIP MUST adopt those final P2MR definitions rather than assuming Taproot tag reuse. The assignment of <code>QRS_EXT_FLAG = 2</code> is also provisional pending conflict review with any other <code>SigMsg</code>-extending proposals.
 
-The pre-review repository tracks these external dependencies in <code>docs/spec/bip360-dependency-matrix.md</code>, including future leaf version behavior and SigMsg extension behavior.
+The pre-review repository tracks these external dependencies in <code>docs/spec/bip360-dependency-matrix.md</code>, including future leaf version behavior, zero-depth / single-leaf P2MR tree behavior, and SigMsg extension behavior.
+
+Throughout this BIP, "one leaf version" means one validation rule, not a recommendation to rely on a zero-depth/single-leaf P2MR tree. If final BIP-360 changes zero-depth / single-leaf P2MR tree behavior, this BIP MUST follow the final BIP-360 rule and update its vectors, wallet guidance, and examples accordingly.
 
 ===Witness structure===
 

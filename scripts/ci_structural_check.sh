@@ -13,6 +13,7 @@ RESOURCE_MD="$TMP_DIR/resource-accounting-decision.md"
 
 mkdir -p "$TMP_DIR"
 
+python3 "$ROOT/scripts/check_doc_paths.py"
 python3 "$ROOT/scripts/compute_qrs_digest_model.py" "$ROOT/test_vectors"
 python3 "$ROOT/scripts/validate_vector_coverage_matrix.py"
 python3 "$ROOT/scripts/validate_consensus_gap_manifest.py"
